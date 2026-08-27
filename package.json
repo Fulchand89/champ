@@ -1,0 +1,18 @@
+{
+  "name": "knowchamp-admin-fullstack",
+  "version": "1.0.0",
+  "description": "Fullstack Quiz App Admin Panel & Backend runner",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run dev --prefix backend\" \"npm run dev --prefix admin\"",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix admin",
+    "dev:admin": "npm run dev --prefix admin",
+    "build": "npm run build --prefix admin",
+    "start": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run start --prefix backend\" \"npm run dev --prefix admin\"",
+    "install:all": "npm install && npm --prefix backend install && npm --prefix admin install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

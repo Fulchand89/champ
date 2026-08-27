@@ -1,0 +1,15 @@
+{
+  "watch": ["src"],
+  "ext": "js,json",
+  "ignore": [
+    "src/logs/**",
+    "src/uploads/**",
+    "logs/**",
+    "uploads/**",
+    "**/*.log",
+    "**/*.tmp"
+  ],
+  "delay": 500,
+  "signal": "SIGUSR2"
+}
+

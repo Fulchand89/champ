@@ -1,0 +1,815 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  Search, 
+  Filter, 
+  RotateCw, 
+  UserPlus, 
+  Trash2, 
+  Loader2, 
+  UserCheck, 
+  UserX, 
+  Eye, 
+  Edit3, 
+  ShieldCheck, 
+  Users, 
+  Trophy, 
+  Coins, 
+  X, 
+  Save, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Lock 
+} from 'lucide-react';
+import Table from '../../components/common/Table';
+import userService from '../../api/services/userService';
+import ConfirmModal from '../../components/common/ConfirmModal';
+import toast from 'react-hot-toast';
+
+const ManageUsers = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'active' | 'blocked'
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Modals state
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Delete modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Form State for Add / Edit
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    mobile: '',
+    password: '',
+    city: '',
+    role: 'user',
+    isActive: true,
+  });
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await userService.getUsers();
+      if (res?.success && Array.isArray(res.data)) {
+        const mappedUsers = res.data.map(u => ({
+          id: u.uuid || `USR-${u.id}`,
+          rawId: u.id,
+          name: u.name,
+          email: u.email,
+          mobile: u.mobile || '-',
+          city: u.city || '-',
+          role: u.role || 'user',
+          joined: new Date(u.createdAt).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+          }),
+          quizzesPlayed: u.quizzesPlayed || 0,
+          coinsEarned: u.coinsEarned || 0,
+          isActive: !!u.isActive,
+          status: u.isActive ? 'Active' : 'Blocked',
+          raw: u,
+        }));
+        setUsers(mappedUsers);
+      } else {
+        toast.error(res?.message || 'Failed to fetch users');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error loading users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // Stats calculation
+  const stats = useMemo(() => {
+    const total = users.length;
+    const active = users.filter(u => u.isActive).length;
+    const blocked = users.filter(u => !u.isActive).length;
+    const totalQuizzes = users.reduce((acc, u) => acc + (u.quizzesPlayed || 0), 0);
+    return { total, active, blocked, totalQuizzes };
+  }, [users]);
+
+  // Handle Add User Submit
+  const handleAddSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.email.trim()) {
+      toast.error('Name and email are required');
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const res = await userService.createUser(formData);
+      if (res?.success) {
+        toast.success('User created successfully');
+        setIsAddModalOpen(false);
+        setFormData({ name: '', email: '', mobile: '', password: '', city: '', role: 'user', isActive: true });
+        fetchUsers();
+      } else {
+        toast.error(res?.message || 'Failed to create user');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error creating user');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Handle Edit User Submit
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedUser) return;
+    setIsSaving(true);
+    try {
+      const res = await userService.updateUser(selectedUser.rawId, {
+        name: formData.name,
+        mobile: formData.mobile,
+        city: formData.city,
+        role: formData.role,
+        isActive: formData.isActive,
+      });
+      if (res?.success) {
+        toast.success('User updated successfully');
+        setIsEditModalOpen(false);
+        setSelectedUser(null);
+        fetchUsers();
+      } else {
+        toast.error(res?.message || 'Failed to update user');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error updating user');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Handle Toggle Status
+  const handleToggleStatus = async (user) => {
+    try {
+      const res = await userService.toggleUserStatus(user.rawId);
+      if (res?.success) {
+        toast.success(`User ${res.data?.isActive ? 'activated' : 'blocked'} successfully`);
+        setUsers(prev => prev.map(u => u.rawId === user.rawId ? {
+          ...u,
+          isActive: res.data.isActive,
+          status: res.data.isActive ? 'Active' : 'Blocked'
+        } : u));
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update user status');
+    }
+  };
+
+  // Open Delete Confirmation
+  const confirmDelete = (user) => {
+    setUserToDelete(user);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
+    setIsDeleting(true);
+    try {
+      const res = await userService.deleteUser(userToDelete.rawId);
+      if (res?.success) {
+        toast.success('User deleted successfully');
+        setUsers(prev => prev.filter(u => u.rawId !== userToDelete.rawId));
+        setDeleteModalOpen(false);
+        setUserToDelete(null);
+      } else {
+        toast.error(res?.message || 'Failed to delete user');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error deleting user');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Open Edit Modal
+  const openEditModal = (user) => {
+    setSelectedUser(user);
+    setFormData({
+      name: user.name || '',
+      email: user.email || '',
+      mobile: user.mobile === '-' ? '' : user.mobile,
+      city: user.city === '-' ? '' : user.city,
+      role: user.role || 'user',
+      isActive: user.isActive,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  // Open View Modal
+  const openViewModal = (user) => {
+    setSelectedUser(user);
+    setIsViewModalOpen(true);
+  };
+
+  // Filtered users
+  const filteredUsers = useMemo(() => {
+    return users.filter(user => {
+      const matchesSearch = 
+        (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (user.id && user.id.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesStatus = 
+        statusFilter === 'all' ? true :
+        statusFilter === 'active' ? user.isActive :
+        statusFilter === 'blocked' ? !user.isActive : true;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [users, searchTerm, statusFilter]);
+
+  const columns = [
+    { key: 'id', label: 'User ID', cellClassName: 'font-mono text-[#E94B4B] font-bold' },
+    { 
+      key: 'name', 
+      label: 'Name', 
+      render: (_, row) => (
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full bg-[#E94B4B]/15 border border-[#E94B4B]/30 flex items-center justify-center font-bold text-xs text-[#E94B4B] shrink-0">
+            {row.name ? row.name.charAt(0).toUpperCase() : 'U'}
+          </div>
+          <div>
+            <p className="font-semibold text-white text-sm leading-tight">{row.name}</p>
+            <p className="text-white/40 text-xs mt-0.5">{row.email}</p>
+          </div>
+        </div>
+      )
+    },
+    { key: 'mobile', label: 'Mobile' },
+    { key: 'city', label: 'City' },
+    { key: 'joined', label: 'Date Joined' },
+    { key: 'quizzesPlayed', label: 'Quizzes', headerClassName: 'text-center', cellClassName: 'text-center font-semibold' },
+    { key: 'coinsEarned', label: 'Coins', headerClassName: 'text-center', cellClassName: 'text-center text-amber-400 font-bold' },
+    {
+      key: 'status',
+      label: 'Status',
+      headerClassName: 'text-center',
+      cellClassName: 'text-center',
+      render: (_, row) => (
+        <button
+          onClick={() => handleToggleStatus(row)}
+          title={`Click to ${row.isActive ? 'block' : 'activate'} user`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            row.isActive 
+              ? 'bg-green-500/15 text-green-400 border border-green-500/30 hover:bg-green-500/25' 
+              : 'bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25'
+          }`}
+        >
+          {row.isActive ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
+          <span>{row.status}</span>
+        </button>
+      )
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      headerClassName: 'text-center',
+      cellClassName: 'text-center',
+      render: (_, row) => (
+        <div className="flex items-center justify-center gap-1.5">
+          <button
+            onClick={() => openViewModal(row)}
+            className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all cursor-pointer"
+            title="View Details"
+          >
+            <Eye size={15} />
+          </button>
+          <button
+            onClick={() => openEditModal(row)}
+            className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all cursor-pointer"
+            title="Edit User"
+          >
+            <Edit3 size={15} />
+          </button>
+          <button
+            onClick={() => confirmDelete(row)}
+            className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-all cursor-pointer"
+            title="Delete User"
+          >
+            <Trash2 size={15} />
+          </button>
+        </div>
+      )
+    }
+  ];
+
+  return (
+    <div className="font-sans space-y-6 pb-12">
+      
+      {/* Top Banner & Header */}
+      <div className="bg-[#0f1117] text-white p-5 sm:p-6 rounded-2xl shadow-sm border border-white/10 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl sm:text-2xl font-bold text-white">Manage Users</h1>
+            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#E94B4B]/15 text-[#E94B4B] border border-[#E94B4B]/30">
+              {stats.total} Total Registered
+            </span>
+          </div>
+          <p className="text-xs text-white/50 mt-1">Real-time user management, verification, role assignments and security controls.</p>
+        </div>
+
+        <button
+          onClick={() => {
+            setFormData({ name: '', email: '', mobile: '', password: '', city: '', role: 'user', isActive: true });
+            setIsAddModalOpen(true);
+          }}
+          className="flex items-center justify-center gap-2 px-4 py-2.5 text-white rounded-xl text-sm font-bold transition-all cursor-pointer shadow-md hover:opacity-90 shrink-0"
+          style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+        >
+          <UserPlus size={16} />
+          <span>Add New User</span>
+        </button>
+      </div>
+
+      {/* KPI Stats Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center text-blue-400 shrink-0">
+            <Users className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-white/50">Total Users</p>
+            <p className="text-lg font-bold text-white">{stats.total}</p>
+          </div>
+        </div>
+
+        <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center text-green-400 shrink-0">
+            <UserCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-white/50">Active Users</p>
+            <p className="text-lg font-bold text-green-400">{stats.active}</p>
+          </div>
+        </div>
+
+        <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center text-red-400 shrink-0">
+            <UserX className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-white/50">Blocked Users</p>
+            <p className="text-lg font-bold text-red-400">{stats.blocked}</p>
+          </div>
+        </div>
+
+        <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-400 shrink-0">
+            <Trophy className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-white/50">Total Quizzes</p>
+            <p className="text-lg font-bold text-amber-400">{stats.totalQuizzes}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Table Container */}
+      <div className="bg-[#0f1117] text-white rounded-2xl shadow-sm border border-white/10 overflow-hidden flex flex-col">
+        
+        {/* Controls Toolbar */}
+        <div className="p-4 sm:p-5 flex flex-col sm:flex-row justify-between gap-4 border-b border-white/10">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search by name, email or ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2.5 w-full border border-white/10 rounded-xl text-sm bg-white/5 text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Status Filter buttons */}
+            <div className="inline-flex p-1 bg-white/5 rounded-xl border border-white/10 text-xs">
+              <button
+                onClick={() => setStatusFilter('all')}
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+                  statusFilter === 'all' ? 'bg-[#E94B4B] text-white shadow-xs' : 'text-white/60 hover:text-white'
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setStatusFilter('active')}
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+                  statusFilter === 'active' ? 'bg-[#E94B4B] text-white shadow-xs' : 'text-white/60 hover:text-white'
+                }`}
+              >
+                Active
+              </button>
+              <button
+                onClick={() => setStatusFilter('blocked')}
+                className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
+                  statusFilter === 'blocked' ? 'bg-[#E94B4B] text-white shadow-xs' : 'text-white/60 hover:text-white'
+                }`}
+              >
+                Blocked
+              </button>
+            </div>
+
+            <button 
+              onClick={fetchUsers}
+              disabled={loading}
+              className="flex items-center gap-2 px-3.5 py-2 border border-white/10 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold text-white transition-all cursor-pointer disabled:opacity-50"
+            >
+              <RotateCw size={14} className={loading ? 'animate-spin text-[#E94B4B]' : 'text-[#E94B4B]'} />
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Table View */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 text-white/50 gap-3">
+            <Loader2 className="w-10 h-10 animate-spin text-[#E94B4B]" />
+            <p className="text-sm font-semibold">Loading users data...</p>
+          </div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="py-20 text-center flex flex-col items-center justify-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-3 border border-white/10">
+              <Users className="w-6 h-6 text-white/30" />
+            </div>
+            <p className="text-sm font-bold text-white">No Users Found</p>
+            <p className="text-xs text-white/40 mt-1">Try adjusting your search or filters.</p>
+          </div>
+        ) : (
+          <Table columns={columns} data={filteredUsers} />
+        )}
+      </div>
+
+      {/* ── Add User Modal ── */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
+          <div className="bg-[#0f1117] rounded-2xl border border-white/15 w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#E94B4B]/15 flex items-center justify-center text-[#E94B4B]">
+                  <UserPlus className="w-4 h-4" />
+                </div>
+                <h3 className="text-base font-bold text-white">Add New User</h3>
+              </div>
+              <button 
+                onClick={() => setIsAddModalOpen(false)}
+                className="text-white/40 hover:text-white cursor-pointer p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                  Full Name <span className="text-[#E94B4B]">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Rahul Sharma"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    Email Address <span className="text-[#E94B4B]">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="user@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    Mobile Number
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 9876543210"
+                    value={formData.mobile}
+                    onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    Initial Password
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="KnowChamp@123"
+                    value={formData.password}
+                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Mumbai"
+                    value={formData.city}
+                    onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    System Role
+                  </label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
+                  >
+                    <option value="user">Standard Player (User)</option>
+                    <option value="admin">Administrator</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    Initial Status
+                  </label>
+                  <select
+                    value={formData.isActive ? 'active' : 'blocked'}
+                    onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.value === 'active' }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
+                  >
+                    <option value="active">Active</option>
+                    <option value="blocked">Blocked</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="flex items-center gap-2 px-5 py-2 text-xs font-bold text-white rounded-xl shadow-md cursor-pointer hover:opacity-90 disabled:opacity-50"
+                  style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+                >
+                  {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                  <span>Create User</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Edit User Modal ── */}
+      {isEditModalOpen && selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
+          <div className="bg-[#0f1117] rounded-2xl border border-white/15 w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#E94B4B]/15 flex items-center justify-center text-[#E94B4B]">
+                  <Edit3 className="w-4 h-4" />
+                </div>
+                <h3 className="text-base font-bold text-white">Edit User Profile</h3>
+              </div>
+              <button 
+                onClick={() => setIsEditModalOpen(false)}
+                className="text-white/40 hover:text-white cursor-pointer p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    Email Address (Read-only)
+                  </label>
+                  <input
+                    type="email"
+                    disabled
+                    value={formData.email}
+                    className="w-full px-3.5 py-2.5 text-sm bg-white/3 border border-white/5 rounded-xl text-white/50 cursor-not-allowed"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    Mobile Number
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.mobile}
+                    onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    System Role
+                  </label>
+                  <select
+                    value={formData.role}
+                    onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
+                  >
+                    <option value="user">Standard Player</option>
+                    <option value="admin">Administrator</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                  Account Status
+                </label>
+                <select
+                  value={formData.isActive ? 'active' : 'blocked'}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.value === 'active' }))}
+                  className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
+                >
+                  <option value="active">Active</option>
+                  <option value="blocked">Blocked</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold text-white/70 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="flex items-center gap-2 px-5 py-2 text-xs font-bold text-white rounded-xl shadow-md cursor-pointer hover:opacity-90 disabled:opacity-50"
+                  style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+                >
+                  {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                  <span>Save Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── View User Modal ── */}
+      {isViewModalOpen && selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
+          <div className="bg-[#0f1117] rounded-2xl border border-white/15 w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+              <h3 className="text-base font-bold text-white">User Information</h3>
+              <button 
+                onClick={() => setIsViewModalOpen(false)}
+                className="text-white/40 hover:text-white cursor-pointer p-1"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="flex items-center gap-4 pb-4 border-b border-white/10">
+                <div className="w-14 h-14 rounded-2xl bg-[#E94B4B]/15 border border-[#E94B4B]/30 flex items-center justify-center text-xl font-bold text-[#E94B4B]">
+                  {selectedUser.name ? selectedUser.name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-white">{selectedUser.name}</h4>
+                  <p className="text-xs text-white/50 font-mono mt-0.5">{selectedUser.id}</p>
+                  <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                    selectedUser.isActive ? 'bg-green-500/15 text-green-400 border border-green-500/30' : 'bg-red-500/15 text-red-400 border border-red-500/30'
+                  }`}>
+                    {selectedUser.status}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-3 text-xs">
+                <div className="flex justify-between py-1.5 border-b border-white/5">
+                  <span className="text-white/50">Email</span>
+                  <span className="font-semibold text-white">{selectedUser.email}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-white/5">
+                  <span className="text-white/50">Mobile</span>
+                  <span className="font-semibold text-white">{selectedUser.mobile}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-white/5">
+                  <span className="text-white/50">City</span>
+                  <span className="font-semibold text-white">{selectedUser.city}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-white/5">
+                  <span className="text-white/50">Role</span>
+                  <span className="font-semibold text-white capitalize">{selectedUser.role}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-white/5">
+                  <span className="text-white/50">Date Joined</span>
+                  <span className="font-semibold text-white">{selectedUser.joined}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-white/5">
+                  <span className="text-white/50">Quizzes Played</span>
+                  <span className="font-bold text-white">{selectedUser.quizzesPlayed}</span>
+                </div>
+                <div className="flex justify-between py-1.5">
+                  <span className="text-white/50">Coins Earned</span>
+                  <span className="font-bold text-amber-400">{selectedUser.coinsEarned}</span>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsViewModalOpen(false)}
+                  className="px-5 py-2 text-xs font-bold text-white bg-white/10 hover:bg-white/15 rounded-xl transition-all cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Confirmation Modal for Delete ── */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => { setDeleteModalOpen(false); setUserToDelete(null); }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete User?"
+        message={`Are you sure you want to delete "${userToDelete?.name}" (${userToDelete?.email})? All associated attempts and participation records will be permanently removed.`}
+        confirmText="Yes, Delete User"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={isDeleting}
+      />
+
+    </div>
+  );
+};
+
+export default ManageUsers;

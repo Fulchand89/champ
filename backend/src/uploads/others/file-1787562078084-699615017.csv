@@ -1,0 +1,8 @@
+TXN ID,User Name,Email,Type,Amount (INR),Payment Method,Gateway,Status,Date & Time
+"TXN_WTH_WTH001","Admin","admin@gmail.com","withdrawal","1500","UPI Payout","Direct Payout","successful","23/8/2026, 11:47:45 pm"
+"TXN100240","Admin","admin@gmail.com","prize_payout","1500","Wallet Coins","Internal Wallet","successful","23/8/2026, 11:47:44 pm"
+"TXN100241","Admin","admin@gmail.com","entry_fee","100","UPI - Paytm","Razorpay","failed","23/8/2026, 11:47:44 pm"
+"TXN100242","Admin","admin@gmail.com","entry_fee","10","Wallet Coins","Internal Wallet","successful","23/8/2026, 11:47:44 pm"
+"TXN100243","Admin","admin@gmail.com","withdrawal","500","Bank Transfer","Direct Bank","pending","23/8/2026, 11:47:44 pm"
+"TXN100244","Admin","admin@gmail.com","coins_pack","100","Credit Card","Razorpay","successful","23/8/2026, 11:47:44 pm"
+"TXN100245","Admin","admin@gmail.com","entry_fee","50","UPI - Google Pay","Razorpay","successful","23/8/2026, 11:47:44 pm"

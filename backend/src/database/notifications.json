@@ -1,0 +1,63 @@
+[
+  {
+    "id": "1787571736193",
+    "userId": null,
+    "targetRole": "admin",
+    "type": "contest",
+    "title": "New Contest Created",
+    "message": "Contest \"sports\" has been created with entry fee ₹10.",
+    "isRead": false,
+    "data": {
+      "contestId": 26,
+      "title": "sports"
+    },
+    "createdAt": "2026-08-24T11:42:16.193Z",
+    "updatedAt": "2026-08-24T11:42:16.193Z"
+  },
+  {
+    "id": "1787567288692",
+    "userId": 3,
+    "targetRole": "admin",
+    "type": "user",
+    "title": "New User Registered",
+    "message": "Fulchand Dhakad (dhakadfulchand85@gmail.com) has registered on KnowChamp.",
+    "isRead": true,
+    "data": {
+      "userId": 3,
+      "name": "Fulchand Dhakad",
+      "email": "dhakadfulchand85@gmail.com"
+    },
+    "createdAt": "2026-08-24T10:28:08.692Z",
+    "updatedAt": "2026-08-24T10:28:08.693Z"
+  },
+  {
+    "id": "1787564415897",
+    "userId": null,
+    "targetRole": "admin",
+    "type": "contest",
+    "title": "New Contest Created",
+    "message": "Contest \"Sports\" has been created with entry fee ₹10.",
+    "isRead": true,
+    "data": {
+      "contestId": 25,
+      "title": "Sports"
+    },
+    "createdAt": "2026-08-24T09:40:15.897Z",
+    "updatedAt": "2026-08-24T09:40:15.897Z"
+  },
+  {
+    "id": "1787563070276",
+    "userId": null,
+    "targetRole": "admin",
+    "type": "contest",
+    "title": "New Contest Created",
+    "message": "Contest \"sports\" has been created with entry fee ₹10.",
+    "isRead": true,
+    "data": {
+      "contestId": 24,
+      "title": "sports"
+    },
+    "createdAt": "2026-08-24T09:17:50.276Z",
+    "updatedAt": "2026-08-24T09:17:50.276Z"
+  }
+]

@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+build/
+backend/src/config/quizapp-firebase-adminsdk.json
+backend/src/uploads/adhar_images/
+backend/src/uploads/profile_pics/
+backend/src/uploads/categories/
+backend/src/uploads/contests/
+backend/src/uploads/others/

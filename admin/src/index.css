@@ -1,0 +1,394 @@
+@import "tailwindcss";
+ 
+/* ── Universal Scrollbar Removal ── */
+*, html, body, #root, div, main, aside, section, nav, table {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+#root::-webkit-scrollbar,
+div::-webkit-scrollbar,
+main::-webkit-scrollbar,
+aside::-webkit-scrollbar,
+section::-webkit-scrollbar,
+nav::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ── Mobile responsive: tables horizontal scroll ── */
+@media (max-width: 640px) {
+  .admin-portal-main table {
+    min-width: 600px !important;
+  }
+  .admin-portal-main .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Touch-friendly tap targets */
+  .admin-portal-main button,
+  .admin-portal-main a {
+    min-height: 36px;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* ReactQuill Full height styling */
+.quill-editor-wrapper .ql-toolbar.ql-snow {
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+  background-color: #ffffff;
+}
+
+.quill-editor-wrapper .ql-container.ql-snow {
+  border: none;
+  min-height: 420px;
+  font-size: 14px;
+}
+
+.quill-editor-wrapper .ql-editor {
+  min-height: 420px;
+}
+
+/* ReactQuill HTML Content / Preview Typography Styles */
+.ql-editor,
+.ql-editor-content {
+  font-family: inherit;
+  color: #1f2937;
+}
+
+.ql-editor h1,
+.ql-editor-content h1 {
+  font-size: 2em !important;
+  font-weight: 700 !important;
+  margin-top: 0.8em !important;
+  margin-bottom: 0.4em !important;
+  color: #111827 !important;
+  line-height: 1.25 !important;
+  display: block !important;
+}
+
+.ql-editor h2,
+.ql-editor-content h2 {
+  font-size: 1.5em !important;
+  font-weight: 700 !important;
+  margin-top: 0.8em !important;
+  margin-bottom: 0.4em !important;
+  color: #111827 !important;
+  line-height: 1.3 !important;
+  display: block !important;
+}
+
+.ql-editor h3,
+.ql-editor-content h3 {
+  font-size: 1.25em !important;
+  font-weight: 600 !important;
+  margin-top: 0.75em !important;
+  margin-bottom: 0.4em !important;
+  color: #1f2937 !important;
+  line-height: 1.4 !important;
+  display: block !important;
+}
+
+.ql-editor h4,
+.ql-editor-content h4 {
+  font-size: 1.1em !important;
+  font-weight: 600 !important;
+  margin-top: 0.75em !important;
+  margin-bottom: 0.4em !important;
+  color: #374151 !important;
+  display: block !important;
+}
+
+.ql-editor p,
+.ql-editor-content p {
+  margin-bottom: 0.75em !important;
+  line-height: 1.6 !important;
+  color: #374151 !important;
+  display: block !important;
+}
+
+/* Lists styling fix for Tailwind CSS v4 Reset */
+.ql-editor ul,
+.ql-editor-content ul {
+  list-style-type: disc !important;
+  padding-left: 1.75rem !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.85em !important;
+  display: block !important;
+}
+
+.ql-editor ol,
+.ql-editor-content ol {
+  list-style-type: decimal !important;
+  padding-left: 1.75rem !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.85em !important;
+  display: block !important;
+}
+
+.ql-editor li,
+.ql-editor-content li {
+  display: list-item !important;
+  list-style: inherit !important;
+  margin-bottom: 0.35rem !important;
+  line-height: 1.6 !important;
+  color: #374151 !important;
+}
+
+/* ReactQuill standard list formatting formats (data-list or ql-indent) */
+.ql-editor ul > li,
+.ql-editor-content ul > li {
+  list-style-type: disc !important;
+}
+
+.ql-editor ol > li,
+.ql-editor-content ol > li {
+  list-style-type: decimal !important;
+}
+
+.ql-editor blockquote,
+.ql-editor-content blockquote {
+  border-left: 4px solid #E94B4B !important;
+  padding-left: 1rem !important;
+  font-style: italic !important;
+  color: #4b5563 !important;
+  margin-top: 0.75em !important;
+  margin-bottom: 0.75em !important;
+  background-color: #fffbeb !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  border-radius: 0 0.375rem 0.375rem 0 !important;
+  display: block !important;
+}
+
+.ql-editor strong,
+.ql-editor b,
+.ql-editor-content strong,
+.ql-editor-content b {
+  font-weight: 700 !important;
+  color: #111827 !important;
+}
+
+.ql-editor u,
+.ql-editor-content u {
+  text-decoration: underline !important;
+}
+
+.ql-editor s,
+.ql-editor strike,
+.ql-editor-content s,
+.ql-editor-content strike {
+  text-decoration: line-through !important;
+}
+
+/* ==========================================
+   Admin Portal Theme Overrides (Dark Theme Cards & Inner Elements)
+   ========================================== */
+.admin-portal-main {
+  background-color: #0f1117;
+  color: #ffffff;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.admin-portal-main::-webkit-scrollbar {
+  display: none;
+}
+
+/* Make all white containers dark to match dashboard card style */
+.admin-portal-main .bg-white {
+  background-color: #0f1117 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Text colors to white / light gray */
+.admin-portal-main .text-gray-900,
+.admin-portal-main .text-slate-900,
+.admin-portal-main .text-gray-800,
+.admin-portal-main .text-gray-700 {
+  color: #ffffff !important;
+}
+
+.admin-portal-main .text-gray-600,
+.admin-portal-main .text-gray-500,
+.admin-portal-main .text-slate-600 {
+  color: #94a3b8 !important; /* light slate-400 */
+}
+
+.admin-portal-main .text-gray-400 {
+  color: #64748b !important; /* slate-500 */
+}
+
+/* Border overrides to subtle light borders */
+.admin-portal-main .border-gray-50,
+.admin-portal-main .border-gray-100,
+.admin-portal-main .border-gray-200,
+.admin-portal-main .border-gray-300,
+.admin-portal-main .border-gray-100\/50,
+.admin-portal-main .border-gray-100\/60,
+.admin-portal-main .border-gray-100\/80,
+.admin-portal-main .border-gray-200\/60,
+.admin-portal-main .border-gray-200\/80,
+.admin-portal-main .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+.admin-portal-main .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Inputs, select dropdowns and textareas to a sleek dark background */
+.admin-portal-main input[type="text"],
+.admin-portal-main input[type="email"],
+.admin-portal-main input[type="password"],
+.admin-portal-main input[type="search"],
+.admin-portal-main input[type="number"],
+.admin-portal-main input[type="date"],
+.admin-portal-main select,
+.admin-portal-main textarea {
+  background-color: #1a1d29 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+/* Input placeholders */
+.admin-portal-main input::placeholder,
+.admin-portal-main textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Button/Interactive overlays matching Dashboard button style */
+.admin-portal-main button.bg-white,
+.admin-portal-main button.border-gray-200,
+.admin-portal-main button.border-\[\#E94B4B\]\/20:not(.bg-\[\#E94B4B\]) {
+  background-color: #0f1117 !important;
+  border-color: #4b5563 !important; /* border-gray-600 */
+  color: #ffffff !important;
+}
+
+.admin-portal-main button.bg-white:hover,
+.admin-portal-main button.border-gray-200:hover,
+.admin-portal-main button.border-\[\#E94B4B\]\/20:not(.bg-\[\#E94B4B\]):hover {
+  background-color: #1f2937 !important; /* hover:bg-gray-800 */
+}
+
+/* Make icons inside secondary buttons have the new red theme color */
+.admin-portal-main button.bg-white svg,
+.admin-portal-main button.border-gray-200 svg,
+.admin-portal-main button.border-\[\#E94B4B\]\/20:not(.bg-\[\#E94B4B\]) svg {
+  color: #E94B4B !important;
+}
+
+/* Global button overlays for primary buttons with rose backgrounds */
+.admin-portal-main button.bg-\[\#E94B4B\],
+.admin-portal-main .bg-\[\#E94B4B\],
+.admin-portal-main button.bg-rose-500,
+.admin-portal-main .bg-rose-500 {
+  background-color: #E94B4B !important;
+}
+
+.admin-portal-main button.bg-\[\#E94B4B\]:hover,
+.admin-portal-main .bg-\[\#E94B4B\]:hover,
+.admin-portal-main button.bg-rose-500:hover,
+.admin-portal-main .bg-rose-500:hover {
+  background-color: #911616 !important; /* hover:bg-rose-900 / primaryDark */
+}
+
+/* Global text color overrides for IDs and badges using rose color */
+.admin-portal-main .text-\[\#E94B4B\],
+.admin-portal-main .text-rose-500 {
+  color: #E94B4B !important;
+}
+
+/* Hover states for rows and items */
+.admin-portal-main .hover\:bg-gray-50:hover,
+.admin-portal-main .hover\:bg-gray-100:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* React Select controls inside dark panel */
+.admin-portal-main div[class*="-control"] {
+  background-color: #1a1d29 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+.admin-portal-main div[class*="-singleValue"] {
+  color: #ffffff !important;
+}
+.admin-portal-main div[class*="-menu"] {
+  background-color: #0f1117 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+.admin-portal-main div[class*="-option"] {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+.admin-portal-main div[class*="-option"]:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+.admin-portal-main div[class*="-placeholder"] {
+  color: #64748b !important;
+}
+
+/* Table cells styling */
+.admin-portal-main td {
+  color: #ffffff !important;
+}
+
+/* Let's also adjust the table skeleton components so they load in dark style */
+.admin-portal-main .animate-pulse {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ── Brand Button Styles ── */
+.btn-brand-primary {
+  background: linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%) !important;
+  color: #ffffff !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 10px !important;
+  cursor: pointer !important;
+}
+
+.btn-brand-primary:hover {
+  opacity: 0.95 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.35) !important;
+}
+
+.btn-brand-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-brand-outline {
+  border: 2px solid #E94B4B !important;
+  color: #ffffff !important;
+  background: transparent !important;
+  transition: all 0.3s ease;
+}
+
+.btn-brand-outline:hover {
+  background: linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%) !important;
+  border-color: transparent !important;
+}

@@ -1,0 +1,16 @@
+{
+  "id": 1,
+  "phoneHeaderTitle": "Call Support",
+  "phoneHeaderSubtitle": "Talk to our KnowChamp support team",
+  "emailTitle": "Send us an Email",
+  "emailSubtitle": "We usually reply within a few hours",
+  "emailAddress": "support@knowchamp.com",
+  "phones": [
+    "+91 98765 43210"
+  ],
+  "supportEmail": "support@knowchamp.com",
+  "helplineNumber": "+91 98765 43210",
+  "officeAddress": "102, Innovation Hub, Tech City, Bangalore, India",
+  "workingHours": "Mon - Sat: 9:00 AM to 6:00 PM",
+  "updatedAt": "2026-08-24T12:00:00.000Z"
+}

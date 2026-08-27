@@ -1,0 +1,11 @@
+CREATE DATABASE IF NOT EXISTS `quiz_app` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `quiz_app`;
+CREATE TABLE IF NOT EXISTS `contact_messages` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  `subject` VARCHAR(255) NULL,
+  `message` TEXT NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  `updatedAt` DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,0 +1,10 @@
+{
+  "platformName": "KnowChamp Updated",
+  "logoUrl": "/logo_knowchamp.png",
+  "emailNotifications": true,
+  "realtimeSocketAlerts": true,
+  "newBookingAlerts": true,
+  "quotationAlerts": true,
+  "settlementAlerts": true,
+  "userRegistrationAlerts": true
+}
