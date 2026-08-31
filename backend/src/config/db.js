@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
 const mysql = require('mysql2/promise');
+const mysql2 = require('mysql2');
 const env = require('./env');
 const logger = require('./logger');
 const MESSAGES = require('../shared/constants/messages');
@@ -20,6 +21,7 @@ const createSequelizeInstance = (port) => {
       host: env.db.host,
       port: port,
       dialect: 'mysql',
+      dialectModule: mysql2,
       logging: (msg) => logger.debug(msg),
       dialectOptions: {
         connectTimeout: 10000,
