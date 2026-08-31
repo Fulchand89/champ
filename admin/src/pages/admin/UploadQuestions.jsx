@@ -22,7 +22,7 @@ const UploadQuestions = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
 
-  // Dynamic subjects and topics
+  // Dynamic filtered lists based on parent selection
   const [filteredSubjects, setFilteredSubjects] = useState([]);
   const [filteredTopics, setFilteredTopics] = useState([]);
 
@@ -37,9 +37,6 @@ const UploadQuestions = () => {
 
         if (catRes.status === 'fulfilled' && catRes.value?.success) {
           setCategories(catRes.value.data || []);
-          if (catRes.value.data?.length > 0) {
-            setCategoryId(catRes.value.data[0].id);
-          }
         }
         if (subRes.status === 'fulfilled' && subRes.value?.success) {
           setSubjects(subRes.value.data || []);
@@ -54,19 +51,23 @@ const UploadQuestions = () => {
     fetchMetadata();
   }, []);
 
-  // Filter subjects when category changes
+  // Update filtered subjects when Category changes
   useEffect(() => {
     if (!categoryId) {
       setFilteredSubjects([]);
       setSubjectId('');
+      setFilteredTopics([]);
+      setTopicId('');
       return;
     }
     const filtered = subjects.filter((s) => String(s.categoryId) === String(categoryId));
     setFilteredSubjects(filtered);
-    setSubjectId(filtered[0]?.id || '');
+    setSubjectId('');
+    setFilteredTopics([]);
+    setTopicId('');
   }, [categoryId, subjects]);
 
-  // Filter topics when subject changes
+  // Update filtered topics when Subject changes
   useEffect(() => {
     if (!subjectId) {
       setFilteredTopics([]);
@@ -75,8 +76,22 @@ const UploadQuestions = () => {
     }
     const filtered = topics.filter((t) => String(t.subjectId) === String(subjectId));
     setFilteredTopics(filtered);
-    setTopicId(filtered[0]?.id || '');
+    setTopicId('');
   }, [subjectId, topics]);
+
+  const handleCategoryChange = (e) => {
+    const newCatId = e.target.value;
+    setCategoryId(newCatId);
+  };
+
+  const handleSubjectChange = (e) => {
+    const newSubId = e.target.value;
+    setSubjectId(newSubId);
+  };
+
+  const handleTopicChange = (e) => {
+    setTopicId(e.target.value);
+  };
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -117,6 +132,18 @@ const UploadQuestions = () => {
 
   const handleUpload = async (e) => {
     e.preventDefault();
+    if (!categoryId) {
+      toast.error('Please select a Category');
+      return;
+    }
+    if (!subjectId) {
+      toast.error('Please select a Subject');
+      return;
+    }
+    if (!topicId) {
+      toast.error('Please select a Topic');
+      return;
+    }
     if (!selectedFile) {
       toast.error('Please select a CSV file to upload');
       return;
@@ -125,9 +152,9 @@ const UploadQuestions = () => {
     setUploading(true);
     const formData = new FormData();
     formData.append('file', selectedFile);
-    if (categoryId) formData.append('categoryId', categoryId);
-    if (subjectId) formData.append('subjectId', subjectId);
-    if (topicId) formData.append('topicId', topicId);
+    formData.append('categoryId', categoryId);
+    formData.append('subjectId', subjectId);
+    formData.append('topicId', topicId);
 
     try {
       const res = await questionService.uploadQuestions(formData);
@@ -172,7 +199,7 @@ const UploadQuestions = () => {
         <div>
           <h1 className="text-xl font-bold">Upload Questions</h1>
           <p className="text-xs text-gray-400 mt-1">
-            Bulk upload quiz questions to the question bank using CSV templates.
+            Bulk upload quiz questions to the question bank using CSV templates organized by Category → Subject → Topic hierarchy.
           </p>
         </div>
         <Link
@@ -191,10 +218,13 @@ const UploadQuestions = () => {
             {/* Category / Subject / Topic target hierarchy */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold text-gray-300 mb-1.5">Target Category *</label>
+                <label className="block text-xs font-bold text-gray-300 mb-1.5">
+                  1. Target Category <span className="text-[#E94B4B]">*</span>
+                </label>
                 <select
+                  required
                   value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
+                  onChange={handleCategoryChange}
                   className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-xs bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] cursor-pointer"
                 >
                   <option value="">Select Category</option>
@@ -207,15 +237,22 @@ const UploadQuestions = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-300 mb-1.5">Target Subject</label>
+                <label className="block text-xs font-bold text-gray-300 mb-1.5">
+                  2. Target Subject <span className="text-[#E94B4B]">*</span>
+                </label>
                 <select
+                  required
                   value={subjectId}
-                  onChange={(e) => setSubjectId(e.target.value)}
+                  onChange={handleSubjectChange}
                   disabled={!categoryId}
-                  className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-xs bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] cursor-pointer disabled:opacity-50"
+                  className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-xs bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">
-                    {filteredSubjects.length > 0 ? 'Select Subject' : 'General / None'}
+                    {!categoryId
+                      ? 'Select Category first'
+                      : filteredSubjects.length === 0
+                      ? 'No Subjects Available'
+                      : 'Select Subject'}
                   </option>
                   {filteredSubjects.map((s) => (
                     <option key={s.id} value={s.id}>
@@ -226,15 +263,22 @@ const UploadQuestions = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-300 mb-1.5">Target Topic</label>
+                <label className="block text-xs font-bold text-gray-300 mb-1.5">
+                  3. Target Topic <span className="text-[#E94B4B]">*</span>
+                </label>
                 <select
+                  required
                   value={topicId}
-                  onChange={(e) => setTopicId(e.target.value)}
+                  onChange={handleTopicChange}
                   disabled={!subjectId}
-                  className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-xs bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] cursor-pointer disabled:opacity-50"
+                  className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-xs bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">
-                    {filteredTopics.length > 0 ? 'Select Topic' : 'All Topics / None'}
+                    {!subjectId
+                      ? 'Select Subject first'
+                      : filteredTopics.length === 0
+                      ? 'No Topics Available'
+                      : 'Select Topic'}
                   </option>
                   {filteredTopics.map((t) => (
                     <option key={t.id} value={t.id}>
@@ -244,6 +288,24 @@ const UploadQuestions = () => {
                 </select>
               </div>
             </div>
+
+            {/* Hierarchy Path Badge */}
+            {categoryId && (
+              <div className="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-300 flex items-center gap-2">
+                <span className="font-semibold text-white">Target Hierarchy:</span>
+                <span className="text-[#E94B4B] font-bold">
+                  {categories.find((c) => String(c.id) === String(categoryId))?.name || 'Category'}
+                </span>
+                <span className="text-gray-500">→</span>
+                <span className={subjectId ? 'text-amber-400 font-bold' : 'text-gray-500 italic'}>
+                  {subjects.find((s) => String(s.id) === String(subjectId))?.name || 'Select Subject'}
+                </span>
+                <span className="text-gray-500">→</span>
+                <span className={topicId ? 'text-green-400 font-bold' : 'text-gray-500 italic'}>
+                  {topics.find((t) => String(t.id) === String(topicId))?.name || 'Select Topic'}
+                </span>
+              </div>
+            )}
 
             {/* Drop Zone */}
             <div
@@ -284,7 +346,7 @@ const UploadQuestions = () => {
             {/* Upload submit button */}
             <button
               type="submit"
-              disabled={!selectedFile || uploading}
+              disabled={!selectedFile || uploading || !categoryId || !subjectId || !topicId}
               className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-white rounded-lg text-sm font-semibold transition-all cursor-pointer hover:opacity-90 disabled:opacity-50"
               style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
             >
@@ -309,7 +371,7 @@ const UploadQuestions = () => {
                   <p className="text-sm font-semibold">Questions Imported Successfully</p>
                   <p className="text-xs text-gray-300 mt-1">
                     {uploadResult.importedCount} of {uploadResult.totalRows} questions validated and
-                    saved to the Question Bank.
+                    saved to the Question Bank under the selected Category, Subject, and Topic.
                   </p>
                 </div>
               </div>
