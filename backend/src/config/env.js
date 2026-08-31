@@ -15,11 +15,11 @@ module.exports = {
 
   // Database
   db: {
-    host: process.env.DB_HOST || '127.0.0.1',
+    host: process.env.DB_HOST || (process.env.VERCEL ? 'srv1823.hstgr.io' : '127.0.0.1'),
     port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : '',
-    database: process.env.DB_NAME || 'quiz_app',
+    user: process.env.DB_USER || (process.env.VERCEL ? 'u879279162_camelcaravan' : 'root'),
+    password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : (process.env.VERCEL ? 'CamelCaravan@123' : ''),
+    database: process.env.DB_NAME || (process.env.VERCEL ? 'u879279162_camelcaravan' : 'quiz_app'),
   },
 
   // JWT
