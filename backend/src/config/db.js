@@ -5,10 +5,10 @@ const env = require('./env');
 const logger = require('./logger');
 const MESSAGES = require('../shared/constants/messages');
 
-const dbName = process.env.DB_NAME || env.db.database || 'quiz_app';
-const dbUser = process.env.DB_USER || env.db.user || 'root';
+const dbName = process.env.DB_NAME || (process.env.VERCEL ? 'u879279162_camelcaravan' : (env.db.database || 'quiz_app'));
+const dbUser = process.env.DB_USER || (process.env.VERCEL ? 'u879279162_camelcaravan' : (env.db.user || 'root'));
 const dbPassword = process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : env.db.password;
-const dbHost = process.env.DB_HOST || env.db.host || '127.0.0.1';
+const dbHost = process.env.DB_HOST || (process.env.VERCEL ? 'srv1823.hstgr.io' : (env.db.host || '127.0.0.1'));
 const dbPort = Number(process.env.DB_PORT || env.db.port || 3306);
 
 const sequelize = new Sequelize(
