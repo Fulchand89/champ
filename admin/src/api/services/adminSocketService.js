@@ -1,7 +1,24 @@
 import { io } from 'socket.io-client';
 import Cookies from 'js-cookie';
 
-const SOCKET_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:6060';
+const getSocketUrl = () => {
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return import.meta.env.VITE_BACKEND_URL;
+  }
+  // Safe production fallback (never use localhost in production)
+  if (
+    import.meta.env.PROD ||
+    (typeof window !== 'undefined' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1')
+  ) {
+    return 'https://backend-xi-nine-42.vercel.app';
+  }
+  // Local development fallback
+  return 'http://localhost:6060';
+};
+
+const SOCKET_URL = getSocketUrl();
 
 let socket = null;
 

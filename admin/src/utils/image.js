@@ -1,4 +1,19 @@
-const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:6060';
+const getBackendBaseUrl = () => {
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return import.meta.env.VITE_BACKEND_URL;
+  }
+  if (
+    import.meta.env.PROD ||
+    (typeof window !== 'undefined' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1')
+  ) {
+    return 'https://backend-xi-nine-42.vercel.app';
+  }
+  return 'http://localhost:6060';
+};
+
+const BACKEND_BASE_URL = getBackendBaseUrl();
 
 /**
  * Formats a relative upload image path to a full backend URL.

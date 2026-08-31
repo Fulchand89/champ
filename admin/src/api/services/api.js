@@ -1,7 +1,24 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const RAW_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:6060/api/v1';
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  // Safe production fallback (never use localhost in production)
+  if (
+    import.meta.env.PROD ||
+    (typeof window !== 'undefined' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1')
+  ) {
+    return 'https://backend-xi-nine-42.vercel.app/api/v1';
+  }
+  // Local development fallback
+  return 'http://localhost:6060/api/v1';
+};
+
+const RAW_BASE_URL = getApiBaseUrl();
 const API_BASE_URL = RAW_BASE_URL.replace(/\/+$/, '');
 
 const api = axios.create({
