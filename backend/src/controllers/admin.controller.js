@@ -12,31 +12,20 @@ const authRepository = require('../services/auth.repository');
 const contestService = require('../services/contest.service');
 const questionService = require('../services/question.service');
 const transactionService = require('../services/transaction.service');
-const os = require('os');
-const bundledSettingsPath = path.join(__dirname, '../database/settings.json');
-const bundledNotificationsPath = path.join(__dirname, '../database/notifications.json');
-const settingsFilePath = process.env.VERCEL ? path.join(os.tmpdir(), 'settings.json') : bundledSettingsPath;
-const notificationsFilePath = process.env.VERCEL ? path.join(os.tmpdir(), 'notifications.json') : bundledNotificationsPath;
+const withdrawalService = require('../services/withdrawal.service');
+const notificationService = require('../services/notification.service');
+
+const settingsFilePath = path.join(__dirname, '../database/settings.json');
+const notificationsFilePath = path.join(__dirname, '../database/notifications.json');
 
 // Helper to read JSON files safely
 const readJsonFile = (filePath, defaultData = []) => {
   try {
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf8');
-      return JSON.parse(content);
+    if (!fs.existsSync(filePath)) {
+      return defaultData;
     }
-    // Check bundled path if using /tmp on Vercel
-    if (process.env.VERCEL) {
-      if (filePath === settingsFilePath && fs.existsSync(bundledSettingsPath)) {
-        const content = fs.readFileSync(bundledSettingsPath, 'utf8');
-        return JSON.parse(content);
-      }
-      if (filePath === notificationsFilePath && fs.existsSync(bundledNotificationsPath)) {
-        const content = fs.readFileSync(bundledNotificationsPath, 'utf8');
-        return JSON.parse(content);
-      }
-    }
-    return defaultData;
+    const content = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(content);
   } catch (err) {
     console.error(`Error reading file ${filePath}:`, err);
     return defaultData;
@@ -445,7 +434,7 @@ const updateCategory = asyncHandler(async (req, res) => {
     if (category.image && typeof category.image === 'string' && category.image.startsWith('/uploads/')) {
       const oldPath = path.join(__dirname, '..', category.image.replace(/^\//, ''));
       if (fs.existsSync(oldPath)) {
-        try { fs.unlinkSync(oldPath); } catch (e) {}
+        try { fs.unlinkSync(oldPath); } catch (e) { }
       }
     }
     imageUrl = `/uploads/categories/${req.file.filename}`;
@@ -455,7 +444,7 @@ const updateCategory = asyncHandler(async (req, res) => {
     if (category.image && typeof category.image === 'string' && category.image.startsWith('/uploads/')) {
       const oldPath = path.join(__dirname, '..', category.image.replace(/^\//, ''));
       if (fs.existsSync(oldPath)) {
-        try { fs.unlinkSync(oldPath); } catch (e) {}
+        try { fs.unlinkSync(oldPath); } catch (e) { }
       }
     }
     imageUrl = null;
@@ -483,7 +472,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
   if (category.image && typeof category.image === 'string' && category.image.startsWith('/uploads/')) {
     const fullPath = path.join(__dirname, '..', category.image.replace(/^\//, ''));
     if (fs.existsSync(fullPath)) {
-      try { fs.unlinkSync(fullPath); } catch (e) {}
+      try { fs.unlinkSync(fullPath); } catch (e) { }
     }
   }
 
@@ -780,7 +769,7 @@ const updateContest = asyncHandler(async (req, res) => {
     if (existing && existing.image && typeof existing.image === 'string' && existing.image.startsWith('/uploads/')) {
       const oldPath = path.join(__dirname, '..', existing.image.replace(/^\//, ''));
       if (fs.existsSync(oldPath)) {
-        try { fs.unlinkSync(oldPath); } catch (e) {}
+        try { fs.unlinkSync(oldPath); } catch (e) { }
       }
     }
     contestPayload.image = `/uploads/contests/${req.file.filename}`;
@@ -789,7 +778,7 @@ const updateContest = asyncHandler(async (req, res) => {
     if (existing && existing.image && typeof existing.image === 'string' && existing.image.startsWith('/uploads/')) {
       const oldPath = path.join(__dirname, '..', existing.image.replace(/^\//, ''));
       if (fs.existsSync(oldPath)) {
-        try { fs.unlinkSync(oldPath); } catch (e) {}
+        try { fs.unlinkSync(oldPath); } catch (e) { }
       }
     }
     contestPayload.image = null;

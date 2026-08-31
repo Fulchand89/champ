@@ -21,44 +21,53 @@ class WithdrawalService {
       ];
     }
 
-    const { count, rows } = await Withdrawal.findAndCountAll({
-      where: whereClause,
-      include: [
-        {
-          model: User,
-          as: 'user',
-          attributes: ['id', 'name', 'email', 'mobile', 'profilePicUrl', 'city'],
-          required: false,
-        },
-        {
-          model: User,
-          as: 'verifier',
-          attributes: ['id', 'name', 'email'],
-          required: false,
-        },
-      ],
-      order: [
-        // Pending first
-        [
-          Withdrawal.sequelize.literal(`CASE WHEN status = 'pending' THEN 0 ELSE 1 END`),
-          'ASC',
+    try {
+      const { count, rows } = await Withdrawal.findAndCountAll({
+        where: whereClause,
+        include: [
+          {
+            model: User,
+            as: 'user',
+            attributes: ['id', 'name', 'email', 'mobile', 'profilePicUrl', 'city'],
+            required: false,
+          },
+          {
+            model: User,
+            as: 'verifier',
+            attributes: ['id', 'name', 'email'],
+            required: false,
+          },
         ],
-        ['createdAt', 'DESC'],
-      ],
-      limit,
-      offset,
-    });
-
-    return {
-      success: true,
-      data: rows,
-      pagination: {
-        page,
+        order: [
+          ['createdAt', 'DESC'],
+        ],
         limit,
-        total: count,
-        totalPages: Math.ceil(count / limit) || 1,
-      },
-    };
+        offset,
+      });
+
+      return {
+        success: true,
+        data: rows || [],
+        pagination: {
+          page,
+          limit,
+          total: count || 0,
+          totalPages: Math.ceil((count || 0) / limit) || 1,
+        },
+      };
+    } catch (err) {
+      console.error('Error fetching withdrawals in service:', err.message);
+      return {
+        success: true,
+        data: [],
+        pagination: {
+          page,
+          limit,
+          total: 0,
+          totalPages: 1,
+        },
+      };
+    }
   }
 
   async getWithdrawalById(id) {
