@@ -8,7 +8,7 @@
     "dev:backend": "npm run dev --prefix backend",
     "dev:frontend": "npm run dev --prefix admin",
     "dev:admin": "npm run dev --prefix admin",
-    "build": "npm run build --prefix admin",
+    "build": "npm install --prefix admin && npm run build --prefix admin",
     "start": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run start --prefix backend\" \"npm run dev --prefix admin\"",
     "install:all": "npm install && npm --prefix backend install && npm --prefix admin install"
   },
