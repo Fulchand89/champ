@@ -44,7 +44,15 @@ const Leaderboard = () => {
                 Rank 2
               </span>
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-slate-400 bg-gray-800 flex items-center justify-center">
-                <span className="text-lg font-bold text-white">{podium[0].name.charAt(0)}</span>
+                {podium[0].image ? (
+                  <img
+                    src={podium[0].image}
+                    alt={podium[0].name}
+                    className="w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <span className="text-lg font-bold text-white">{podium[0].name.charAt(0)}</span>
+                )}
               </div>
               <div className="text-center">
                 <h4 className="font-bold text-white">{podium[0].name}</h4>
@@ -69,7 +77,15 @@ const Leaderboard = () => {
                 Rank 1
               </span>
               <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-amber-400 bg-gray-800 flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">{podium[1].name.charAt(0)}</span>
+                {podium[1].image ? (
+                  <img
+                    src={podium[1].image}
+                    alt={podium[1].name}
+                    className="w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <span className="text-2xl font-bold text-white">{podium[1].name.charAt(0)}</span>
+                )}
               </div>
               <div className="text-center">
                 <h4 className="font-black text-white text-lg">{podium[1].name}</h4>
@@ -88,7 +104,15 @@ const Leaderboard = () => {
                 Rank 3
               </span>
               <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-amber-600 bg-gray-800 flex items-center justify-center">
-                <span className="text-base font-bold text-white">{podium[2].name.charAt(0)}</span>
+                {podium[2].image ? (
+                  <img
+                    src={podium[2].image}
+                    alt={podium[2].name}
+                    className="w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <span className="text-base font-bold text-white">{podium[2].name.charAt(0)}</span>
+                )}
               </div>
               <div className="text-center">
                 <h4 className="font-bold text-white">{podium[2].name}</h4>
@@ -125,16 +149,24 @@ const Leaderboard = () => {
                         <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${player.rank === 1 ? 'bg-amber-400 text-gray-950 font-black' :
                           player.rank === 2 ? 'bg-slate-400 text-[#FFFFFF] font-black' :
                             player.rank === 3 ? 'bg-amber-600 text-[#FFFFFF] font-black' :
-                              'text-'
+                              'text-gray-400'
                           }`}>
                           {player.rank}
                         </span>
                       </td>
                       <td className="px-6 py-4 font-bold text-white flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-800 border border-gray-700 flex items-center justify-center text-xs text-gray-300">
-                          {player.name.charAt(0)}
+                        <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-800 border border-gray-700 flex items-center justify-center text-xs text-gray-300 shrink-0">
+                          {player.image ? (
+                            <img
+                              src={player.image}
+                              alt={player.name}
+                              className="w-full h-full object-cover object-top"
+                            />
+                          ) : (
+                            <span>{player.name.charAt(0)}</span>
+                          )}
                         </div>
-                        {player.name}
+                        <span>{player.name}</span>
                       </td>
                       <td className="px-6 py-4 text-[#FFFFFF]">{player.contest}</td>
                       <td className="px-6 py-4 text-right font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">

@@ -44,16 +44,22 @@ const ManageUsers = () => {
   const [userToDelete, setUserToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Form State for Add / Edit
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     name: '',
     email: '',
+    dob: '',
+    panNumber: '',
+    aadhaarNumber: '',
+    address: '',
     mobile: '',
     password: '',
     city: '',
     role: 'user',
     isActive: true,
-  });
+  };
+
+  // Form State for Add / Edit
+  const [formData, setFormData] = useState(initialFormData);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -106,17 +112,61 @@ const ManageUsers = () => {
   // Handle Add User Submit
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim()) {
-      toast.error('Name and email are required');
+    if (!formData.name.trim()) {
+      toast.error('Full Name is required');
       return;
     }
+    if (!formData.email.trim()) {
+      toast.error('Email Address is required');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    if (!formData.dob) {
+      toast.error('Date of Birth (DOB) is required');
+      return;
+    }
+    if (!formData.panNumber.trim()) {
+      toast.error('PAN Card Number is required');
+      return;
+    }
+    const panClean = formData.panNumber.trim().toUpperCase();
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    if (!panRegex.test(panClean)) {
+      toast.error('Please enter a valid 10-digit PAN number (e.g. ABCDE1234F)');
+      return;
+    }
+    if (!formData.aadhaarNumber.trim()) {
+      toast.error('Aadhaar Card Number is required');
+      return;
+    }
+    const aadhaarClean = formData.aadhaarNumber.trim().replace(/\s+/g, '');
+    if (!/^\d{12}$/.test(aadhaarClean)) {
+      toast.error('Please enter a valid 12-digit Aadhaar card number');
+      return;
+    }
+    if (!formData.address.trim()) {
+      toast.error('Full Address is required');
+      return;
+    }
+
     setIsSaving(true);
     try {
-      const res = await userService.createUser(formData);
+      const res = await userService.createUser({
+        ...formData,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        panNumber: panClean,
+        aadhaarNumber: aadhaarClean,
+        address: formData.address.trim(),
+      });
       if (res?.success) {
         toast.success('User created successfully');
         setIsAddModalOpen(false);
-        setFormData({ name: '', email: '', mobile: '', password: '', city: '', role: 'user', isActive: true });
+        setFormData(initialFormData);
         fetchUsers();
       } else {
         toast.error(res?.message || 'Failed to create user');
@@ -328,7 +378,7 @@ const ManageUsers = () => {
 
         <button
           onClick={() => {
-            setFormData({ name: '', email: '', mobile: '', password: '', city: '', role: 'user', isActive: true });
+            setFormData(initialFormData);
             setIsAddModalOpen(true);
           }}
           className="flex items-center justify-center gap-2 px-4 py-2.5 text-white rounded-xl text-sm font-bold transition-all cursor-pointer shadow-md hover:opacity-90 shrink-0"
@@ -460,8 +510,8 @@ const ManageUsers = () => {
       {/* ── Add User Modal ── */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
-          <div className="bg-[#0f1117] rounded-2xl border border-white/15 w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+          <div className="bg-[#0f1117] rounded-2xl border border-white/15 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-[#E94B4B]/15 flex items-center justify-center text-[#E94B4B]">
                   <UserPlus className="w-4 h-4" />
@@ -476,106 +526,154 @@ const ManageUsers = () => {
               </button>
             </div>
 
-            <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                  Full Name <span className="text-[#E94B4B]">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Rahul Sharma"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
-                />
+            <form onSubmit={handleAddSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
+              {/* PERSONAL INFORMATION */}
+              <div className="space-y-4">
+                <h4 className="text-xs font-bold text-white/70 uppercase tracking-wider">
+                  PERSONAL INFORMATION
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                      Full Name <span className="text-[#E94B4B]">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter full name"
+                      value={formData.name}
+                      onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                      Email Address <span className="text-[#E94B4B]">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="Enter email address"
+                      value={formData.email}
+                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                      className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                      Date of Birth (DOB) <span className="text-[#E94B4B]">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      placeholder="Select date of birth"
+                      value={formData.dob}
+                      onChange={(e) => setFormData(prev => ({ ...prev, dob: e.target.value }))}
+                      className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B] [color-scheme:dark]"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* KYC INFORMATION */}
+              <div className="border-t border-white/10 pt-5 space-y-4">
+                <h4 className="text-xs font-bold text-white/70 uppercase tracking-wider">
+                  KYC INFORMATION
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                      PAN Card Number <span className="text-[#E94B4B]">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={10}
+                      placeholder="Enter PAN card number"
+                      value={formData.panNumber}
+                      onChange={(e) => setFormData(prev => ({ ...prev, panNumber: e.target.value.toUpperCase() }))}
+                      className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B] uppercase"
+                    />
+                    <p className="text-[11px] text-white/40 mt-1">Enter 10 digit PAN number (e.g., ABCDE1234F)</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                      Aadhaar Card Number <span className="text-[#E94B4B]">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={12}
+                      placeholder="Enter Aadhaar card number"
+                      value={formData.aadhaarNumber}
+                      onChange={(e) => setFormData(prev => ({ ...prev, aadhaarNumber: e.target.value.replace(/\D/g, '') }))}
+                      className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                    />
+                    <p className="text-[11px] text-white/40 mt-1">Enter 12 digit Aadhaar number</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ADDRESS INFORMATION */}
+              <div className="border-t border-white/10 pt-5 space-y-4">
+                <h4 className="text-xs font-bold text-white/70 uppercase tracking-wider">
+                  ADDRESS INFORMATION
+                </h4>
                 <div>
                   <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                    Email Address <span className="text-[#E94B4B]">*</span>
+                    Full Address <span className="text-[#E94B4B]">*</span>
                   </label>
-                  <input
-                    type="email"
+                  <textarea
+                    rows={3}
                     required
-                    placeholder="user@example.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                    placeholder="Enter complete address"
+                    value={formData.address}
+                    onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B] resize-none"
                   />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                    Mobile Number
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 9876543210"
-                    value={formData.mobile}
-                    onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
-                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
-                  />
+                  <p className="text-[11px] text-white/40 mt-1">Enter complete address including house no., street, area, city, state and pincode.</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                    Initial Password
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="KnowChamp@123"
-                    value={formData.password}
-                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                    City
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Mumbai"
-                    value={formData.city}
-                    onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-                <div>
-                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                    System Role
-                  </label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
-                    className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
-                  >
-                    <option value="user">Standard Player (User)</option>
-                    <option value="admin">Administrator</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                    Initial Status
-                  </label>
-                  <select
-                    value={formData.isActive ? 'active' : 'blocked'}
-                    onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.value === 'active' }))}
-                    className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
-                  >
-                    <option value="active">Active</option>
-                    <option value="blocked">Blocked</option>
-                  </select>
+              {/* ADDITIONAL INFORMATION (OPTIONAL) */}
+              <div className="border-t border-white/10 pt-5 space-y-4">
+                <h4 className="text-xs font-bold text-white/70 uppercase tracking-wider">
+                  ADDITIONAL INFORMATION (OPTIONAL)
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                      System Role
+                    </label>
+                    <select
+                      value={formData.role}
+                      onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+                      className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
+                    >
+                      <option value="user">Standard Player (User)</option>
+                      <option value="admin">Administrator</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                      Account Status
+                    </label>
+                    <select
+                      value={formData.isActive ? 'active' : 'blocked'}
+                      onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.value === 'active' }))}
+                      className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
+                    >
+                      <option value="active">Active</option>
+                      <option value="blocked">Blocked</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+              <div className="flex justify-end gap-3 pt-4 border-t border-white/10 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
@@ -589,7 +687,7 @@ const ManageUsers = () => {
                   className="flex items-center gap-2 px-5 py-2 text-xs font-bold text-white rounded-xl shadow-md cursor-pointer hover:opacity-90 disabled:opacity-50"
                   style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
                 >
-                  {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                  {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
                   <span>Create User</span>
                 </button>
               </div>

@@ -1,5 +1,7 @@
 export const ROUTES = {
   HOME: '/',
+  EXCELLENCE_LEAGUE: '/excellence-league',
+  LEAGUE: '/league',
   ADMIN: {
     ROOT: '/admin',
     LOGIN: '/admin/login',

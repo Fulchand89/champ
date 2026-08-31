@@ -123,6 +123,15 @@ const Footer = () => {
 
               <li>
                 <Link
+                  to="/excellence-league"
+                  className="inline-block hover:text-red-400 transition-colors duration-200"
+                >
+                  Excellence League
+                </Link>
+              </li>
+
+              <li>
+                <Link
                   to="#"
                   className="inline-block hover:text-red-400 transition-colors duration-200"
                 >

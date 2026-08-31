@@ -3,6 +3,7 @@ import { ROUTES } from '../constants/routes'
 
 const KnowChampHome = lazy(() => import('../pages/know-champ/Home'))
 const ContestPage = lazy(() => import('../pages/know-champ/Contest'))
+const ExcellenceLeaguePage = lazy(() => import('../pages/know-champ/ExcellenceLeague'))
 const HowItWorksPage = lazy(() => import('../pages/know-champ/HowItWorks'))
 const LeaderboardPage = lazy(() => import('../pages/know-champ/Leaderboard'))
 const Login = lazy(() => import('../pages/admin/Login'))
@@ -26,6 +27,14 @@ const PublicRoutes = [
   {
     path: ROUTES.HOME,
     element: withSuspense(KnowChampHome),
+  },
+  {
+    path: '/excellence-league',
+    element: withSuspense(ExcellenceLeaguePage),
+  },
+  {
+    path: '/league',
+    element: withSuspense(ExcellenceLeaguePage),
   },
   {
     path: '/contests',

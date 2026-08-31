@@ -24,6 +24,7 @@ const Navbar = () => {
     { name: "Contests", path: "/contests" },
     { name: "How It Works", path: "/how-it-works" },
     { name: "Leaderboard", path: "/leaderboard" },
+    { name: "Excellence League", path: "/excellence-league" },
   ];
 
   const isActive = (path) => {
