@@ -5,8 +5,9 @@ const MESSAGES = require('../shared/constants/messages');
 const errorHandler = (err, req, res, next) => {
   let error = err;
   
-  // Log error
-  logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+  // Log error explicitly to console for Vercel runtime logs and logger
+  console.error('GLOBAL SERVER ERROR:', err);
+  logger.error(`${err.status || err.statusCode || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
   
   // If error is not an instance of ApiError, convert it
   if (!(error instanceof ApiError)) {

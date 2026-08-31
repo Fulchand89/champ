@@ -5,75 +5,57 @@ const env = require('./env');
 const logger = require('./logger');
 const MESSAGES = require('../shared/constants/messages');
 
-// Auto-resolve port for Hostinger remote MySQL if set to 3307
-const rawHost = process.env.DB_HOST || env.db.host || '127.0.0.1';
-const rawPort = parseInt(process.env.DB_PORT || env.db.port || '3306', 10);
-const resolvedPort = (rawHost && (rawHost.includes('hstgr.io') || rawHost.includes('hostinger')) && rawPort === 3307) 
-  ? 3306 
-  : rawPort;
+const dbName = process.env.DB_NAME || env.db.database || 'quiz_app';
+const dbUser = process.env.DB_USER || env.db.user || 'root';
+const dbPassword = process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : env.db.password;
+const dbHost = process.env.DB_HOST || env.db.host || '127.0.0.1';
+const dbPort = Number(process.env.DB_PORT || env.db.port || 3306);
 
-let activePort = resolvedPort;
-
-const createSequelizeInstance = (port) => {
-  const dbHost = process.env.DB_HOST || env.db.host || '127.0.0.1';
-  const dbPort = parseInt(port || process.env.DB_PORT || env.db.port || 3306, 10);
-  const dbUser = process.env.DB_USER || env.db.user || 'root';
-  const dbPassword = process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : env.db.password;
-  const dbName = process.env.DB_NAME || env.db.database || 'quiz_app';
-
-  return new Sequelize(
-    dbName,
-    dbUser,
-    dbPassword,
-    {
-      host: dbHost,
-      port: dbPort,
-      dialect: 'mysql',
-      dialectModule: mysql2,
-      logging: (msg) => {
-        if (process.env.NODE_ENV === 'development') {
-          logger.debug(msg);
-        }
-      },
-      dialectOptions: {
-        connectTimeout: 15000,
-        decimalNumbers: true,
-        enableKeepAlive: true,
-        keepAliveInitialDelay: 10000,
-      },
-      define: {
-        charset: 'utf8mb4',
-        collate: 'utf8mb4_unicode_ci',
-      },
-      pool: {
-        max: process.env.VERCEL ? 5 : 20,
-        min: 0,
-        acquire: 30000,
-        idle: 10000,
-        evict: 1000,
-      },
-      retry: {
-        max: 3,
-        match: [
-          /SequelizeConnectionError/,
-          /SequelizeConnectionRefusedError/,
-          /SequelizeHostNotFoundError/,
-          /SequelizeHostNotReachableError/,
-          /SequelizeInvalidConnectionError/,
-          /SequelizeConnectionTimedOutError/,
-          /TimeoutError/,
-          /PROTOCOL_CONNECTION_LOST/,
-          /ECONNRESET/,
-          /ECONNREFUSED/,
-          /ETIMEDOUT/,
-          /EHOSTUNREACH/,
-        ],
-      },
-    }
-  );
-};
-
-let sequelize = createSequelizeInstance(activePort);
+const sequelize = new Sequelize(
+  dbName,
+  dbUser,
+  dbPassword,
+  {
+    host: dbHost,
+    port: dbPort,
+    dialect: 'mysql',
+    dialectModule: mysql2,
+    logging: false,
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 60000,
+      idle: 10000,
+    },
+    dialectOptions: {
+      connectTimeout: 60000,
+      decimalNumbers: true,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 10000,
+    },
+    define: {
+      charset: 'utf8mb4',
+      collate: 'utf8mb4_unicode_ci',
+    },
+    retry: {
+      max: 3,
+      match: [
+        /SequelizeConnectionError/,
+        /SequelizeConnectionRefusedError/,
+        /SequelizeHostNotFoundError/,
+        /SequelizeHostNotReachableError/,
+        /SequelizeInvalidConnectionError/,
+        /SequelizeConnectionTimedOutError/,
+        /TimeoutError/,
+        /PROTOCOL_CONNECTION_LOST/,
+        /ECONNRESET/,
+        /ECONNREFUSED/,
+        /ETIMEDOUT/,
+        /EHOSTUNREACH/,
+      ],
+    },
+  }
+);
 
 // Helper to ensure MySQL database exists before connecting (safe for both local XAMPP & shared hosting)
 const ensureDatabase = async (port) => {

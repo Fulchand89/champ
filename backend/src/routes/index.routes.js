@@ -39,7 +39,7 @@ router.use('/admin', adminRoutes);
 // Public Content Endpoints
 const { Category, Contest, Feature, FAQ } = require('../database');
 
-router.get('/public/faq', async (req, res, next) => {
+router.get('/public/faq', async (req, res) => {
   try {
     const { contestId } = req.query;
     const whereClause = { isActive: true };
@@ -52,18 +52,25 @@ router.get('/public/faq', async (req, res, next) => {
       include: [{ model: Contest, as: 'contest', attributes: ['id', 'title'] }]
     });
 
-    return res.status(200).json({ success: true, data: faqs || [] });
+    return res.status(200).json({
+      success: true,
+      data: Array.isArray(faqs) ? faqs : []
+    });
   } catch (error) {
-    next(error);
+    console.error('PUBLIC FAQ ERROR:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch FAQs'
+    });
   }
 });
 
-router.get('/public/features', async (req, res, next) => {
+router.get('/public/features', async (req, res) => {
   try {
     const { contestId } = req.query;
     const whereClause = { isActive: true };
     if (contestId) {
-      whereClause.contestId = parseInt(contestId);
+      whereClause.contestId = parseInt(contestId, 10);
     }
     const features = await Feature.findAll({
       where: whereClause,
@@ -71,34 +78,57 @@ router.get('/public/features', async (req, res, next) => {
       include: [{ model: Contest, as: 'contest', attributes: ['id', 'title'] }]
     });
 
-    return res.status(200).json({ success: true, data: features || [] });
+    return res.status(200).json({
+      success: true,
+      data: Array.isArray(features) ? features : []
+    });
   } catch (error) {
-    next(error);
+    console.error('PUBLIC FEATURES ERROR:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch features'
+    });
   }
 });
 
-router.get('/public/categories', async (req, res, next) => {
+router.get('/public/categories', async (req, res) => {
   try {
     const categories = await Category.findAll({
       where: { isActive: true },
       order: [['id', 'ASC']]
     });
-    return res.status(200).json({ success: true, data: categories || [] });
+
+    return res.status(200).json({
+      success: true,
+      data: Array.isArray(categories) ? categories : []
+    });
   } catch (error) {
-    next(error);
+    console.error('PUBLIC CATEGORIES ERROR:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch categories'
+    });
   }
 });
 
-router.get('/public/contests', async (req, res, next) => {
+router.get('/public/contests', async (req, res) => {
   try {
     const contests = await Contest.findAll({ 
       where: { isActive: true },
       order: [['startTime', 'ASC'], ['id', 'ASC']],
       include: [{ model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'image', 'icon', 'colorClass'] }]
     });
-    return res.status(200).json({ success: true, data: contests || [] });
+
+    return res.status(200).json({
+      success: true,
+      data: Array.isArray(contests) ? contests : []
+    });
   } catch (error) {
-    next(error);
+    console.error('PUBLIC CONTESTS ERROR:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch contests'
+    });
   }
 });
 

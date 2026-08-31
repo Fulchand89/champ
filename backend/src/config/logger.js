@@ -36,15 +36,22 @@ const emailLoggerTransports = [];
 | Vercel Serverless Functions cannot use /var/task/logs for persistent logs.
 */
 
-if (!isVercel) {
-  const logDir = path.isAbsolute(env.logDir || '')
-    ? env.logDir
-    : path.join(process.cwd(), env.logDir || 'logs');
+const os = require('os');
 
+const logDir = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'logs')
+  : (path.isAbsolute(env.logDir || '') ? env.logDir : path.join(process.cwd(), env.logDir || 'logs'));
+
+try {
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
+} catch (error) {
+  console.error('Failed to create log directory:', error.message);
+}
+
+if (!isVercel) {
   try {
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir, { recursive: true });
-    }
 
     // Main application logs
     loggerTransports.push(
