@@ -12,20 +12,31 @@ const authRepository = require('../services/auth.repository');
 const contestService = require('../services/contest.service');
 const questionService = require('../services/question.service');
 const transactionService = require('../services/transaction.service');
-const withdrawalService = require('../services/withdrawal.service');
-const notificationService = require('../services/notification.service');
-
-const settingsFilePath = path.join(__dirname, '../database/settings.json');
-const notificationsFilePath = path.join(__dirname, '../database/notifications.json');
+const os = require('os');
+const bundledSettingsPath = path.join(__dirname, '../database/settings.json');
+const bundledNotificationsPath = path.join(__dirname, '../database/notifications.json');
+const settingsFilePath = process.env.VERCEL ? path.join(os.tmpdir(), 'settings.json') : bundledSettingsPath;
+const notificationsFilePath = process.env.VERCEL ? path.join(os.tmpdir(), 'notifications.json') : bundledNotificationsPath;
 
 // Helper to read JSON files safely
 const readJsonFile = (filePath, defaultData = []) => {
   try {
-    if (!fs.existsSync(filePath)) {
-      return defaultData;
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      return JSON.parse(content);
     }
-    const content = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(content);
+    // Check bundled path if using /tmp on Vercel
+    if (process.env.VERCEL) {
+      if (filePath === settingsFilePath && fs.existsSync(bundledSettingsPath)) {
+        const content = fs.readFileSync(bundledSettingsPath, 'utf8');
+        return JSON.parse(content);
+      }
+      if (filePath === notificationsFilePath && fs.existsSync(bundledNotificationsPath)) {
+        const content = fs.readFileSync(bundledNotificationsPath, 'utf8');
+        return JSON.parse(content);
+      }
+    }
+    return defaultData;
   } catch (err) {
     console.error(`Error reading file ${filePath}:`, err);
     return defaultData;

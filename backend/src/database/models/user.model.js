@@ -21,24 +21,14 @@ const User = sequelize.define('User', {
   name: {
     type: DataTypes.STRING(100),
     allowNull: false,
-    validate: {
-      len: [2, 100],
-    },
   },
   email: {
     type: DataTypes.STRING(100),
     allowNull: false,
-    validate: {
-      isEmail: true,
-    },
   },
   mobile: {
     type: DataTypes.STRING(15),
     allowNull: true,
-    validate: {
-      isNumeric: true,
-      len: [10, 15],
-    },
   },
   password: {
     type: DataTypes.STRING(255),
@@ -72,24 +62,11 @@ const User = sequelize.define('User', {
   city: {
     type: DataTypes.STRING(100),
     allowNull: true,
-    validate: {
-      len: [2, 100],
-    },
     comment: 'City of residence/operation of the user',
   },
   adharNumber: {
     type: DataTypes.STRING(20),
     allowNull: true,
-    validate: {
-      isAadharFormat(value) {
-        if (value && value.trim() !== '') {
-          const cleaned = value.replace(/[\s-]/g, '');
-          if (!/^\d{12}$/.test(cleaned)) {
-            throw new Error('Adhar number must be a valid 12-digit number');
-          }
-        }
-      }
-    },
     comment: '12-digit Aadhaar/Adhar identification number',
   },
   adharImages: {
@@ -131,9 +108,6 @@ const User = sequelize.define('User', {
   pendingEmail: {
     type: DataTypes.STRING(255),
     allowNull: true,
-    validate: {
-      isEmail: true,
-    },
   },
   emailChangeToken: {
     type: DataTypes.STRING(255),
