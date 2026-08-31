@@ -23,12 +23,32 @@ router.get('/', (req, res) => {
 
 // Health Check Route
 router.get('/health', async (req, res) => {
+  const hasPassword = Boolean(process.env.DB_PASSWORD || process.env.DATABASE_PASSWORD || process.env.MYSQL_PASSWORD || process.env.DB_PASS || process.env.db_password);
+  const host = process.env.DB_HOST || 'srv1823.hstgr.io';
+  const user = process.env.DB_USER || 'u879279162_camelcaravan';
+  const database = process.env.DB_NAME || 'u879279162_camelcaravan';
+
   try {
     const { sequelize } = require('../database');
     await sequelize.authenticate();
-    res.status(200).json({ status: 'OK', database: 'connected' });
+    res.status(200).json({
+      status: 'OK',
+      database: 'connected',
+      details: { host, user, database, passwordConfigured: hasPassword }
+    });
   } catch (error) {
-    res.status(503).json({ status: 'ERROR', database: 'disconnected', error: error.message });
+    res.status(503).json({
+      status: 'ERROR',
+      database: 'disconnected',
+      error: error.message,
+      details: {
+        host,
+        user,
+        database,
+        passwordConfigured: hasPassword,
+        hint: !hasPassword ? 'DB_PASSWORD is missing in Vercel Environment Variables' : 'Check MySQL user password and Hostinger Remote MySQL % wildcard'
+      }
+    });
   }
 });
 

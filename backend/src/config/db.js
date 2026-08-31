@@ -5,11 +5,11 @@ const env = require('./env');
 const logger = require('./logger');
 const MESSAGES = require('../shared/constants/messages');
 
-const dbName = process.env.DB_NAME || (process.env.VERCEL ? 'u879279162_camelcaravan' : (env.db.database || 'quiz_app'));
-const dbUser = process.env.DB_USER || (process.env.VERCEL ? 'u879279162_camelcaravan' : (env.db.user || 'root'));
-const dbPassword = process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : env.db.password;
-const dbHost = process.env.DB_HOST || (process.env.VERCEL ? 'srv1823.hstgr.io' : (env.db.host || '127.0.0.1'));
-const dbPort = Number(process.env.DB_PORT || env.db.port || 3306);
+const dbName = (process.env.DB_NAME || process.env.DATABASE_NAME || (process.env.VERCEL ? 'u879279162_camelcaravan' : (env.db.database || 'quiz_app'))).trim();
+const dbUser = (process.env.DB_USER || process.env.DATABASE_USER || process.env.MYSQL_USER || (process.env.VERCEL ? 'u879279162_camelcaravan' : (env.db.user || 'root'))).trim();
+const dbPassword = (process.env.DB_PASSWORD || process.env.DATABASE_PASSWORD || process.env.MYSQL_PASSWORD || process.env.DB_PASS || process.env.db_password || env.db.password || '').trim();
+const dbHost = (process.env.DB_HOST || process.env.DATABASE_HOST || process.env.MYSQL_HOST || (process.env.VERCEL ? 'srv1823.hstgr.io' : (env.db.host || '127.0.0.1'))).trim();
+const dbPort = Number((process.env.DB_PORT || process.env.DATABASE_PORT || process.env.MYSQL_PORT || env.db.port || 3306));
 
 const sequelize = new Sequelize(
   dbName,
