@@ -43,12 +43,12 @@ module.exports = {
   //Logging
   logLevel: process.env.LOG_LEVEL || 'debug',
   logDir: process.env.LOG_DIR || 'logs',
-  
+
   //Cors
   corsOrigin: process.env.CORS_ORIGIN || 'https://localhost:5173,https://192.168.1.9:5173,http://localhost:5173,http://192.168.1.9:5173',
-   
+
   //Mail Configuration
-  mail:{
+  mail: {
     mailer: process.env.MAIL_MAILER || 'smtp',
     host: process.env.MAIL_HOST || 'smtp.gmail.com',
     port: process.env.MAIL_PORT || 587,

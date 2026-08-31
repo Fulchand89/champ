@@ -1,5 +1,7 @@
 {
-  "watch": ["src"],
+  "watch": [
+    "src"
+  ],
   "ext": "js,json",
   "ignore": [
     "src/logs/**",
@@ -12,4 +14,3 @@
   "delay": 500,
   "signal": "SIGUSR2"
 }
-

@@ -4,7 +4,12 @@ const env = require('./env');
 const logger = require('./logger');
 const MESSAGES = require('../shared/constants/messages');
 
-let activePort = env.db.port;
+// Auto-resolve port for Hostinger remote MySQL if set to 3307
+const resolvedPort = (env.db.host && (env.db.host.includes('hstgr.io') || env.db.host.includes('hostinger')) && env.db.port === 3307) 
+  ? 3306 
+  : env.db.port;
+
+let activePort = resolvedPort;
 
 const createSequelizeInstance = (port) => {
   return new Sequelize(
@@ -17,7 +22,7 @@ const createSequelizeInstance = (port) => {
       dialect: 'mysql',
       logging: (msg) => logger.debug(msg),
       dialectOptions: {
-        connectTimeout: 30000,
+        connectTimeout: 10000,
         decimalNumbers: true,
         enableKeepAlive: true,
         keepAliveInitialDelay: 10000,
@@ -29,12 +34,12 @@ const createSequelizeInstance = (port) => {
       pool: {
         max: 20,
         min: 0,
-        acquire: 60000,
+        acquire: 30000,
         idle: 10000,
         evict: 1000,
       },
       retry: {
-        max: 5,
+        max: 3,
         match: [
           /SequelizeConnectionError/,
           /SequelizeConnectionRefusedError/,
@@ -56,24 +61,27 @@ const createSequelizeInstance = (port) => {
 
 let sequelize = createSequelizeInstance(activePort);
 
-// Helper to ensure MySQL database exists before connecting
+// Helper to ensure MySQL database exists before connecting (safe for both local XAMPP & shared hosting)
 const ensureDatabase = async (port) => {
-  const connection = await mysql.createConnection({
-    host: env.db.host,
-    port: port,
-    user: env.db.user,
-    password: env.db.password,
-    connectTimeout: 10000,
-  });
-  await connection.query(
-    `CREATE DATABASE IF NOT EXISTS \`${env.db.database}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
-  );
-  await connection.end();
+  try {
+    const connection = await mysql.createConnection({
+      host: env.db.host,
+      port: port,
+      user: env.db.user,
+      password: env.db.password,
+      database: env.db.database,
+      connectTimeout: 5000,
+    });
+    await connection.end();
+  } catch (err) {
+    logger.debug('Database connection check note:', err.message);
+  }
 };
 
 const connectDB = async (retries = 5, delay = 2000) => {
   let attempt = 0;
-  const candidatePorts = [env.db.port, env.db.port === 3306 ? 3307 : 3306];
+  const candidatePorts = [resolvedPort];
+  if (resolvedPort !== 3306) candidatePorts.push(3306);
 
   while (attempt < retries) {
     attempt++;
@@ -111,7 +119,7 @@ const connectDB = async (retries = 5, delay = 2000) => {
           try {
             const [columns] = await sequelize.query("SHOW COLUMNS FROM `contests`");
             const colNames = columns.map(c => c.Field);
-            
+
             if (!colNames.includes('subjectId')) {
               await sequelize.query("ALTER TABLE `contests` ADD COLUMN `subjectId` INT NULL");
             }
@@ -151,7 +159,7 @@ const connectDB = async (retries = 5, delay = 2000) => {
             // Ensure missing columns exist in contest_participants table
             const [partColumns] = await sequelize.query("SHOW COLUMNS FROM `contest_participants`");
             const partColNames = partColumns.map(c => c.Field);
-            
+
             if (!partColNames.includes('score')) {
               await sequelize.query("ALTER TABLE `contest_participants` ADD COLUMN `score` DECIMAL(10,2) DEFAULT 0.00");
             }
@@ -402,4 +410,4 @@ const connectDB = async (retries = 5, delay = 2000) => {
 };
 
 module.exports = { sequelize, connectDB };
-
+
