@@ -27,20 +27,27 @@ const errorHandler = (err, req, res, next) => {
   
   // Handle specific error types
   if (error.name === 'ValidationError' || error.message === MESSAGES.VALIDATION_ERROR) {
-    response.message = MESSAGES.VALIDATION_ERROR;
+    const firstErr = Array.isArray(error.errors) && error.errors.length > 0
+      ? (error.errors[0].message || error.errors[0].msg || error.errors[0])
+      : null;
+    response.message = firstErr || MESSAGES.VALIDATION_ERROR;
     response.errors = error.errors;
   } else if (error.name === 'SequelizeValidationError') {
-    response.message = MESSAGES.VALIDATION_ERROR;
-    response.errors = error.errors?.map(e => ({
+    const errList = error.errors?.map(e => ({
       field: e.path,
       message: e.message,
     })) || [];
+    const firstMsg = errList.length > 0 ? errList[0].message : null;
+    response.message = firstMsg || MESSAGES.VALIDATION_ERROR;
+    response.errors = errList;
   } else if (error.name === 'SequelizeUniqueConstraintError') {
-    response.message = MESSAGES.DUPLICATE_ENTRY;
-    response.errors = error.errors?.map(e => ({
+    const errList = error.errors?.map(e => ({
       field: e.path,
-      message: `${e.path} ${MESSAGES.ALREADY_EXISTS}`,
+      message: `${e.path} already exists`,
     })) || [];
+    const firstMsg = errList.length > 0 ? errList[0].message : null;
+    response.message = firstMsg || MESSAGES.DUPLICATE_ENTRY;
+    response.errors = errList;
   }
   
   // Log validation errors if present
