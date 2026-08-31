@@ -9,12 +9,11 @@ const env = require('../config/env');
 
 // Vercel serverless filesystem only allows temporary writes in /tmp.
 // Local development continues to use backend/src/uploads.
-const isVercel = process.env.VERCEL === '1';
+const isVercel = !!process.env.VERCEL;
 
 const uploadBaseDir = isVercel
   ? path.join('/tmp', 'uploads')
   : path.join(__dirname, '../uploads');
-
 
 // ======================================================
 // ENSURE ALL UPLOAD DIRECTORIES EXIST
@@ -29,14 +28,14 @@ const uploadFolders = [
 ];
 
 uploadFolders.forEach(folder => {
-  const dir = path.join(uploadBaseDir, folder);
-
-  if (!fs.existsSync(dir)) {
-    try {
+  try {
+    const dir = path.join(uploadBaseDir, folder);
+    if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
-    } catch (error) {
-      console.error(`Failed to create upload directory: ${dir}`, error);
     }
+  } catch (error) {
+    // Non-fatal warning on read-only environments
+    console.warn(`Upload directory note (${folder}):`, error.message);
   }
 });
 

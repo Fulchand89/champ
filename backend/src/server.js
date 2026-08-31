@@ -117,4 +117,11 @@ const startServer = async () => {
   }
 };
 
-startServer();
+const app = require('./app');
+
+// Only start the standalone HTTP listener in non-Vercel environments (e.g. local dev / container)
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+module.exports = app;

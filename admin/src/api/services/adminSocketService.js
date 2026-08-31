@@ -25,6 +25,18 @@ let socket = null;
 export const initAdminSocket = () => {
   if (socket && socket.connected) return socket;
 
+  // Vercel serverless backend does not support persistent WebSockets
+  if (SOCKET_URL.includes('vercel.app')) {
+    socket = {
+      connected: false,
+      on: () => {},
+      off: () => {},
+      emit: () => {},
+      disconnect: () => {},
+    };
+    return socket;
+  }
+
   const token =
     Cookies.get('token') ||
     localStorage.getItem('token') ||
@@ -37,7 +49,7 @@ export const initAdminSocket = () => {
       transports: ['websocket', 'polling'],
       autoConnect: true,
       reconnection: true,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: 3,
       reconnectionDelay: 2000,
       timeout: 5000,
     });
@@ -57,6 +69,13 @@ export const initAdminSocket = () => {
     });
   } catch (err) {
     console.debug('Socket initialization error:', err.message);
+    socket = {
+      connected: false,
+      on: () => {},
+      off: () => {},
+      emit: () => {},
+      disconnect: () => {},
+    };
   }
 
   return socket;

@@ -5,20 +5,20 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 module.exports = {
   // Server
-  port: process.env.PORT || 8080,
-  nodeEnv: process.env.NODE_ENV || 'development',
+  port: parseInt(process.env.PORT || '6060', 10),
+  nodeEnv: process.env.NODE_ENV || (process.env.VERCEL ? 'production' : 'development'),
 
   // App
   app: {
-    baseUrl: process.env.BASE_URL || `http://localhost:${process.env.PORT || 8080}`,
+    baseUrl: process.env.BASE_URL || (process.env.VERCEL ? 'https://backend-xi-nine-42.vercel.app' : `http://localhost:${process.env.PORT || 6060}`),
   },
 
   // Database
   db: {
     host: process.env.DB_HOST || '127.0.0.1',
-    port: parseInt(process.env.DB_PORT || '3307', 10),
+    port: parseInt(process.env.DB_PORT || '3306', 10),
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
+    password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : '',
     database: process.env.DB_NAME || 'quiz_app',
   },
 
@@ -42,10 +42,10 @@ module.exports = {
 
   //Logging
   logLevel: process.env.LOG_LEVEL || 'debug',
-  logDir: process.env.LOG_DIR || 'logs',
+  logDir: process.env.LOG_DIR || (process.env.VERCEL ? '/tmp/logs' : 'logs'),
 
   //Cors
-  corsOrigin: process.env.CORS_ORIGIN || 'https://localhost:5173,https://192.168.1.9:5173,http://localhost:5173,http://192.168.1.9:5173',
+  corsOrigin: process.env.CORS_ORIGIN || 'https://admin-ten-dun-45.vercel.app,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173',
 
   //Mail Configuration
   mail: {

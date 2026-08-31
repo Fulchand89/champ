@@ -6,25 +6,37 @@ const logger = require('./logger');
 const MESSAGES = require('../shared/constants/messages');
 
 // Auto-resolve port for Hostinger remote MySQL if set to 3307
-const resolvedPort = (env.db.host && (env.db.host.includes('hstgr.io') || env.db.host.includes('hostinger')) && env.db.port === 3307) 
+const rawHost = process.env.DB_HOST || env.db.host || '127.0.0.1';
+const rawPort = parseInt(process.env.DB_PORT || env.db.port || '3306', 10);
+const resolvedPort = (rawHost && (rawHost.includes('hstgr.io') || rawHost.includes('hostinger')) && rawPort === 3307) 
   ? 3306 
-  : env.db.port;
+  : rawPort;
 
 let activePort = resolvedPort;
 
 const createSequelizeInstance = (port) => {
+  const dbHost = process.env.DB_HOST || env.db.host || '127.0.0.1';
+  const dbPort = parseInt(port || process.env.DB_PORT || env.db.port || 3306, 10);
+  const dbUser = process.env.DB_USER || env.db.user || 'root';
+  const dbPassword = process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : env.db.password;
+  const dbName = process.env.DB_NAME || env.db.database || 'quiz_app';
+
   return new Sequelize(
-    env.db.database,
-    env.db.user,
-    env.db.password,
+    dbName,
+    dbUser,
+    dbPassword,
     {
-      host: env.db.host,
-      port: port,
+      host: dbHost,
+      port: dbPort,
       dialect: 'mysql',
       dialectModule: mysql2,
-      logging: (msg) => logger.debug(msg),
+      logging: (msg) => {
+        if (process.env.NODE_ENV === 'development') {
+          logger.debug(msg);
+        }
+      },
       dialectOptions: {
-        connectTimeout: 10000,
+        connectTimeout: 15000,
         decimalNumbers: true,
         enableKeepAlive: true,
         keepAliveInitialDelay: 10000,
@@ -34,7 +46,7 @@ const createSequelizeInstance = (port) => {
         collate: 'utf8mb4_unicode_ci',
       },
       pool: {
-        max: 20,
+        max: process.env.VERCEL ? 5 : 20,
         min: 0,
         acquire: 30000,
         idle: 10000,

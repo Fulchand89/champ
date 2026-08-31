@@ -12,6 +12,12 @@ let io = null;
  * @param {import('http').Server} server - Node HTTP server instance
  */
 const initSocket = (server) => {
+  // Do not initialize persistent WebSockets on Vercel Serverless
+  if (process.env.VERCEL) {
+    logger.info('Socket.IO disabled in Vercel Serverless environment');
+    return null;
+  }
+
   if (io) {
     logger.warn(MESSAGES.SOCKET_ALREADY_INIT);
     return io;
@@ -152,6 +158,13 @@ const initSocket = (server) => {
  */
 const getIO = () => {
   if (!io) {
+    if (process.env.VERCEL) {
+      return {
+        to: () => ({ emit: () => {} }),
+        emit: () => {},
+        sockets: { adapter: { rooms: new Map() } },
+      };
+    }
     throw new Error(MESSAGES.SOCKET_NOT_INIT);
   }
   return io;
@@ -164,6 +177,9 @@ const getIO = () => {
  * @param {any} data - Payload data
  */
 const emitToRoom = (room, event, data) => {
+  if (process.env.VERCEL) {
+    return false;
+  }
   try {
     const activeIo = getIO();
     activeIo.to(room).emit(event, data);
@@ -182,7 +198,7 @@ const emitToRoom = (room, event, data) => {
  * @param {any} data - Payload data
  */
 const emitToEventRoom = (eventCode, event, data) => {
-  if (!eventCode) return false;
+  if (process.env.VERCEL || !eventCode) return false;
   const room = `event_${eventCode}`;
   return emitToRoom(room, event, data);
 };

@@ -7,12 +7,34 @@ const optimizeImage = require('../middlewares/optimizeImage.middleware');
 
 const router = express.Router();
 
-// Apply Auth and Role limits on all Admin endpoints
+// Branding / Settings Endpoints (GET /settings is public/optional auth for platform title, PUT /settings is strictly protected)
+router.get('/settings', (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  let token = null;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (req.cookies && (req.cookies.token || req.cookies.adminToken)) {
+    token = req.cookies.token || req.cookies.adminToken;
+  }
+  if (token) {
+    try {
+      const { verifyToken } = require('../shared/utils/jwt');
+      const User = require('../database/models/user.model');
+      const decoded = verifyToken(token);
+      User.findByPk(decoded.id).then((u) => {
+        if (u && u.isActive) req.user = u;
+        next();
+      }).catch(() => next());
+      return;
+    } catch (e) {}
+  }
+  next();
+}, adminController.getSettings);
+
+// Apply Auth and Role limits on all protected Admin management endpoints
 router.use(authMiddleware);
 router.use(roleMiddleware('admin', 'super_admin'));
 
-// Branding / Settings Endpoints
-router.get('/settings', adminController.getSettings);
 router.put('/settings', upload.single('logo'), optimizeImage, adminController.updateSettings);
 
 // Notification Logs Endpoints

@@ -5,6 +5,14 @@ const adminRoutes = require('./admin.routes');
 
 const router = express.Router();
 
+// Normalize any duplicated /public/public segments cleanly
+router.use((req, res, next) => {
+  if (req.url && req.url.includes('/public/public')) {
+    req.url = req.url.replace(/\/public\/public/g, '/public');
+  }
+  next();
+});
+
 // Base API Route
 router.get('/', (req, res) => {
   res.status(200).json({
