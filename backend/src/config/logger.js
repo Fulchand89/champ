@@ -1,86 +1,142 @@
 const winston = require('winston');
 const path = require('path');
+const fs = require('fs');
 const env = require('./env');
 
-const fs = require('fs');
+// Detect Vercel Serverless Environment
+const isVercel = !!process.env.VERCEL;
 
-const logDir = path.isAbsolute(env.logDir)
-  ? env.logDir
-  : path.join(process.cwd(), env.logDir || 'logs');
+// Common log format
+const logFormat = winston.format.combine(
+  winston.format.timestamp({
+    format: 'YYYY-MM-DD HH:mm:ss'
+  }),
+  winston.format.errors({ stack: true }),
+  winston.format.splat(),
+  winston.format.json()
+);
 
-if (!fs.existsSync(logDir)) {
+// Console log format
+const consoleFormat = winston.format.combine(
+  winston.format.colorize(),
+  winston.format.simple()
+);
+
+// Main logger transports
+const loggerTransports = [];
+
+// Email logger transports
+const emailLoggerTransports = [];
+
+/*
+|--------------------------------------------------------------------------
+| File Logging
+|--------------------------------------------------------------------------
+| Disable Winston File transports on Vercel.
+| Vercel Serverless Functions cannot use /var/task/logs for persistent logs.
+*/
+
+if (!isVercel) {
+  const logDir = path.isAbsolute(env.logDir || '')
+    ? env.logDir
+    : path.join(process.cwd(), env.logDir || 'logs');
+
   try {
-    fs.mkdirSync(logDir, { recursive: true });
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+
+    // Main application logs
+    loggerTransports.push(
+      new winston.transports.File({
+        filename: path.join(logDir, 'error.log'),
+        level: 'error',
+        maxsize: 5242880,
+        maxFiles: 5
+      }),
+
+      new winston.transports.File({
+        filename: path.join(logDir, 'combined.log'),
+        maxsize: 5242880,
+        maxFiles: 5
+      })
+    );
+
+    // Email logs
+    emailLoggerTransports.push(
+      new winston.transports.File({
+        filename: path.join(logDir, 'email.log'),
+        maxsize: 5242880,
+        maxFiles: 5
+      })
+    );
+
   } catch (err) {
-    console.error('Failed to create log directory:', err);
+    console.error('Failed to initialize file logging:', err);
   }
 }
 
-const logger = winston.createLogger({
-  level: env.nodeEnv === 'development' ? env.logLevel || 'debug' : 'info',
-  format: winston.format.combine(
-    winston.format.timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss'
-    }),
-    winston.format.errors({ stack: true }),
-    winston.format.splat(),
-    winston.format.json()
-  ),
-  defaultMeta: { service: 'quiz-app-api' },
-  transports: [
-    new winston.transports.File({ 
-      filename: path.join(logDir, 'error.log'), 
-      level: 'error',
-      maxsize: 5242880,
-      maxFiles: 5,
-    }),
-    new winston.transports.File({ 
-      filename: path.join(logDir, 'combined.log'),
-      maxsize: 5242880,
-      maxFiles: 5,
-    }),
-  ],
-});
+/*
+|--------------------------------------------------------------------------
+| Console Logging
+|--------------------------------------------------------------------------
+| Console logs work on both localhost and Vercel.
+*/
 
-// Dedicated Email Logger
-const emailLogger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss'
-    }),
-    winston.format.errors({ stack: true }),
-    winston.format.splat(),
-    winston.format.json()
-  ),
-  defaultMeta: { service: 'camel-logistics-email' },
-  transports: [
-    new winston.transports.File({ 
-      filename: path.join(logDir, 'email.log'),
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
-    }),
-  ],
-});
-
-// Always enable Console logs in terminal / dev unless explicitly silenced
 if (process.env.SILENT_LOGS !== 'true') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.simple()
-    ),
-  }));
-  
-  emailLogger.add(new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.simple()
-    ),
-  }));
+  loggerTransports.push(
+    new winston.transports.Console({
+      format: consoleFormat
+    })
+  );
+
+  emailLoggerTransports.push(
+    new winston.transports.Console({
+      format: consoleFormat
+    })
+  );
 }
 
-// Attach emailLogger to the default logger export
+/*
+|--------------------------------------------------------------------------
+| Main Logger
+|--------------------------------------------------------------------------
+*/
+
+const logger = winston.createLogger({
+  level:
+    env.nodeEnv === 'development'
+      ? env.logLevel || 'debug'
+      : 'info',
+
+  format: logFormat,
+
+  defaultMeta: {
+    service: 'quiz-app-api'
+  },
+
+  transports: loggerTransports
+});
+
+/*
+|--------------------------------------------------------------------------
+| Dedicated Email Logger
+|--------------------------------------------------------------------------
+*/
+
+const emailLogger = winston.createLogger({
+  level: 'info',
+
+  format: logFormat,
+
+  defaultMeta: {
+    service: 'camel-logistics-email'
+  },
+
+  transports: emailLoggerTransports
+});
+
+// Attach emailLogger to main loggerlo
 logger.emailLogger = emailLogger;
 
 module.exports = logger;
