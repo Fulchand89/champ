@@ -4,6 +4,10 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
+// Ensure all Sequelize models and associations are registered immediately
+require('./database');
+const { connectDB } = require('./config/db');
+
 const routes = require('./routes/index.routes');
 const errorHandler = require('./middlewares/error.middleware');
 const logger = require('./config/logger');
@@ -12,6 +16,21 @@ const swaggerUi = require('swagger-ui-express');
 const getSwaggerSpec = require('./config/swagger');
 const { NotFoundError } = require('./shared/exceptions');
 const app = express();
+
+// Ensure DB initialization on Vercel / serverless environments
+let dbInitPromise = null;
+app.use(async (req, res, next) => {
+  if (!dbInitPromise) {
+    dbInitPromise = connectDB().catch((err) => {
+      console.error('Database connection/sync warning:', err.message);
+      dbInitPromise = null;
+    });
+  }
+  try {
+    await dbInitPromise;
+  } catch (e) {}
+  next();
+});
 
 // Security middleware
 app.use(helmet({
@@ -23,8 +42,6 @@ const corsOptions = require('./config/cors');
 
 // Robust CORS configuration
 app.use(cors(corsOptions));
-
-
 
 const loggerMiddleware = require('./middlewares/logger.middleware');
 

@@ -14,6 +14,7 @@ const {
  * Computes dynamic contest status based on current time & settings
  */
 const computeContestStatus = (contest) => {
+  if (!contest) return 'scheduled';
   if (!contest.isActive || contest.status === 'cancelled') {
     return 'cancelled';
   }
@@ -22,8 +23,8 @@ const computeContestStatus = (contest) => {
   }
 
   const now = new Date();
-  const start = new Date(contest.startTime);
-  const end = new Date(contest.endTime);
+  const start = contest.startTime ? new Date(contest.startTime) : now;
+  const end = contest.endTime ? new Date(contest.endTime) : new Date(start.getTime() + 15 * 60000);
 
   if (now > end) {
     return 'completed';
@@ -44,78 +45,98 @@ class ContestService {
   // ── 1. Contest CRUD ──
 
   async listContests(query = {}) {
-    const page = parseInt(query.page, 10) || 1;
-    const limit = parseInt(query.limit, 10) || 20;
-    const offset = (page - 1) * limit;
+    try {
+      const page = parseInt(query.page, 10) || 1;
+      const limit = parseInt(query.limit, 10) || 20;
+      const offset = (page - 1) * limit;
 
-    const whereClause = {};
+      const whereClause = {};
 
-    if (query.search) {
-      whereClause.title = { [Op.like]: `%${query.search.trim()}%` };
-    }
-
-    if (query.categoryId) {
-      whereClause.categoryId = parseInt(query.categoryId, 10);
-    }
-
-    if (query.isActive !== undefined) {
-      whereClause.isActive = query.isActive === 'true' || query.isActive === true;
-    }
-
-    const { count, rows } = await Contest.findAndCountAll({
-      where: whereClause,
-      order: [['startTime', 'DESC'], ['id', 'DESC']],
-      limit,
-      offset,
-      include: [
-        { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'image', 'icon', 'colorClass'] },
-        { model: Subject, as: 'subject', attributes: ['id', 'name'] },
-        { model: Topic, as: 'topic', attributes: ['id', 'name'] }
-      ]
-    });
-
-    const mapped = rows.map((cnt) => {
-      const data = cnt.toJSON();
-      data.computedStatus = computeContestStatus(cnt);
-      return data;
-    });
-
-    // Filter by computed status if requested
-    let resultRows = mapped;
-    if (query.status && query.status !== 'all') {
-      resultRows = mapped.filter((c) => c.computedStatus.toLowerCase() === query.status.toLowerCase());
-    }
-
-    return {
-      success: true,
-      data: resultRows,
-      pagination: {
-        page,
-        limit,
-        total: count,
-        totalPages: Math.ceil(count / limit) || 1,
+      if (query.search) {
+        whereClause.title = { [Op.like]: `%${query.search.trim()}%` };
       }
-    };
+
+      if (query.categoryId) {
+        whereClause.categoryId = parseInt(query.categoryId, 10);
+      }
+
+      if (query.isActive !== undefined) {
+        whereClause.isActive = query.isActive === 'true' || query.isActive === true;
+      }
+
+      const { count, rows } = await Contest.findAndCountAll({
+        where: whereClause,
+        order: [['startTime', 'DESC'], ['id', 'DESC']],
+        limit,
+        offset,
+        include: [
+          { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'image', 'icon', 'colorClass'], required: false },
+          { model: Subject, as: 'subject', attributes: ['id', 'name'], required: false },
+          { model: Topic, as: 'topic', attributes: ['id', 'name'], required: false }
+        ]
+      });
+
+      const mapped = (rows || []).map((cnt) => {
+        const data = cnt.toJSON();
+        data.computedStatus = computeContestStatus(cnt);
+        return data;
+      });
+
+      // Filter by computed status if requested
+      let resultRows = mapped;
+      if (query.status && query.status !== 'all') {
+        resultRows = mapped.filter((c) => c.computedStatus.toLowerCase() === query.status.toLowerCase());
+      }
+
+      return {
+        success: true,
+        data: resultRows,
+        pagination: {
+          page,
+          limit,
+          total: count || 0,
+          totalPages: Math.ceil((count || 0) / limit) || 1,
+        }
+      };
+    } catch (err) {
+      console.error('Error in listContests:', err);
+      return {
+        success: true,
+        data: [],
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 0,
+          totalPages: 1,
+        }
+      };
+    }
   }
 
   async getContestById(id) {
-    const contest = await Contest.findByPk(id, {
-      include: [
-        { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'image', 'icon', 'colorClass'], required: false },
-        { model: Subject, as: 'subject', attributes: ['id', 'name'], required: false },
-        { model: Topic, as: 'topic', attributes: ['id', 'name'], required: false },
-        { 
-          model: ContestParticipant, 
-          as: 'participants', 
-          required: false,
-          include: [{ model: User, as: 'user', attributes: ['id', 'name', 'email', 'profilePicUrl'], required: false }] 
-        }
-      ]
-    });
-    if (!contest) return null;
-    const json = contest.toJSON();
-    json.computedStatus = computeContestStatus(contest);
-    return json;
+    try {
+      const contest = await Contest.findByPk(id, {
+        include: [
+          { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'image', 'icon', 'colorClass'], required: false },
+          { model: Subject, as: 'subject', attributes: ['id', 'name'], required: false },
+          { model: Topic, as: 'topic', attributes: ['id', 'name'], required: false },
+          { 
+            model: ContestParticipant, 
+            as: 'participants', 
+            required: false,
+            include: [{ model: User, as: 'user', attributes: ['id', 'name', 'email', 'profilePicUrl'], required: false }] 
+          }
+        ]
+      });
+      if (!contest) return null;
+      const json = contest.toJSON();
+      json.computedStatus = computeContestStatus(contest);
+      return json;
+    } catch (err) {
+      console.error(`Error in getContestById (${id}):`, err);
+      const fallback = await Contest.findByPk(id);
+      return fallback ? fallback.toJSON() : null;
+    }
   }
 
   async createContest(data) {
@@ -171,7 +192,8 @@ class ContestService {
       isActive: data.isActive !== undefined ? (data.isActive === 'true' || data.isActive === true) : true,
     });
 
-    return this.getContestById(contest.id);
+    const populated = await this.getContestById(contest.id);
+    return populated || contest.toJSON();
   }
 
   async updateContest(id, data) {

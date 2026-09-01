@@ -137,6 +137,9 @@ const connectDB = async (retries = 5, delay = 2000) => {
             if (!colNames.includes('image')) {
               await sequelize.query("ALTER TABLE `contests` ADD COLUMN `image` VARCHAR(255) NULL");
             }
+            if (!colNames.includes('durationPerQuestion')) {
+              await sequelize.query("ALTER TABLE `contests` ADD COLUMN `durationPerQuestion` INT DEFAULT 15");
+            }
             if (!colNames.includes('prizeDistribution')) {
               await sequelize.query("ALTER TABLE `contests` ADD COLUMN `prizeDistribution` JSON NULL");
             }

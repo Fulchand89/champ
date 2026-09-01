@@ -147,61 +147,73 @@ const ManageQuizCategories = () => {
       return;
     }
 
-    if (modalType === 'add' && !imageFile) {
-      toast.error('Category image is required. Please upload an image.');
-      return;
-    }
-
     const generatedSlug = (slug || name).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-    const formData = new FormData();
-    formData.append('name', name.trim());
-    formData.append('slug', generatedSlug);
-    formData.append('description', description ? description.trim() : '');
-    formData.append('colorClass', colorClass);
-    formData.append('isActive', String(isActive));
-
-    if (imageFile) {
-      formData.append('image', imageFile);
-      formData.append('icon', imageFile);
-    }
+    const jsonPayload = {
+      name: name.trim(),
+      slug: generatedSlug,
+      description: description ? description.trim() : '',
+      colorClass: colorClass || 'hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.25)]',
+      icon: '📚',
+      isActive: Boolean(isActive),
+    };
 
     try {
-      if (modalType === 'add') {
-        const res = await categoryService.createCategory(formData);
-        if (res?.success || res?.data) {
-          toast.success('Category created successfully');
-          fetchCategories();
-          setIsModalOpen(false);
-        } else {
-          toast.error(res?.message || 'Failed to create category');
+      let res;
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('name', jsonPayload.name);
+        formData.append('slug', jsonPayload.slug);
+        formData.append('description', jsonPayload.description);
+        formData.append('colorClass', jsonPayload.colorClass);
+        formData.append('isActive', String(jsonPayload.isActive));
+        formData.append('image', imageFile);
+        try {
+          if (modalType === 'add') {
+            res = await categoryService.createCategory(formData);
+          } else {
+            res = await categoryService.updateCategory(currentCategory.id, formData);
+          }
+        } catch (formErr) {
+          console.warn('FormData category save failed, retrying with JSON:', formErr);
+          if (modalType === 'add') {
+            res = await categoryService.createCategory(jsonPayload);
+          } else {
+            res = await categoryService.updateCategory(currentCategory.id, jsonPayload);
+          }
         }
       } else {
-        const res = await categoryService.updateCategory(currentCategory.id, formData);
-        if (res?.success || res?.data) {
-          toast.success('Category updated successfully');
-          fetchCategories();
-          setIsModalOpen(false);
+        if (modalType === 'add') {
+          res = await categoryService.createCategory(jsonPayload);
         } else {
-          toast.error(res?.message || 'Failed to update category');
+          res = await categoryService.updateCategory(currentCategory.id, jsonPayload);
         }
+      }
+
+      if (res?.success || res?.data) {
+        toast.success(`Category ${modalType === 'add' ? 'created' : 'updated'} successfully`);
+        fetchCategories();
+        setIsModalOpen(false);
+      } else {
+        toast.error(res?.message || `Failed to ${modalType === 'add' ? 'create' : 'update'} category`);
       }
     } catch (err) {
       console.error('Error saving category:', err);
+      console.error('Backend full error response:', err.response?.data);
       const data = err.response?.data;
-      let errMsg = 'Error saving category';
+      let errMsg = 'Failed to save category';
       if (typeof data === 'string') {
         errMsg = data;
       } else if (data?.message) {
         errMsg = data.message;
       } else if (data?.error) {
-        errMsg = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+        errMsg = typeof data.error === 'string' ? data.error : (data.error.message || JSON.stringify(data.error));
       } else if (Array.isArray(data?.errors) && data.errors.length > 0) {
         errMsg = data.errors.map(e => (typeof e === 'string' ? e : e.message || e.msg || JSON.stringify(e))).join(', ');
       } else if (err.message) {
         errMsg = err.message;
       }
-      toast.error(errMsg);
+      toast.error(errMsg, { duration: 5000 });
     }
   };
 

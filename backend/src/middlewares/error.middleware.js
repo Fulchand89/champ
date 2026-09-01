@@ -5,57 +5,49 @@ const MESSAGES = require('../shared/constants/messages');
 const errorHandler = (err, req, res, next) => {
   let error = err;
   
-  // Log error explicitly to console for Vercel runtime logs and logger
-  console.error('GLOBAL SERVER ERROR:', err);
+  // Log error explicitly to console for Vercel runtime logs and server debugging
+  console.error('SERVER API ERROR:', err.name || 'Error', err.message);
+  if (err.stack) console.error(err.stack);
   logger.error(`${err.status || err.statusCode || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
   
-  // If error is not an instance of ApiError, convert it
-  if (!(error instanceof ApiError)) {
-    const statusCode = error.statusCode || (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError' ? 400 : 500);
-    const message = error.message || MESSAGES.INTERNAL_ERROR;
-    error = new ApiError(statusCode, message, false, err.stack);
-    // Preserve original error properties for specific handling below
-    error.name = err.name;
-    error.errors = err.errors;
+  let statusCode = error.statusCode || error.status || 500;
+  let customMessage = error.message || MESSAGES.INTERNAL_ERROR;
+  let errorList = error.errors || [];
+
+  if (error.name === 'SequelizeUniqueConstraintError') {
+    statusCode = 409;
+    errorList = error.errors?.map(e => ({
+      field: e.path,
+      message: `${e.path || 'Item'} already exists`,
+    })) || [];
+    customMessage = errorList.length > 0 ? errorList[0].message : MESSAGES.DUPLICATE_ENTRY;
+  } else if (error.name === 'SequelizeValidationError') {
+    statusCode = 400;
+    errorList = error.errors?.map(e => ({
+      field: e.path,
+      message: e.message,
+    })) || [];
+    customMessage = errorList.length > 0 ? errorList[0].message : MESSAGES.VALIDATION_ERROR;
+  } else if (error.name === 'ValidationError' || error.message === MESSAGES.VALIDATION_ERROR) {
+    statusCode = 400;
+    const firstErr = Array.isArray(error.errors) && error.errors.length > 0
+      ? (error.errors[0].message || error.errors[0].msg || error.errors[0])
+      : null;
+    customMessage = firstErr || MESSAGES.VALIDATION_ERROR;
+  } else if (error.name === 'SequelizeDatabaseError') {
+    console.error('DATABASE ERROR DETAILS:', error.parent || error.original);
+    customMessage = error.original?.sqlMessage || error.message;
   }
   
   const response = {
     success: false,
-    message: error.message,
+    message: customMessage,
+    error: customMessage,
+    ...(errorList.length > 0 && { errors: errorList }),
     ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
   };
   
-  // Handle specific error types
-  if (error.name === 'ValidationError' || error.message === MESSAGES.VALIDATION_ERROR) {
-    const firstErr = Array.isArray(error.errors) && error.errors.length > 0
-      ? (error.errors[0].message || error.errors[0].msg || error.errors[0])
-      : null;
-    response.message = firstErr || MESSAGES.VALIDATION_ERROR;
-    response.errors = error.errors;
-  } else if (error.name === 'SequelizeValidationError') {
-    const errList = error.errors?.map(e => ({
-      field: e.path,
-      message: e.message,
-    })) || [];
-    const firstMsg = errList.length > 0 ? errList[0].message : null;
-    response.message = firstMsg || MESSAGES.VALIDATION_ERROR;
-    response.errors = errList;
-  } else if (error.name === 'SequelizeUniqueConstraintError') {
-    const errList = error.errors?.map(e => ({
-      field: e.path,
-      message: `${e.path} already exists`,
-    })) || [];
-    const firstMsg = errList.length > 0 ? errList[0].message : null;
-    response.message = firstMsg || MESSAGES.DUPLICATE_ENTRY;
-    response.errors = errList;
-  }
-  
-  // Log validation errors if present
-  if (response.errors) {
-    logger.error(`Validation Errors: ${JSON.stringify(response.errors)}`);
-  }
-  
-  res.status(error.statusCode || 500).json(response);
+  res.status(statusCode).json(response);
 };
 
 module.exports = errorHandler;

@@ -730,7 +730,7 @@ const getCategoryById = asyncHandler(async (req, res) => {
 });
 
 const createCategory = asyncHandler(async (req, res) => {
-  let { name, slug, description, colorClass, isActive } = req.body;
+  let { name, slug, description, colorClass, icon, isActive } = req.body;
   if (!name || !name.trim()) {
     return res.status(400).json({ success: false, message: 'Category name is required' });
   }
@@ -741,6 +741,17 @@ const createCategory = asyncHandler(async (req, res) => {
     slug = slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   }
 
+  // Check for duplicate category name or slug before creating
+  const { Op } = require('sequelize');
+  const existingCat = await Category.findOne({
+    where: {
+      [Op.or]: [{ name }, { slug }]
+    }
+  });
+  if (existingCat) {
+    return res.status(409).json({ success: false, message: 'Category with this name or slug already exists' });
+  }
+
   let imageUrl = null;
   if (req.file) {
     imageUrl = `/uploads/categories/${req.file.filename}`;
@@ -748,8 +759,9 @@ const createCategory = asyncHandler(async (req, res) => {
     imageUrl = req.body.image.trim();
   }
 
+  // Fallback to default placeholder if not uploaded
   if (!imageUrl) {
-    return res.status(400).json({ success: false, message: 'Category image is required. Please upload or select an image.' });
+    imageUrl = '/cat-general.png';
   }
 
   const category = await Category.create({
@@ -757,10 +769,11 @@ const createCategory = asyncHandler(async (req, res) => {
     slug,
     description: description ? description.trim() : '',
     image: imageUrl,
+    icon: icon || '📚',
     colorClass: colorClass || 'hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.25)]',
     isActive: isActive !== undefined ? parseBool(isActive) : true
   });
-  res.status(201).json({ success: true, data: category });
+  res.status(201).json({ success: true, message: 'Category created successfully', data: category });
 });
 
 const updateCategory = asyncHandler(async (req, res) => {
