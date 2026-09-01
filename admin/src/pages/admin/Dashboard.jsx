@@ -206,7 +206,7 @@ export default function Dashboard() {
             </div>
 
             {/* Wallet Primary Metric Bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-800/30 p-4 rounded-xl border border-gray-700">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
               <div>
                 <span className="text-xs text-gray-400 block font-medium">Total Wallet Balance</span>
                 <span className="text-xl font-bold text-white block mt-1">
@@ -236,7 +236,7 @@ export default function Dashboard() {
 
             {/* Wallet Detailed Breakdown Sub-Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-              <div className="bg-gray-800/20 p-3 rounded-lg border border-gray-700">
+              <div className="bg-white/[0.03] p-3 rounded-lg border border-white/10">
                 <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
                   <ArrowDownLeft size={13} className="text-[#E94B4B]" />
                   <span>Total Credits</span>
@@ -247,7 +247,7 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-400 mt-0.5">Deposits & Prizes</p>
               </div>
 
-              <div className="bg-gray-800/20 p-3 rounded-lg border border-gray-700">
+              <div className="bg-white/[0.03] p-3 rounded-lg border border-white/10">
                 <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
                   <ArrowUpRight size={13} className="text-[#E94B4B]" />
                   <span>Total Debits</span>
@@ -258,7 +258,7 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-400 mt-0.5">Fees & Payouts</p>
               </div>
 
-              <div className="bg-gray-800/20 p-3 rounded-lg border border-gray-700">
+              <div className="bg-white/[0.03] p-3 rounded-lg border border-white/10">
                 <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
                   <CreditCard size={13} className="text-[#E94B4B]" />
                   <span>Gross Transactions</span>
@@ -269,7 +269,7 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-400 mt-0.5">Gateway Volume</p>
               </div>
 
-              <div className="bg-gray-800/20 p-3 rounded-lg border border-gray-700">
+              <div className="bg-white/[0.03] p-3 rounded-lg border border-white/10">
                 <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
                   <Clock size={13} className="text-[#E94B4B]" />
                   <span>Pending Payouts</span>

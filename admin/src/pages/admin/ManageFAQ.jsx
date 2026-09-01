@@ -206,28 +206,26 @@ const ManageFAQ = () => {
   return (
     <div className="space-y-6">
       {/* ── Page Header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-[#0f1117] text-white p-5 rounded-2xl shadow-sm border border-white/10 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <HelpCircle className="w-6 h-6 text-[#E94B4B]" />
-            Manage FAQs
-          </h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Create, update, reorder and expand answers to inspect details
+          <h1 className="text-xl font-bold">Manage FAQs</h1>
+          <p className="text-xs text-gray-400 mt-1">
+            Create, update, reorder and manage platform FAQs with contest mappings.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={fetchFAQs}
             disabled={loading}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#141728] border border-gray-800 text-gray-300 hover:text-white hover:bg-[#1a1f37] transition-all text-sm font-medium disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 border border-gray-600 hover:bg-gray-800 rounded-lg text-sm text-white transition-all disabled:opacity-50 cursor-pointer"
           >
             <RotateCw className={`w-4 h-4 ${loading ? 'animate-spin text-[#E94B4B]' : ''}`} />
             Refresh
           </button>
           <button
             onClick={handleOpenAddModal}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#E94B4B] hover:bg-[#d43f3f] text-white transition-all text-sm font-semibold shadow-lg shadow-[#E94B4B]/20 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all cursor-pointer hover:opacity-90 shadow-md"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
           >
             <Plus className="w-4 h-4" />
             Add New FAQ
@@ -237,37 +235,46 @@ const ManageFAQ = () => {
 
       {/* ── Stats Overview ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-2xl bg-[#0f111d] border border-gray-800/80 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-[#0f1117] border border-white/10 flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total FAQs</p>
             <p className="text-2xl font-bold text-white mt-1">{totalFaqs}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
-            {totalFaqs}
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
+            <HelpCircle className="w-5 h-5" />
           </div>
         </div>
-        <div className="p-4 rounded-2xl bg-[#0f111d] border border-gray-800/80 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-[#0f1117] border border-white/10 flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active FAQs</p>
-            <p className="text-2xl font-bold text-green-400 mt-1">{activeFaqs}</p>
+            <p className="text-2xl font-bold text-white mt-1">{activeFaqs}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center text-green-400 font-bold">
-            {activeFaqs}
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
+            <Check className="w-5 h-5" />
           </div>
         </div>
-        <div className="p-4 rounded-2xl bg-[#0f111d] border border-gray-800/80 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-[#0f1117] border border-white/10 flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Inactive FAQs</p>
-            <p className="text-2xl font-bold text-gray-400 mt-1">{inactiveFaqs}</p>
+            <p className="text-2xl font-bold text-white mt-1">{inactiveFaqs}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-gray-500/10 border border-gray-500/20 flex items-center justify-center text-gray-400 font-bold">
-            {inactiveFaqs}
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
+            <X className="w-5 h-5" />
           </div>
         </div>
       </div>
 
       {/* ── Filters & Search ── */}
-      <div className="p-4 rounded-2xl bg-[#0f111d] border border-gray-800/80 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-[#0f1117] border border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
@@ -275,14 +282,14 @@ const ManageFAQ = () => {
             placeholder="Search FAQs by question or answer..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-[#141728] border border-gray-800 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E94B4B] transition-colors"
+            className="w-full pl-10 pr-4 py-2 bg-[#0f1117] border border-gray-600 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E94B4B] transition-colors"
           />
         </div>
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           <button
             type="button"
             onClick={toggleExpandAll}
-            className="flex items-center gap-1.5 px-3 py-2 bg-[#141728] hover:bg-[#1a1f37] border border-gray-800 rounded-xl text-xs font-semibold text-gray-300 hover:text-white transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 bg-[#0f1117] hover:bg-gray-800 border border-gray-600 rounded-xl text-xs font-semibold text-gray-300 hover:text-white transition-all cursor-pointer"
             title={isAllExpanded ? "Collapse all answers" : "Expand all answers"}
           >
             <ChevronsUpDown className="w-3.5 h-3.5 text-[#E94B4B]" />
@@ -292,7 +299,7 @@ const ManageFAQ = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 bg-[#141728] border border-gray-800 rounded-xl text-sm text-gray-300 focus:outline-none focus:border-[#E94B4B] transition-colors"
+            className="px-3 py-2 bg-[#0f1117] border border-gray-600 rounded-xl text-sm text-gray-300 focus:outline-none focus:border-[#E94B4B] transition-colors"
           >
             <option value="ALL">All Statuses</option>
             <option value="ACTIVE">Active Only</option>
@@ -301,7 +308,7 @@ const ManageFAQ = () => {
           <select
             value={selectedContestFilter}
             onChange={(e) => setSelectedContestFilter(e.target.value)}
-            className="px-3 py-2 bg-[#141728] border border-gray-800 rounded-xl text-sm text-gray-300 focus:outline-none focus:border-[#E94B4B] transition-colors max-w-[200px]"
+            className="px-3 py-2 bg-[#0f1117] border border-gray-600 rounded-xl text-sm text-gray-300 focus:outline-none focus:border-[#E94B4B] transition-colors max-w-[200px]"
           >
             <option value="ALL">All Mappings</option>
             <option value="GENERAL">General / All Contests</option>
@@ -315,11 +322,11 @@ const ManageFAQ = () => {
       </div>
 
       {/* ── FAQs Expandable Table / List ── */}
-      <div className="bg-[#0f111d] rounded-2xl border border-gray-800/80 overflow-hidden shadow-xl">
+      <div className="bg-[#0f1117] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
         <div className="overflow-x-auto w-full no-scrollbar">
           <table className="w-full text-left border-collapse min-w-[720px]">
             <thead>
-              <tr className="bg-[#141728]/80 border-b border-gray-800 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              <tr className="bg-white/5 border-b border-white/10 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 <th className="py-3.5 px-4 w-16 text-center">Order</th>
                 <th className="py-3.5 px-4 w-16">ID</th>
                 <th className="py-3.5 px-4">Question & Answer</th>
@@ -328,7 +335,7 @@ const ManageFAQ = () => {
                 <th className="py-3.5 px-4 w-28 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800/60">
+            <tbody className="divide-y divide-white/10">
               {loading ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-gray-400 font-medium">
@@ -345,13 +352,13 @@ const ManageFAQ = () => {
                   return (
                     <tr
                       key={faq.id || index}
-                      className={`hover:bg-[#141728]/50 transition-colors ${
-                        isExpanded ? 'bg-[#141728]/30' : ''
+                      className={`hover:bg-white/5 transition-colors ${
+                        isExpanded ? 'bg-white/[0.03]' : ''
                       }`}
                     >
                       {/* Order */}
                       <td className="py-4 px-4 font-mono text-gray-400 text-center text-xs align-top">
-                        <span className="inline-block px-2 py-0.5 rounded bg-gray-800/60 border border-gray-700/50">
+                        <span className="inline-block px-2 py-0.5 rounded bg-white/5 border border-white/10">
                           {faq.displayOrder !== undefined ? faq.displayOrder : index + 1}
                         </span>
                       </td>
@@ -375,7 +382,7 @@ const ManageFAQ = () => {
                               className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
                                 isExpanded
                                   ? 'bg-[#E94B4B]/15 border-[#E94B4B]/40 text-[#E94B4B] shadow-sm'
-                                  : 'bg-[#1a1f37] border-gray-700/60 text-gray-300 hover:text-white hover:bg-[#252b48]'
+                                  : 'bg-white/5 border-white/10 text-gray-300 hover:text-white hover:bg-white/10'
                               }`}
                               title={isExpanded ? "Hide Answer (Up)" : "Show Answer (Down)"}
                             >
@@ -390,7 +397,7 @@ const ManageFAQ = () => {
 
                           {/* Answer Box: Expanded vs Collapsed */}
                           {isExpanded ? (
-                            <div className="mt-2.5 p-3.5 rounded-xl bg-[#090b15]/90 border border-gray-700/60 shadow-inner">
+                            <div className="mt-2.5 p-3.5 rounded-xl bg-white/5 border border-white/10 shadow-inner">
                               <div className="flex items-center gap-1.5 mb-1.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[#E94B4B]"></span>
                                 Complete Answer:
@@ -414,7 +421,7 @@ const ManageFAQ = () => {
                       {/* Contest Mapping */}
                       <td className="py-4 px-4 align-top text-xs">
                         {faq.contest?.title ? (
-                          <span className="inline-block px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">
+                          <span className="inline-block px-2.5 py-1 rounded-lg bg-[#E94B4B]/10 text-[#E94B4B] border border-[#E94B4B]/20 font-medium">
                             {faq.contest.title}
                           </span>
                         ) : (
@@ -430,7 +437,7 @@ const ManageFAQ = () => {
                           className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all border ${
                             faq.isActive
                               ? 'bg-green-500/15 text-green-400 hover:bg-green-500/25 border-green-500/30'
-                              : 'bg-gray-500/15 text-gray-400 hover:bg-gray-500/25 border-gray-500/30'
+                              : 'bg-white/10 text-white/50 hover:bg-white/15 border-white/10'
                           }`}
                           title="Click to toggle status"
                         >
@@ -444,7 +451,7 @@ const ManageFAQ = () => {
                           <button
                             type="button"
                             onClick={() => handleOpenEditModal(faq)}
-                            className="p-2 rounded-xl bg-[#1a1f37] hover:bg-[#252b48] text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
+                            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 transition-colors cursor-pointer"
                             title="Edit FAQ"
                           >
                             <Edit className="w-4 h-4" />
@@ -452,7 +459,7 @@ const ManageFAQ = () => {
                           <button
                             type="button"
                             onClick={() => handleDelete(faq.id)}
-                            className="p-2 rounded-xl bg-[#1a1f37] hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-colors cursor-pointer"
+                            className="p-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-white/10 transition-colors cursor-pointer"
                             title="Delete FAQ"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -477,9 +484,9 @@ const ManageFAQ = () => {
       {/* ── Add / Edit Modal ── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="relative w-full max-w-xl bg-[#0f111d] border border-gray-800 rounded-2xl p-6 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+          <div className="relative w-full max-w-xl bg-[#0f1117] border border-white/10 rounded-2xl p-6 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-gray-800 shrink-0">
+            <div className="flex items-center justify-between pb-4 border-b border-white/10 shrink-0">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-[#E94B4B]" />
                 {modalType === 'add' ? 'Add New FAQ' : 'Edit FAQ'}
@@ -487,7 +494,7 @@ const ManageFAQ = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors cursor-pointer"
+                className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -506,7 +513,7 @@ const ManageFAQ = () => {
                   placeholder="e.g. How do I join a quiz contest?"
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-[#141728] border border-gray-800 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E94B4B] transition-colors"
+                  className="w-full px-3.5 py-2.5 bg-[#0f1117] border border-white/15 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E94B4B] transition-colors"
                 />
               </div>
 
@@ -521,7 +528,7 @@ const ManageFAQ = () => {
                   placeholder="Detailed answer explanation..."
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-[#141728] border border-gray-800 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E94B4B] transition-colors resize-none"
+                  className="w-full px-3.5 py-2.5 bg-[#0f1117] border border-white/15 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E94B4B] transition-colors resize-none"
                 />
               </div>
 
@@ -534,7 +541,7 @@ const ManageFAQ = () => {
                   <select
                     value={contestId}
                     onChange={(e) => setContestId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-[#141728] border border-gray-800 rounded-xl text-sm text-white focus:outline-none focus:border-[#E94B4B] transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-[#0f1117] border border-white/15 rounded-xl text-sm text-white focus:outline-none focus:border-[#E94B4B] transition-colors"
                   >
                     <option value="">General / All Contests</option>
                     {contests.map((c) => (
@@ -553,7 +560,7 @@ const ManageFAQ = () => {
                     min="0"
                     value={displayOrder}
                     onChange={(e) => setDisplayOrder(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-[#141728] border border-gray-800 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E94B4B] transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-[#0f1117] border border-white/15 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#E94B4B] transition-colors"
                   />
                 </div>
               </div>
@@ -565,7 +572,7 @@ const ManageFAQ = () => {
                   id="isActive"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-800 bg-[#141728] text-[#E94B4B] focus:ring-[#E94B4B] cursor-pointer"
+                  className="w-4 h-4 rounded border-white/15 bg-[#0f1117] text-[#E94B4B] focus:ring-[#E94B4B] cursor-pointer"
                 />
                 <label htmlFor="isActive" className="text-sm font-medium text-gray-300 cursor-pointer select-none">
                   Active (visible on website & app)
@@ -573,18 +580,19 @@ const ManageFAQ = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-800 mt-4">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10 mt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-[#141728] hover:bg-[#1a1f37] text-gray-300 text-sm font-medium transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-sm font-medium transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2 rounded-xl bg-[#E94B4B] hover:bg-[#d43f3f] text-white text-sm font-semibold transition-all shadow-lg shadow-[#E94B4B]/20 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                  style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+                  className="px-5 py-2 rounded-xl text-white text-sm font-semibold transition-all shadow-md hover:opacity-90 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                 >
                   {saving && <RotateCw className="w-4 h-4 animate-spin" />}
                   {modalType === 'add' ? 'Create FAQ' : 'Save Changes'}

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { AlertTriangle, X, Loader2 } from 'lucide-react';
 
 const ConfirmModal = ({
@@ -16,19 +16,19 @@ const ConfirmModal = ({
 
   const typeStyles = {
     danger: {
-      iconBg: 'bg-red-100 text-red-600',
+      iconBg: 'bg-red-500/15 text-red-400 border border-red-500/20',
       buttonBg: 'text-white shadow-xs',
       buttonStyle: { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' },
     },
     warning: {
-      iconBg: 'bg-amber-100 text-amber-600',
+      iconBg: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
       buttonBg: 'text-white shadow-xs',
       buttonStyle: { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' },
     },
     info: {
-      iconBg: 'bg-blue-100 text-blue-600',
-      buttonBg: 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs',
-      buttonStyle: {},
+      iconBg: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
+      buttonBg: 'text-white shadow-xs',
+      buttonStyle: { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' },
     }
   };
 
@@ -67,7 +67,7 @@ const ConfirmModal = ({
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="px-4 py-2 text-xs font-bold border border-gray-600 text-white rounded-lg hover:bg-gray-800 transition-all cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 text-xs font-bold border border-white/10 text-white/80 rounded-lg hover:bg-white/10 hover:text-white transition-all cursor-pointer disabled:opacity-50"
           >
             {cancelText}
           </button>

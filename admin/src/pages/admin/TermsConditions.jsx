@@ -310,13 +310,13 @@ const TermsConditions = () => {
         </div>
 
         <div className="bg-[#0f1117] border border-white/10 p-4 rounded-2xl flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center shrink-0">
-            <History className="w-4 h-4 text-blue-400" />
+          <div className="w-10 h-10 rounded-xl bg-[#E94B4B]/15 border border-[#E94B4B]/20 flex items-center justify-center shrink-0">
+            <History className="w-5 h-5 text-[#E94B4B]" />
           </div>
           <div>
             <span className="text-[11px] text-white/40 font-medium block">Active Version</span>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-500/15 text-blue-400 border border-blue-500/20">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E94B4B]/15 text-[#E94B4B] border border-[#E94B4B]/20">
                 {currentVersionTag}
               </span>
               <span className="text-[10px] text-white/30">Live on Apps</span>
@@ -500,8 +500,8 @@ const TermsConditions = () => {
       <div className="bg-[#0f1117] border border-white/10 rounded-2xl overflow-hidden shadow-xl">
         <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center shrink-0">
-              <History className="w-4 h-4 text-blue-400" />
+            <div className="w-9 h-9 rounded-xl bg-[#E94B4B]/15 border border-[#E94B4B]/20 flex items-center justify-center shrink-0">
+              <History className="w-4 h-4 text-[#E94B4B]" />
             </div>
             <div>
               <h3 className="font-bold text-white text-sm">Terms Revision History</h3>

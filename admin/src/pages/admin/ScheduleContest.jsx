@@ -236,7 +236,7 @@ const ScheduleContest = () => {
         const imgPath = row.image || row.category?.image || row.category?.icon || fallbackImg;
         return (
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#14182e] border border-gray-800 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
               <img
                 src={getImageUrl(imgPath)}
                 alt={val}
@@ -397,14 +397,14 @@ const ScheduleContest = () => {
                 </div>
 
                 {/* Contest Cover Image */}
-                <div className="col-span-1 sm:col-span-2 bg-[#14182e]/40 p-3 rounded-xl border border-gray-800">
+                <div className="col-span-1 sm:col-span-2 bg-white/5 p-3 rounded-xl border border-white/10">
                   <label className="block text-xs font-bold text-gray-300 mb-2">Contest Cover Image (Optional)</label>
                   <div className="flex flex-col sm:flex-row items-center gap-3">
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full sm:flex-1 border border-dashed border-gray-600 hover:border-red-500 rounded-xl p-2.5 text-center cursor-pointer transition-colors bg-[#090b15] flex flex-col items-center justify-center gap-1"
+                      className="w-full sm:flex-1 border border-dashed border-white/20 hover:border-[#E94B4B] rounded-xl p-2.5 text-center cursor-pointer transition-colors bg-[#0f1117] flex flex-col items-center justify-center gap-1"
                     >
-                      <Upload size={16} className="text-red-400" />
+                      <Upload size={16} className="text-[#E94B4B]" />
                       <p className="text-xs text-gray-300 font-medium">{imageFile ? imageFile.name : 'Click to select contest image'}</p>
                       <p className="text-[10px] text-gray-500">JPG, PNG, WEBP (Max 5MB)</p>
                       <input
@@ -417,7 +417,7 @@ const ScheduleContest = () => {
                     </div>
 
                     {imagePreview && (
-                      <div className="flex items-center gap-2.5 p-2 bg-[#090b15] rounded-xl border border-gray-700">
+                      <div className="flex items-center gap-2.5 p-2 bg-[#0f1117] rounded-xl border border-white/15">
                         <img src={getImageUrl(imagePreview)} alt="Preview" className="w-12 h-12 object-contain rounded-lg" />
                         <div>
                           <p className="text-xs font-semibold text-white">Preview</p>
@@ -427,7 +427,7 @@ const ScheduleContest = () => {
                               setImageFile(null);
                               setImagePreview('');
                             }}
-                            className="text-[10px] text-red-400 hover:underline cursor-pointer"
+                            className="text-[10px] text-[#E94B4B] hover:underline cursor-pointer"
                           >
                             Remove
                           </button>

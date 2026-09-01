@@ -193,8 +193,8 @@ const SupportContact = () => {
       {/* ── Email Support Card ── */}
       <div className="bg-[#0f1117] rounded-2xl border border-white/10 overflow-hidden">
         <div className="px-5 py-4 border-b border-white/10 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-500/15 flex items-center justify-center shrink-0">
-            <Mail className="w-4 h-4 text-blue-400" />
+          <div className="w-9 h-9 rounded-xl bg-[#E94B4B]/15 flex items-center justify-center shrink-0">
+            <Mail className="w-4 h-4 text-[#E94B4B]" />
           </div>
           <div>
             <h2 className="text-sm font-bold text-white">Email Support Configuration</h2>
@@ -268,8 +268,8 @@ const SupportContact = () => {
 
           <div className="bg-white/4 border border-white/8 rounded-xl p-4">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-full bg-blue-500/15 flex items-center justify-center">
-                <Mail className="w-4 h-4 text-blue-400" />
+              <div className="w-9 h-9 rounded-full bg-[#E94B4B]/15 flex items-center justify-center">
+                <Mail className="w-4 h-4 text-[#E94B4B]" />
               </div>
               <div>
                 <p className="text-sm font-bold text-white">{emailTitle || 'Send us an Email'}</p>
@@ -277,7 +277,7 @@ const SupportContact = () => {
               </div>
             </div>
             <div className="flex items-center gap-2 text-xs text-white/70 break-all">
-              <CheckCircle className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <CheckCircle className="w-3.5 h-3.5 text-[#E94B4B] shrink-0" />
               {emailAddress || '—'}
             </div>
           </div>

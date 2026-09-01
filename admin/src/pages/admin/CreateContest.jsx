@@ -262,14 +262,14 @@ const CreateContest = () => {
           </div>
 
           {/* Contest Image Upload */}
-          <div className="bg-[#14182e]/40 p-4 rounded-xl border border-gray-800">
+          <div className="bg-white/5 p-4 rounded-xl border border-white/10">
             <label className="block text-xs font-bold text-gray-300 mb-2">Contest Cover Image (Optional)</label>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full sm:flex-1 border border-dashed border-gray-600 hover:border-red-500 rounded-xl p-3 text-center cursor-pointer transition-colors bg-[#090b15] flex flex-col items-center justify-center gap-1.5"
+                className="w-full sm:flex-1 border border-dashed border-white/20 hover:border-[#E94B4B] rounded-xl p-3 text-center cursor-pointer transition-colors bg-[#0f1117] flex flex-col items-center justify-center gap-1.5"
               >
-                <Upload size={18} className="text-red-400" />
+                <Upload size={18} className="text-[#E94B4B]" />
                 <p className="text-xs text-gray-300 font-medium">{imageFile ? imageFile.name : 'Click to select contest image'}</p>
                 <p className="text-[10px] text-gray-500">JPG, PNG, WEBP (Max 5MB)</p>
                 <input
@@ -282,7 +282,7 @@ const CreateContest = () => {
               </div>
 
               {imagePreview && (
-                <div className="flex items-center gap-3 p-2 bg-[#090b15] rounded-xl border border-gray-700">
+                <div className="flex items-center gap-3 p-2 bg-[#0f1117] rounded-xl border border-white/15">
                   <img src={imagePreview} alt="Preview" className="w-14 h-14 object-contain rounded-lg" />
                   <div>
                     <p className="text-xs font-semibold text-white">Selected Image</p>
@@ -292,7 +292,7 @@ const CreateContest = () => {
                         setImageFile(null);
                         setImagePreview('');
                       }}
-                      className="text-[10px] text-red-400 hover:underline cursor-pointer mt-1"
+                      className="text-[10px] text-[#E94B4B] hover:underline cursor-pointer mt-1"
                     >
                       Remove
                     </button>
@@ -314,7 +314,7 @@ const CreateContest = () => {
                   placeholder="0 for Free or e.g. 50"
                   value={entryFee}
                   onChange={(e) => setEntryFee(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                  className="block w-full pl-9 pr-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
                 />
               </div>
             </div>
@@ -322,7 +322,7 @@ const CreateContest = () => {
             <div>
               <label className="block text-xs font-bold text-gray-300 mb-1.5">Min Participants *</label>
               <div className="relative">
-                <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400" />
+                <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#E94B4B]" />
                 <input
                   required
                   type="number"
@@ -330,7 +330,7 @@ const CreateContest = () => {
                   placeholder="e.g. 2"
                   value={minParticipants}
                   onChange={(e) => setMinParticipants(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                  className="block w-full pl-9 pr-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
                 />
               </div>
             </div>
@@ -338,7 +338,7 @@ const CreateContest = () => {
             <div>
               <label className="block text-xs font-bold text-gray-300 mb-1.5">Max Participants *</label>
               <div className="relative">
-                <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" />
+                <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#E94B4B]" />
                 <input
                   required
                   type="number"
@@ -346,7 +346,7 @@ const CreateContest = () => {
                   placeholder="e.g. 100"
                   value={maxParticipants}
                   onChange={(e) => setMaxParticipants(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                  className="block w-full pl-9 pr-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
                 />
               </div>
             </div>
@@ -366,7 +366,7 @@ const CreateContest = () => {
                   type="datetime-local"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] [color-scheme:dark] cursor-pointer"
+                  className="block w-full pl-9 pr-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] [color-scheme:dark] cursor-pointer"
                 />
               </div>
             </div>
@@ -374,7 +374,7 @@ const CreateContest = () => {
             <div>
               <label className="block text-xs font-bold text-gray-300 mb-1.5">Duration (Minutes) *</label>
               <div className="relative">
-                <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400" />
+                <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#E94B4B]" />
                 <input
                   required
                   type="number"
@@ -382,7 +382,7 @@ const CreateContest = () => {
                   placeholder="e.g. 15"
                   value={durationMinutes}
                   onChange={(e) => setDurationMinutes(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                  className="block w-full pl-9 pr-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
                 />
               </div>
             </div>
@@ -390,7 +390,7 @@ const CreateContest = () => {
             <div>
               <label className="block text-xs font-bold text-gray-300 mb-1.5">Duration per Question (Seconds) *</label>
               <div className="relative">
-                <Timer size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" />
+                <Timer size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#E94B4B]" />
                 <input
                   required
                   type="number"
@@ -398,7 +398,7 @@ const CreateContest = () => {
                   placeholder="e.g. 15"
                   value={durationPerQuestion}
                   onChange={(e) => setDurationPerQuestion(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                  className="block w-full pl-9 pr-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
                 />
               </div>
             </div>
@@ -414,7 +414,7 @@ const CreateContest = () => {
                   placeholder="e.g. 10"
                   value={numQuestions}
                   onChange={(e) => setNumQuestions(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                  className="block w-full pl-9 pr-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
                 />
               </div>
             </div>

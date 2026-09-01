@@ -392,42 +392,54 @@ const ManageUsers = () => {
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-500/15 flex items-center justify-center text-blue-400 shrink-0">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
             <Users className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-white/50">Total Users</p>
+            <p className="text-xs font-semibold text-gray-400">Total Users</p>
             <p className="text-lg font-bold text-white">{stats.total}</p>
           </div>
         </div>
 
         <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-green-500/15 flex items-center justify-center text-green-400 shrink-0">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
             <UserCheck className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-white/50">Active Users</p>
-            <p className="text-lg font-bold text-green-400">{stats.active}</p>
+            <p className="text-xs font-semibold text-gray-400">Active Users</p>
+            <p className="text-lg font-bold text-white">{stats.active}</p>
           </div>
         </div>
 
         <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center text-red-400 shrink-0">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
             <UserX className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-white/50">Blocked Users</p>
-            <p className="text-lg font-bold text-red-400">{stats.blocked}</p>
+            <p className="text-xs font-semibold text-gray-400">Blocked Users</p>
+            <p className="text-lg font-bold text-white">{stats.blocked}</p>
           </div>
         </div>
 
         <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-400 shrink-0">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
             <Trophy className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-white/50">Total Quizzes</p>
-            <p className="text-lg font-bold text-amber-400">{stats.totalQuizzes}</p>
+            <p className="text-xs font-semibold text-gray-400">Total Quizzes</p>
+            <p className="text-lg font-bold text-white">{stats.totalQuizzes}</p>
           </div>
         </div>
       </div>

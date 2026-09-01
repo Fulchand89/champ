@@ -393,42 +393,54 @@ const SettingsPage = () => {
       {/* ── Dynamic System Overview Cards (Live Database Metrics) ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
         <div className="bg-[#0f1117] rounded-xl border border-white/10 p-4 flex items-center gap-3.5 shadow-md">
-          <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center shrink-0">
-            <Trophy className="w-5 h-5 text-amber-400" />
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
+            <Trophy className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] text-white/40 font-medium uppercase tracking-wider">Total Contests</p>
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Total Contests</p>
             <p className="text-base font-bold text-white mt-0.5">{liveStats.totalContests ?? 0}</p>
           </div>
         </div>
 
         <div className="bg-[#0f1117] rounded-xl border border-white/10 p-4 flex items-center gap-3.5 shadow-md">
-          <div className="w-10 h-10 rounded-xl bg-blue-400/10 border border-blue-400/20 flex items-center justify-center shrink-0">
-            <Users className="w-5 h-5 text-blue-400" />
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
+            <Users className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] text-white/40 font-medium uppercase tracking-wider">Registered Users</p>
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Registered Users</p>
             <p className="text-base font-bold text-white mt-0.5">{liveStats.totalUsers ?? 0}</p>
           </div>
         </div>
 
         <div className="bg-[#0f1117] rounded-xl border border-white/10 p-4 flex items-center gap-3.5 shadow-md">
-          <div className="w-10 h-10 rounded-xl bg-green-400/10 border border-green-400/20 flex items-center justify-center shrink-0">
-            <CreditCard className="w-5 h-5 text-green-400" />
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
+            <CreditCard className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] text-white/40 font-medium uppercase tracking-wider">Transactions</p>
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Transactions</p>
             <p className="text-base font-bold text-white mt-0.5">{liveStats.totalTransactions ?? 0}</p>
           </div>
         </div>
 
         <div className="bg-[#0f1117] rounded-xl border border-white/10 p-4 flex items-center gap-3.5 shadow-md">
-          <div className="w-10 h-10 rounded-xl bg-purple-400/10 border border-purple-400/20 flex items-center justify-center shrink-0">
-            <Activity className="w-5 h-5 text-purple-400" />
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
+            <Activity className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[10px] text-white/40 font-medium uppercase tracking-wider">Pending Payouts</p>
-            <p className="text-base font-bold text-purple-400 mt-0.5">{liveStats.pendingWithdrawals ?? 0}</p>
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Pending Payouts</p>
+            <p className="text-base font-bold text-white mt-0.5">{liveStats.pendingWithdrawals ?? 0}</p>
           </div>
         </div>
       </div>

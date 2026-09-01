@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { MoreVertical, Edit, UserCheck, UserX, Trash2, Loader2, KeyRound } from 'lucide-react';
 
@@ -65,7 +65,7 @@ const ActionDropdown = ({ onEdit, onChangePassword, onToggleStatus, isActive = t
             setIsOpen(false);
             if (onEdit) onEdit();
           }}
-          className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-white hover:bg-gray-800 hover:text-[#E94B4B] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-white hover:bg-white/10 hover:text-[#E94B4B] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Edit className="w-4 h-4 text-gray-400" />
           <span className="font-medium">Edit Profile</span>
@@ -79,9 +79,9 @@ const ActionDropdown = ({ onEdit, onChangePassword, onToggleStatus, isActive = t
             setIsOpen(false);
             if (onChangePassword) onChangePassword();
           }}
-          className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-white hover:bg-gray-800 hover:text-[#E94B4B] transition-colors border-t border-gray-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-white hover:bg-white/10 hover:text-[#E94B4B] transition-colors border-t border-white/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <KeyRound className="w-4 h-4 text-amber-600" />
+          <KeyRound className="w-4 h-4 text-amber-500" />
           <span className="font-medium">Change Password</span>
         </button>
       )}
@@ -94,18 +94,18 @@ const ActionDropdown = ({ onEdit, onChangePassword, onToggleStatus, isActive = t
             setIsOpen(false);
             if (onToggleStatus) onToggleStatus(!isActive);
           }}
-          className={`w-full flex items-center gap-2 px-3 py-2.5 text-xs font-medium transition-colors border-t border-gray-50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+          className={`w-full flex items-center gap-2 px-3 py-2.5 text-xs font-medium transition-colors border-t border-white/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
             isActive 
-              ? 'text-[#E03137] hover:bg-[#FCEAEB]' 
-              : 'text-[#2F9B4D] hover:bg-gray-800'
+              ? 'text-[#E94B4B] hover:bg-[#E94B4B]/10' 
+              : 'text-green-400 hover:bg-white/10'
           }`}
         >
           {isLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : isActive ? (
-            <UserX className="w-4 h-4 text-[#E03137]" />
+            <UserX className="w-4 h-4 text-[#E94B4B]" />
           ) : (
-            <UserCheck className="w-4 h-4 text-[#2F9B4D]" />
+            <UserCheck className="w-4 h-4 text-green-400" />
           )}
           <span>{isLoading ? 'Updating...' : isActive ? 'Deactivate' : 'Activate'}</span>
         </button>
@@ -118,7 +118,7 @@ const ActionDropdown = ({ onEdit, onChangePassword, onToggleStatus, isActive = t
             setIsOpen(false);
             if (onDelete) onDelete();
           }}
-          className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-[#E03137] hover:bg-[#FCEAEB] transition-colors border-t border-gray-50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-[#E94B4B] hover:bg-[#E94B4B]/10 transition-colors border-t border-white/10 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Trash2 className="w-4 h-4" />
           <span className="font-medium">Delete</span>

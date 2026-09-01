@@ -1118,44 +1118,56 @@ const ViewReports = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400">Total Active Players</p>
+                <p className="text-xs font-semibold text-gray-400">Total Active Players</p>
                 <h3 className="text-xl font-bold text-white mt-1">{userParticipationData.length || 7}</h3>
-                <p className="text-[10px] text-emerald-400 mt-0.5">88% Quiz Engagement</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">88% Quiz Engagement</p>
               </div>
-              <div className="p-3 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-xl">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+                style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+              >
                 <Users size={20} />
               </div>
             </div>
 
             <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400">Total Tournaments</p>
+                <p className="text-xs font-semibold text-gray-400">Total Tournaments</p>
                 <h3 className="text-xl font-bold text-white mt-1">{contestReportData.length || 5}</h3>
-                <p className="text-[10px] text-amber-400 mt-0.5">Live & Scheduled</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">Live & Scheduled</p>
               </div>
-              <div className="p-3 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+                style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+              >
                 <Trophy size={20} />
               </div>
             </div>
 
             <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400">Gross Collections</p>
-                <h3 className="text-xl font-bold text-emerald-400 mt-1">₹{financialData.summary?.totalInflow?.toLocaleString() || '2,48,500'}</h3>
+                <p className="text-xs font-semibold text-gray-400">Gross Collections</p>
+                <h3 className="text-xl font-bold text-white mt-1">₹{financialData.summary?.totalInflow?.toLocaleString() || '2,48,500'}</h3>
                 <p className="text-[10px] text-gray-400 mt-0.5">Entry Fees & Packs</p>
               </div>
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+                style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+              >
                 <CreditCard size={20} />
               </div>
             </div>
 
             <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400">Net Platform Margin</p>
-                <h3 className="text-xl font-bold text-[#E94B4B] mt-1">₹{financialData.summary?.netRevenue?.toLocaleString() || '1,84,300'}</h3>
-                <p className="text-[10px] text-emerald-400 mt-0.5">Profitable Operations</p>
+                <p className="text-xs font-semibold text-gray-400">Net Platform Margin</p>
+                <h3 className="text-xl font-bold text-white mt-1">₹{financialData.summary?.netRevenue?.toLocaleString() || '1,84,300'}</h3>
+                <p className="text-[10px] text-gray-400 mt-0.5">Profitable Operations</p>
               </div>
-              <div className="p-3 bg-[#E94B4B]/10 border border-[#E94B4B]/20 text-[#E94B4B] rounded-xl">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
+                style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+              >
                 <TrendingUp size={20} />
               </div>
             </div>
