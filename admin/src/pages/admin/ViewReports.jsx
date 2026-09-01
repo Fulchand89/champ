@@ -1046,9 +1046,10 @@ const ViewReports = () => {
           onClick={() => { setActiveTab('overview'); setSearchTerm(''); }}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'overview'
-              ? 'bg-[#E94B4B] text-white shadow-lg shadow-[#E94B4B]/20'
-              : 'bg-[#0f1117] text-gray-400 hover:text-white border border-white/5 hover:border-white/10'
+              ? 'text-white shadow-md'
+              : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'
           }`}
+          style={activeTab === 'overview' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
         >
           <Layers size={14} /> Overview Catalog
         </button>
@@ -1057,9 +1058,10 @@ const ViewReports = () => {
           onClick={() => { setActiveTab('user-participation'); setSearchTerm(''); }}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'user-participation'
-              ? 'bg-[#E94B4B] text-white shadow-lg shadow-[#E94B4B]/20'
-              : 'bg-[#0f1117] text-gray-400 hover:text-white border border-white/5 hover:border-white/10'
+              ? 'text-white shadow-md'
+              : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'
           }`}
+          style={activeTab === 'user-participation' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
         >
           <Users size={14} /> 1. User Participation Report
         </button>
@@ -1068,9 +1070,10 @@ const ViewReports = () => {
           onClick={() => { setActiveTab('contest-report'); setSearchTerm(''); }}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'contest-report'
-              ? 'bg-[#E94B4B] text-white shadow-lg shadow-[#E94B4B]/20'
-              : 'bg-[#0f1117] text-gray-400 hover:text-white border border-white/5 hover:border-white/10'
+              ? 'text-white shadow-md'
+              : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'
           }`}
+          style={activeTab === 'contest-report' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
         >
           <Trophy size={14} /> 2. Contest Report
         </button>
@@ -1079,9 +1082,10 @@ const ViewReports = () => {
           onClick={() => { setActiveTab('contest-payments'); setSearchTerm(''); }}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'contest-payments'
-              ? 'bg-[#E94B4B] text-white shadow-lg shadow-[#E94B4B]/20'
-              : 'bg-[#0f1117] text-gray-400 hover:text-white border border-white/5 hover:border-white/10'
+              ? 'text-white shadow-md'
+              : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'
           }`}
+          style={activeTab === 'contest-payments' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
         >
           <CreditCard size={14} /> 3. Revenue Report
         </button>
@@ -1090,9 +1094,10 @@ const ViewReports = () => {
           onClick={() => { setActiveTab('financial-report'); setSearchTerm(''); }}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'financial-report'
-              ? 'bg-[#E94B4B] text-white shadow-lg shadow-[#E94B4B]/20'
-              : 'bg-[#0f1117] text-gray-400 hover:text-white border border-white/5 hover:border-white/10'
+              ? 'text-white shadow-md'
+              : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'
           }`}
+          style={activeTab === 'financial-report' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
         >
           <DollarSign size={14} /> 4. Financial Report
         </button>
@@ -1101,9 +1106,10 @@ const ViewReports = () => {
           onClick={() => { setActiveTab('contest-results'); setSearchTerm(''); }}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
             activeTab === 'contest-results'
-              ? 'bg-[#E94B4B] text-white shadow-lg shadow-[#E94B4B]/20'
-              : 'bg-[#0f1117] text-gray-400 hover:text-white border border-white/5 hover:border-white/10'
+              ? 'text-white shadow-md'
+              : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'
           }`}
+          style={activeTab === 'contest-results' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
         >
           <Award size={14} /> 5. Contest Result Report
         </button>

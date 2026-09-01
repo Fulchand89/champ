@@ -246,7 +246,7 @@ const ManageQuizCategories = () => {
         const imgPath = row.image || row.icon || fallbackImg;
         return (
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#14182e] border border-gray-800 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+            <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
               <img
                 src={getImageUrl(imgPath)}
                 alt={val}
@@ -369,7 +369,7 @@ const ManageQuizCategories = () => {
                 <select
                   value={STANDARD_CATEGORIES.includes(name) ? name : (name ? '__custom__' : '')}
                   onChange={(e) => handleCategorySelect(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#14182e] text-white focus:outline-none focus:border-[#E94B4B] mb-2 cursor-pointer"
+                  className="block w-full px-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] mb-2 cursor-pointer"
                 >
                   <option value="">-- Select Category from Dropdown --</option>
                   {STANDARD_CATEGORIES.map((catName) => (
@@ -387,7 +387,7 @@ const ManageQuizCategories = () => {
                   placeholder="e.g. Sports or custom name..."
                   value={name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                  className="block w-full px-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
                 />
               </div>
 
@@ -399,7 +399,7 @@ const ManageQuizCategories = () => {
                   placeholder="e.g. sports"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] font-mono"
+                  className="block w-full px-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] font-mono"
                 />
               </div>
 
@@ -410,7 +410,7 @@ const ManageQuizCategories = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows="2"
-                  className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                  className="block w-full px-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
                 />
               </div>
 
@@ -418,7 +418,7 @@ const ManageQuizCategories = () => {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-bold text-gray-300">
-                    Category Image <span className="text-red-500">* (Required)</span>
+                    Category Image <span className="text-[#E94B4B]">* (Required)</span>
                   </label>
                   <span className="text-[10px] text-gray-400">Max 5MB (Auto-optimized)</span>
                 </div>
@@ -426,11 +426,11 @@ const ManageQuizCategories = () => {
                 {/* Upload box */}
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className={`border border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors bg-[#14182e]/50 flex flex-col items-center justify-center gap-2 ${
-                    imageFile ? 'border-green-500/80 bg-green-500/5' : 'border-gray-600 hover:border-red-500'
+                  className={`border border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors bg-white/5 flex flex-col items-center justify-center gap-2 ${
+                    imageFile ? 'border-green-500/80 bg-green-500/5' : 'border-white/20 hover:border-[#E94B4B]'
                   }`}
                 >
-                  <Upload size={24} className={imageFile ? 'text-green-400' : 'text-red-400'} />
+                  <Upload size={24} className={imageFile ? 'text-green-400' : 'text-[#E94B4B]'} />
                   <div>
                     <p className="text-xs text-gray-200 font-semibold">
                       {imageFile ? `Selected: ${imageFile.name}` : 'Click or drop image here to upload'}
