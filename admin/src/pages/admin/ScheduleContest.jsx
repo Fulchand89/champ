@@ -140,15 +140,12 @@ const ScheduleContest = () => {
       return;
     }
 
-    const pad = (n) => String(n).padStart(2, '0');
-    const formatSqlDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-
     const jsonPayload = {
       title: title.trim(),
       description: description || '',
       categoryId: parseInt(categoryId, 10) || categoryId,
-      startTime: formatSqlDate(new Date(startTime)),
-      endTime: formatSqlDate(new Date(endTime)),
+      startTime: new Date(startTime).toISOString(),
+      endTime: new Date(endTime).toISOString(),
       entryFee: parseFloat(entryFee) || 0,
       prizePool: parseFloat(prizePool) || 0,
       maxParticipants: parseInt(maxParticipants, 10) || 100,

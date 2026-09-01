@@ -140,9 +140,24 @@ class ContestService {
   }
 
   async createContest(data) {
-    const startTime = data.startTime ? new Date(data.startTime) : new Date();
+    const parseSafeDate = (val) => {
+      if (!val) return new Date();
+      if (val instanceof Date && !isNaN(val.getTime())) return val;
+      if (typeof val === 'string') {
+        const isoLike = val.trim().replace(' ', 'T');
+        const d = new Date(isoLike);
+        if (!isNaN(d.getTime())) return d;
+      }
+      const d = new Date(val);
+      return !isNaN(d.getTime()) ? d : new Date();
+    };
+
+    const startTime = parseSafeDate(data.startTime);
     const duration = data.durationMinutes ? parseInt(data.durationMinutes, 10) : 15;
-    const endTime = data.endTime ? new Date(data.endTime) : new Date(startTime.getTime() + duration * 60000);
+    let endTime = data.endTime ? parseSafeDate(data.endTime) : null;
+    if (!endTime || isNaN(endTime.getTime()) || endTime <= startTime) {
+      endTime = new Date(startTime.getTime() + duration * 60000);
+    }
 
     let categoryId = data.categoryId ? parseInt(data.categoryId, 10) : null;
     let subjectId = data.subjectId ? parseInt(data.subjectId, 10) : null;
@@ -189,7 +204,7 @@ class ContestService {
       image: data.image || null,
       numQuestions: data.numQuestions !== undefined ? parseInt(data.numQuestions, 10) : 10,
       prizeDistribution: data.prizeDistribution || null,
-      isActive: data.isActive !== undefined ? (data.isActive === 'true' || data.isActive === true) : true,
+      isActive: data.isActive !== undefined ? (data.isActive === 'true' || data.isActive === true || data.isActive === '1' || data.isActive === 1) : true,
     });
 
     const populated = await this.getContestById(contest.id);

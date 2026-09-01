@@ -144,15 +144,12 @@ const CreateContest = () => {
       // Find subject ID if selected from list
       const matchedSubject = subjects.find(s => s.name === subject || String(s.id) === String(subject));
 
-      const pad = (n) => String(n).padStart(2, '0');
-      const formatSqlDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-
       const jsonPayload = {
         title: title.trim(),
         description: subject ? `Subject: ${matchedSubject?.name || subject}` : '',
         categoryId: parseInt(categoryId, 10) || categoryId,
-        startTime: formatSqlDate(start),
-        endTime: formatSqlDate(end),
+        startTime: start.toISOString(),
+        endTime: end.toISOString(),
         entryFee: parseFloat(entryFee) || 0,
         prizePool: Math.max(0, (parseFloat(entryFee) || 0) * maxPart * 0.9),
         minParticipants: minPart,

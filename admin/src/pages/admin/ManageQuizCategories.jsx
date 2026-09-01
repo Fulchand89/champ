@@ -149,6 +149,16 @@ const ManageQuizCategories = () => {
 
     const generatedSlug = (slug || name).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
+    if (modalType === 'add') {
+      const exists = (categories || []).some(
+        c => c.name?.toLowerCase().trim() === name.trim().toLowerCase() || c.slug?.toLowerCase().trim() === generatedSlug
+      );
+      if (exists) {
+        toast.error(`Category "${name.trim()}" already exists! Please use a unique category name.`);
+        return;
+      }
+    }
+
     const jsonPayload = {
       name: name.trim(),
       slug: generatedSlug,
