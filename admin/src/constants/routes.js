@@ -24,9 +24,6 @@ export const ROUTES = {
     CONFIGURE_PRIZE_POOL: '/admin/contests/prize-pool',
     MONITOR_LIVE: '/admin/contests/live',
 
-    // TRANSACTION MANAGEMENT
-    MANAGE_TRANSACTIONS: '/admin/transactions',
-
     // WALLET
     DEPOSITS: '/admin/deposits',
     WITHDRAWALS: '/admin/withdrawals',

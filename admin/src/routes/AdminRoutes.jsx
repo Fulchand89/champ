@@ -91,7 +91,7 @@ const AdminRoutes = {
       element: <MonitorLiveContests />,
     },
     {
-      path: ROUTES.ADMIN.MANAGE_TRANSACTIONS.replace(ROUTES.ADMIN.ROOT + '/', ''),
+      path: ROUTES.ADMIN.TRANSACTIONS.replace(ROUTES.ADMIN.ROOT + '/', ''),
       element: <Transactions />,
     },
     {

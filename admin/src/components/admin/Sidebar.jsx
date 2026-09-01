@@ -38,12 +38,6 @@ const NAV = [
     ],
   },
   {
-    section: 'TRANSACTION MANAGEMENT',
-    items: [
-      { label: 'Manage Transactions', path: ROUTES.ADMIN.MANAGE_TRANSACTIONS, icon: 'CreditCard' },
-    ],
-  },
-  {
     section: 'WALLET',
     items: [
       { label: 'Deposits', path: ROUTES.ADMIN.DEPOSITS, icon: 'Deposits' },

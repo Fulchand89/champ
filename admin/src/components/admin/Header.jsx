@@ -23,7 +23,6 @@ const searchableNav = [
   { label: 'Configure Entry Fee', path: ROUTES.ADMIN.CONFIGURE_ENTRY_FEE, category: 'Contest Management' },
   { label: 'Configure Prize Pool', path: ROUTES.ADMIN.CONFIGURE_PRIZE_POOL, category: 'Contest Management' },
   { label: 'Monitor Live Contests', path: ROUTES.ADMIN.MONITOR_LIVE, category: 'Contest Management' },
-  { label: 'Manage Transactions', path: ROUTES.ADMIN.MANAGE_TRANSACTIONS, category: 'Transaction Management' },
   { label: 'Deposits', path: ROUTES.ADMIN.DEPOSITS, category: 'Wallet' },
   { label: 'Withdrawals', path: ROUTES.ADMIN.WITHDRAWALS, category: 'Wallet' },
   { label: 'Transactions', path: ROUTES.ADMIN.TRANSACTIONS, category: 'Wallet' },
