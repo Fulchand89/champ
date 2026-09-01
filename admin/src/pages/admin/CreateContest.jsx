@@ -146,9 +146,8 @@ const CreateContest = () => {
 
       const formData = new FormData();
       formData.append('title', title.trim());
-      formData.append('description', subject ? `Subject: ${matchedSubject?.name || subject}` : '');
+      formData.append('description', subject ? `Subject: ${matchedSubject?.name || subject}` : (description || ''));
       if (categoryId) formData.append('categoryId', categoryId);
-      if (matchedSubject?.id) formData.append('subjectId', matchedSubject.id);
       formData.append('startTime', start.toISOString());
       formData.append('endTime', end.toISOString());
       formData.append('entryFee', parseFloat(entryFee) || 0);
@@ -158,8 +157,6 @@ const CreateContest = () => {
       formData.append('minParticipants', minPart);
       formData.append('maxParticipants', maxPart);
       formData.append('durationMinutes', durMin);
-      formData.append('numQuestions', totalQues);
-      formData.append('status', 'scheduled');
       formData.append('isActive', true);
 
       if (imageFile) {
@@ -167,7 +164,7 @@ const CreateContest = () => {
       }
 
       const res = await contestService.createContest(formData);
-      if (res?.success) {
+      if (res?.success || res?.data) {
         toast.success('Contest created and launched successfully!');
         setSuccessMsg(true);
         setTitle('');
@@ -182,10 +179,24 @@ const CreateContest = () => {
         setNumQuestions('10');
         setImageFile(null);
         setImagePreview('');
+      } else {
+        toast.error(res?.message || 'Failed to create contest');
       }
     } catch (err) {
       console.error('Error creating contest:', err);
-      const errMsg = err.response?.data?.message || err.response?.data?.errors?.[0]?.message || 'Failed to create contest';
+      const data = err.response?.data;
+      let errMsg = 'Failed to create contest';
+      if (typeof data === 'string') {
+        errMsg = data;
+      } else if (data?.message) {
+        errMsg = data.message;
+      } else if (data?.error) {
+        errMsg = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+      } else if (Array.isArray(data?.errors) && data.errors.length > 0) {
+        errMsg = data.errors.map(e => (typeof e === 'string' ? e : e.message || e.msg || JSON.stringify(e))).join(', ');
+      } else if (err.message) {
+        errMsg = err.message;
+      }
       toast.error(errMsg);
     } finally {
       setSubmitting(false);
