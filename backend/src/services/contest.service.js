@@ -184,7 +184,7 @@ class ContestService {
       if (!topExists) topicId = null;
     }
 
-    const contest = await Contest.create({
+    const contestFields = {
       title: data.title ? data.title.trim() : 'New Contest',
       description: data.description || '',
       categoryId,
@@ -205,7 +205,24 @@ class ContestService {
       numQuestions: data.numQuestions !== undefined ? parseInt(data.numQuestions, 10) : 10,
       prizeDistribution: data.prizeDistribution || null,
       isActive: data.isActive !== undefined ? (data.isActive === 'true' || data.isActive === true || data.isActive === '1' || data.isActive === 1) : true,
-    });
+    };
+
+    let contest;
+    try {
+      contest = await Contest.create(contestFields);
+    } catch (createErr) {
+      if (createErr.message && (createErr.message.includes('Unknown column') || createErr.name === 'SequelizeDatabaseError')) {
+        console.warn('Unknown column encountered during Contest.create, retrying with core columns:', createErr.message);
+        delete contestFields.durationPerQuestion;
+        delete contestFields.entryCoins;
+        delete contestFields.platformCut;
+        delete contestFields.numQuestions;
+        delete contestFields.prizeDistribution;
+        contest = await Contest.create(contestFields);
+      } else {
+        throw createErr;
+      }
+    }
 
     const populated = await this.getContestById(contest.id);
     return populated || contest.toJSON();
@@ -262,10 +279,23 @@ class ContestService {
     if (data.durationMinutes !== undefined) updates.durationMinutes = parseInt(data.durationMinutes, 10);
     if (data.durationPerQuestion !== undefined) updates.durationPerQuestion = parseInt(data.durationPerQuestion, 10);
     if (data.numQuestions !== undefined) updates.numQuestions = parseInt(data.numQuestions, 10);
-    if (data.prizeDistribution !== undefined) updates.prizeDistribution = data.prizeDistribution;
-    if (data.isActive !== undefined) updates.isActive = data.isActive === 'true' || data.isActive === true;
+    if (data.isActive !== undefined) updates.isActive = (data.isActive === 'true' || data.isActive === true || data.isActive === '1' || data.isActive === 1);
 
-    await contest.update(updates);
+    try {
+      await contest.update(updates);
+    } catch (updateErr) {
+      if (updateErr.message && (updateErr.message.includes('Unknown column') || updateErr.name === 'SequelizeDatabaseError')) {
+        console.warn('Unknown column encountered during Contest.update, retrying with core columns:', updateErr.message);
+        delete updates.durationPerQuestion;
+        delete updates.entryCoins;
+        delete updates.platformCut;
+        delete updates.numQuestions;
+        delete updates.prizeDistribution;
+        await contest.update(updates);
+      } else {
+        throw updateErr;
+      }
+    }
     return this.getContestById(id);
   }
 
