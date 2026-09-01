@@ -240,8 +240,13 @@ const Footer = () => {
           </div>
         </div>
         {/* Footer Bottom copyright */}
-        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 text-xs text-gray-600">
-          <p>© {currentYear} KnowChamp Quiz. All rights reserved.</p>
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 text-xs text-gray-600 gap-4 sm:gap-0">
+          <div className="text-center sm:text-left space-y-1">
+            <p>© {currentYear} KnowChamp Quiz. All rights reserved.</p>
+            <p className="text-[11px] text-gray-500">
+              Powered by <span className="text-gray-400 font-medium">Zigisa Consultancy Services Private Limited</span>
+            </p>
+          </div>
           <div className="flex items-center space-x-6 mt-4 sm:mt-0">
             <Link to="/terms-conditions" className="hover:text-gray-400 transition-colors">Terms of Service</Link>
             <Link to="/privacy-policy" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>
