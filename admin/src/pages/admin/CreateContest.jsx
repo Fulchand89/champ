@@ -147,24 +147,38 @@ const CreateContest = () => {
       const pad = (n) => String(n).padStart(2, '0');
       const formatSqlDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 
-      const formData = new FormData();
-      formData.append('title', title.trim());
-      formData.append('description', subject ? `Subject: ${matchedSubject?.name || subject}` : '');
-      if (categoryId) formData.append('categoryId', parseInt(categoryId, 10) || categoryId);
-      formData.append('startTime', formatSqlDate(start));
-      formData.append('endTime', formatSqlDate(end));
-      formData.append('entryFee', parseFloat(entryFee) || 0);
-      formData.append('prizePool', Math.max(0, (parseFloat(entryFee) || 0) * maxPart * 0.9));
-      formData.append('minParticipants', minPart);
-      formData.append('maxParticipants', maxPart);
-      formData.append('durationMinutes', durMin);
-      formData.append('isActive', '1');
+      const jsonPayload = {
+        title: title.trim(),
+        description: subject ? `Subject: ${matchedSubject?.name || subject}` : '',
+        categoryId: parseInt(categoryId, 10) || categoryId,
+        startTime: formatSqlDate(start),
+        endTime: formatSqlDate(end),
+        entryFee: parseFloat(entryFee) || 0,
+        prizePool: Math.max(0, (parseFloat(entryFee) || 0) * maxPart * 0.9),
+        minParticipants: minPart,
+        maxParticipants: maxPart,
+        durationMinutes: durMin,
+        isActive: true,
+      };
 
+      let res;
       if (imageFile) {
+        const formData = new FormData();
+        Object.entries(jsonPayload).forEach(([key, val]) => {
+          formData.append(key, val);
+        });
         formData.append('image', imageFile);
+        try {
+          res = await contestService.createContest(formData);
+        } catch (formDataErr) {
+          // If multer/multipart fails on backend, fallback to json
+          console.warn('FormData submission failed, retrying with JSON payload:', formDataErr);
+          res = await contestService.createContest(jsonPayload);
+        }
+      } else {
+        res = await contestService.createContest(jsonPayload);
       }
 
-      const res = await contestService.createContest(formData);
       if (res?.success || res?.data) {
         toast.success('Contest created and launched successfully!');
         setSuccessMsg(true);

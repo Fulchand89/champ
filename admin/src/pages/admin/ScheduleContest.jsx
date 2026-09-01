@@ -143,44 +143,59 @@ const ScheduleContest = () => {
     const pad = (n) => String(n).padStart(2, '0');
     const formatSqlDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 
-    const formData = new FormData();
-    formData.append('title', title.trim());
-    formData.append('description', description || '');
-    if (categoryId) formData.append('categoryId', parseInt(categoryId, 10) || categoryId);
-    formData.append('startTime', formatSqlDate(new Date(startTime)));
-    formData.append('endTime', formatSqlDate(new Date(endTime)));
-    formData.append('entryFee', parseFloat(entryFee) || 0);
-    formData.append('prizePool', parseFloat(prizePool) || 0);
-    formData.append('maxParticipants', parseInt(maxParticipants, 10) || 100);
-    formData.append('minParticipants', parseInt(minParticipants, 10) || 2);
-    formData.append('durationMinutes', parseInt(durationMinutes, 10) || 15);
-    formData.append('isActive', '1');
-
-    if (imageFile) {
-      formData.append('image', imageFile);
-    } else if (!imagePreview && currentContest?.image) {
-      formData.append('removeImage', 'true');
-    }
+    const jsonPayload = {
+      title: title.trim(),
+      description: description || '',
+      categoryId: parseInt(categoryId, 10) || categoryId,
+      startTime: formatSqlDate(new Date(startTime)),
+      endTime: formatSqlDate(new Date(endTime)),
+      entryFee: parseFloat(entryFee) || 0,
+      prizePool: parseFloat(prizePool) || 0,
+      maxParticipants: parseInt(maxParticipants, 10) || 100,
+      minParticipants: parseInt(minParticipants, 10) || 2,
+      durationMinutes: parseInt(durationMinutes, 10) || 15,
+      isActive: true,
+    };
 
     try {
-      if (modalType === 'add') {
-        const res = await contestService.createContest(formData);
-        if (res?.success || res?.data) {
-          toast.success('Contest scheduled successfully');
-          fetchContestsAndCategories();
-          setIsModalOpen(false);
-        } else {
-          toast.error(res?.message || 'Failed to schedule contest');
+      let res;
+      if (imageFile) {
+        const formData = new FormData();
+        Object.entries(jsonPayload).forEach(([key, val]) => {
+          formData.append(key, val);
+        });
+        formData.append('image', imageFile);
+        if (!imagePreview && currentContest?.image) {
+          formData.append('removeImage', 'true');
+        }
+        try {
+          if (modalType === 'add') {
+            res = await contestService.createContest(formData);
+          } else {
+            res = await contestService.updateContest(currentContest.id, formData);
+          }
+        } catch (formErr) {
+          console.warn('FormData submission failed, retrying with JSON payload:', formErr);
+          if (modalType === 'add') {
+            res = await contestService.createContest(jsonPayload);
+          } else {
+            res = await contestService.updateContest(currentContest.id, jsonPayload);
+          }
         }
       } else {
-        const res = await contestService.updateContest(currentContest.id, formData);
-        if (res?.success || res?.data) {
-          toast.success('Contest updated successfully');
-          fetchContestsAndCategories();
-          setIsModalOpen(false);
+        if (modalType === 'add') {
+          res = await contestService.createContest(jsonPayload);
         } else {
-          toast.error(res?.message || 'Failed to update contest');
+          res = await contestService.updateContest(currentContest.id, jsonPayload);
         }
+      }
+
+      if (res?.success || res?.data) {
+        toast.success(`Contest ${modalType === 'add' ? 'scheduled' : 'updated'} successfully`);
+        fetchContestsAndCategories();
+        setIsModalOpen(false);
+      } else {
+        toast.error(res?.message || `Failed to ${modalType === 'add' ? 'schedule' : 'update'} contest`);
       }
     } catch (err) {
       console.error('Error saving contest:', err);
