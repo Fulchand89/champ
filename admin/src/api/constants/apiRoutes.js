@@ -9,6 +9,11 @@ export const API_ROUTES = {
   },
   ANALYTICS: {
     GET_REPORTS: "admin/analytics/reports",
+    USER_PARTICIPATION: "admin/analytics/reports/user-participation",
+    CONTEST_REPORT: "admin/analytics/reports/contests",
+    CONTEST_PAYMENTS: "admin/analytics/reports/contest-payments",
+    FINANCIAL_REPORT: "admin/analytics/reports/financial",
+    CONTEST_RESULTS: "admin/analytics/reports/contest-results",
   },
   SETTINGS: {
     GET: "admin/settings",

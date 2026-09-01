@@ -46,6 +46,11 @@ router.delete('/notifications', adminController.deleteNotifications);
 
 // Analytics Reports Endpoints
 router.get('/analytics/reports', adminController.getAnalyticsReports);
+router.get('/analytics/reports/user-participation', adminController.getUserParticipationReport);
+router.get('/analytics/reports/contests', adminController.getContestReport);
+router.get('/analytics/reports/contest-payments', adminController.getContestPaymentReport);
+router.get('/analytics/reports/financial', adminController.getFinancialReport);
+router.get('/analytics/reports/contest-results', adminController.getContestResultReport);
 
 // Category CRUD Endpoints
 router.get('/categories', adminController.getCategories);
