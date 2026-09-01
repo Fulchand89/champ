@@ -140,18 +140,21 @@ const ScheduleContest = () => {
       return;
     }
 
+    const pad = (n) => String(n).padStart(2, '0');
+    const formatSqlDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+
     const formData = new FormData();
     formData.append('title', title.trim());
     formData.append('description', description || '');
-    if (categoryId) formData.append('categoryId', categoryId);
-    formData.append('startTime', new Date(startTime).toISOString());
-    formData.append('endTime', new Date(endTime).toISOString());
+    if (categoryId) formData.append('categoryId', parseInt(categoryId, 10) || categoryId);
+    formData.append('startTime', formatSqlDate(new Date(startTime)));
+    formData.append('endTime', formatSqlDate(new Date(endTime)));
     formData.append('entryFee', parseFloat(entryFee) || 0);
     formData.append('prizePool', parseFloat(prizePool) || 0);
     formData.append('maxParticipants', parseInt(maxParticipants, 10) || 100);
     formData.append('minParticipants', parseInt(minParticipants, 10) || 2);
     formData.append('durationMinutes', parseInt(durationMinutes, 10) || 15);
-    formData.append('isActive', String(isActive));
+    formData.append('isActive', '1');
 
     if (imageFile) {
       formData.append('image', imageFile);

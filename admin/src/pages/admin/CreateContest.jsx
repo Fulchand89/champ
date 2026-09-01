@@ -144,18 +144,21 @@ const CreateContest = () => {
       // Find subject ID if selected from list
       const matchedSubject = subjects.find(s => s.name === subject || String(s.id) === String(subject));
 
+      const pad = (n) => String(n).padStart(2, '0');
+      const formatSqlDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+
       const formData = new FormData();
       formData.append('title', title.trim());
       formData.append('description', subject ? `Subject: ${matchedSubject?.name || subject}` : '');
-      if (categoryId) formData.append('categoryId', categoryId);
-      formData.append('startTime', start.toISOString());
-      formData.append('endTime', end.toISOString());
+      if (categoryId) formData.append('categoryId', parseInt(categoryId, 10) || categoryId);
+      formData.append('startTime', formatSqlDate(start));
+      formData.append('endTime', formatSqlDate(end));
       formData.append('entryFee', parseFloat(entryFee) || 0);
       formData.append('prizePool', Math.max(0, (parseFloat(entryFee) || 0) * maxPart * 0.9));
       formData.append('minParticipants', minPart);
       formData.append('maxParticipants', maxPart);
       formData.append('durationMinutes', durMin);
-      formData.append('isActive', 'true');
+      formData.append('isActive', '1');
 
       if (imageFile) {
         formData.append('image', imageFile);
