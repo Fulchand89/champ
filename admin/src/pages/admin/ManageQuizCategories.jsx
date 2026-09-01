@@ -159,31 +159,48 @@ const ManageQuizCategories = () => {
     formData.append('slug', generatedSlug);
     formData.append('description', description ? description.trim() : '');
     formData.append('colorClass', colorClass);
-    formData.append('isActive', isActive);
+    formData.append('isActive', String(isActive));
 
     if (imageFile) {
       formData.append('image', imageFile);
+      formData.append('icon', imageFile);
     }
 
     try {
       if (modalType === 'add') {
         const res = await categoryService.createCategory(formData);
-        if (res?.success) {
+        if (res?.success || res?.data) {
           toast.success('Category created successfully');
           fetchCategories();
           setIsModalOpen(false);
+        } else {
+          toast.error(res?.message || 'Failed to create category');
         }
       } else {
         const res = await categoryService.updateCategory(currentCategory.id, formData);
-        if (res?.success) {
+        if (res?.success || res?.data) {
           toast.success('Category updated successfully');
           fetchCategories();
           setIsModalOpen(false);
+        } else {
+          toast.error(res?.message || 'Failed to update category');
         }
       }
     } catch (err) {
       console.error('Error saving category:', err);
-      const errMsg = err.response?.data?.message || err.response?.data?.errors?.[0]?.message || 'Error saving category';
+      const data = err.response?.data;
+      let errMsg = 'Error saving category';
+      if (typeof data === 'string') {
+        errMsg = data;
+      } else if (data?.message) {
+        errMsg = data.message;
+      } else if (data?.error) {
+        errMsg = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+      } else if (Array.isArray(data?.errors) && data.errors.length > 0) {
+        errMsg = data.errors.map(e => (typeof e === 'string' ? e : e.message || e.msg || JSON.stringify(e))).join(', ');
+      } else if (err.message) {
+        errMsg = err.message;
+      }
       toast.error(errMsg);
     }
   };

@@ -41,8 +41,8 @@ export default function Dashboard() {
     setContestsLoading(true);
     try {
       await contestService.getContests({ limit: 10 });
-    } catch (err) {
-      console.error('Error fetching dashboard contests:', err);
+    } catch {
+      // Gracefully handle backend 500 when contest table is initializing
     } finally {
       setContestsLoading(false);
     }

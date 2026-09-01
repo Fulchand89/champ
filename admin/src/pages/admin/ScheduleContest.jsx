@@ -63,10 +63,15 @@ const ScheduleContest = () => {
 
   const formatDateTimeForInput = (dateString) => {
     if (!dateString) return '';
-    const date = new Date(dateString);
-    const tzoffset = date.getTimezoneOffset() * 60000;
-    const localISOTime = (new Date(date.getTime() - tzoffset)).toISOString().slice(0, -1);
-    return localISOTime.substring(0, 16);
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      const tzoffset = date.getTimezoneOffset() * 60000;
+      const localISOTime = new Date(date.getTime() - tzoffset).toISOString().slice(0, -1);
+      return localISOTime.substring(0, 16);
+    } catch {
+      return '';
+    }
   };
 
   const handleOpenAddModal = () => {
@@ -89,19 +94,20 @@ const ScheduleContest = () => {
   };
 
   const handleOpenEditModal = (cnt) => {
+    if (!cnt) return;
     setModalType('edit');
     setCurrentContest(cnt);
-    setTitle(cnt.title);
+    setTitle(cnt.title || '');
     setDescription(cnt.description || '');
     setCategoryId(cnt.categoryId || '');
     setStartTime(formatDateTimeForInput(cnt.startTime));
     setEndTime(formatDateTimeForInput(cnt.endTime));
-    setEntryFee(parseFloat(cnt.entryFee).toString());
-    setPrizePool(parseFloat(cnt.prizePool).toString());
+    setEntryFee(cnt.entryFee !== undefined ? parseFloat(cnt.entryFee).toString() : '0');
+    setPrizePool(cnt.prizePool !== undefined ? parseFloat(cnt.prizePool).toString() : '0');
     setMaxParticipants(cnt.maxParticipants?.toString() || '100');
     setMinParticipants(cnt.minParticipants?.toString() || '2');
     setDurationMinutes(cnt.durationMinutes?.toString() || '15');
-    setIsActive(cnt.isActive);
+    setIsActive(cnt.isActive !== undefined ? cnt.isActive : true);
     setImageFile(null);
     setImagePreview(cnt.image || '');
     setIsModalOpen(true);

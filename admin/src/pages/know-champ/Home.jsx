@@ -217,17 +217,18 @@ const Home = () => {
                   <ContestCard isLoading={true} />
                 </div>
               ))
-            ) : contests.length > 0 ? (
-              contests.map((contest, index) => {
+            ) : (contests || []).filter(Boolean).length > 0 ? (
+              (contests || []).filter(Boolean).map((contest, index) => {
+                if (!contest) return null;
                 const categoryName = contest.category?.name || contest.category || 'General Knowledge';
                 const catTheme = getCategoryTheme(categoryName, contest.category);
                 const prize = contest.prizePool !== undefined ? parseFloat(contest.prizePool) : (contest.prize || 0);
                 const entry = contest.entryFee !== undefined ? parseFloat(contest.entryFee) : (contest.entry || 0);
                 const joined = contest.joined !== undefined ? contest.joined : 0;
                 const image = contest.image || catTheme.image || catTheme.icon;
-                const date = contest.startTime
+                const date = contest?.startTime
                   ? new Date(contest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 Am'
-                  : (contest.date || '');
+                  : (contest?.date || '');
                 return (
                   <div key={contest.id || index} className="w-[85%] xs:w-[calc((100%-1rem)/2)] sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-2*1.5rem)/3)] lg:w-[calc((100%-3*1.5rem)/4)] flex-shrink-0">
                     <ContestCard

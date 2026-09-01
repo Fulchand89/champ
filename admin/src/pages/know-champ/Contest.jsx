@@ -212,18 +212,19 @@ const Contest = () => {
               <ContestCard key={index} isLoading={true} />
             ))}
           </div>
-        ) : filteredContests.length > 0 ? (
+        ) : (filteredContests || []).filter(Boolean).length > 0 ? (
           <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {filteredContests.map((contest, index) => {
+            {(filteredContests || []).filter(Boolean).map((contest, index) => {
+              if (!contest) return null;
               const categoryName = contest.category?.name || contest.category || 'General Knowledge';
               const catTheme = getCategoryTheme(categoryName, contest.category);
               const prize = contest.prizePool !== undefined ? parseFloat(contest.prizePool) : (contest.prize || 0);
               const entry = contest.entryFee !== undefined ? parseFloat(contest.entryFee) : (contest.entry || 0);
               const joined = contest.joined !== undefined ? contest.joined : 0;
               const image = contest.image || catTheme.image || catTheme.icon;
-              const date = contest.startTime
+              const date = contest?.startTime
                 ? new Date(contest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 Am'
-                : (contest.date || '');
+                : (contest?.date || '');
 
               return (
                 <ContestCard

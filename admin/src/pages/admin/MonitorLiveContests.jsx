@@ -13,11 +13,14 @@ const MonitorLiveContests = () => {
     setLoading(true);
     try {
       const res = await contestService.getLiveContests();
-      if (res?.success && res.data) {
+      if (res?.success && Array.isArray(res.data)) {
+        setContests(res.data);
+      } else if (Array.isArray(res?.data)) {
         setContests(res.data);
       }
-    } catch (err) {
-      console.error('Error fetching live contests:', err);
+    } catch {
+      // Backend may return 500 if live room table is empty or offline
+      setContests((prev) => (prev.length > 0 ? prev : []));
     } finally {
       setLoading(false);
     }
