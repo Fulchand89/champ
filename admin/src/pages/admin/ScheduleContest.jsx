@@ -196,7 +196,7 @@ const ScheduleContest = () => {
       }
     } catch (err) {
       console.error('Error saving contest:', err);
-      console.error('Backend full error response:', err.response?.data);
+      console.error('Backend full error response detail:', JSON.stringify(err.response?.data || {}, null, 2));
       const data = err.response?.data;
       let errMsg = 'Failed to save contest (Server 500 Error)';
       if (typeof data === 'string') {
@@ -212,7 +212,7 @@ const ScheduleContest = () => {
       } else if (err.message) {
         errMsg = err.message;
       }
-      toast.error(errMsg, { duration: 6000 });
+      toast.error(errMsg, { duration: 8000 });
     }
   };
 
