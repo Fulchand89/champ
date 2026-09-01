@@ -27,8 +27,10 @@ export const ROUTES = {
     // TRANSACTION MANAGEMENT
     MANAGE_TRANSACTIONS: '/admin/transactions',
 
-    // WITHDRAWAL MANAGEMENT
-    VERIFY_WITHDRAWALS: '/admin/withdrawals',
+    // WALLET
+    DEPOSITS: '/admin/deposits',
+    WITHDRAWALS: '/admin/withdrawals',
+    TRANSACTIONS: '/admin/transactions',
 
     // REPORTS & ANALYTICS
     VIEW_REPORTS: '/admin/reports',

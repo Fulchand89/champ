@@ -198,10 +198,10 @@ export default function Dashboard() {
               </div>
 
               <Link
-                to={ROUTES.ADMIN.VERIFY_WITHDRAWALS}
+                to={ROUTES.ADMIN.WITHDRAWALS}
                 className="text-xs text-[#E94B4B] font-bold hover:underline flex items-center gap-1"
               >
-                Verify Withdrawals <ChevronRight className="w-3.5 h-3.5 text-[#E94B4B]" />
+                Withdrawals <ChevronRight className="w-3.5 h-3.5 text-[#E94B4B]" />
               </Link>
             </div>
 

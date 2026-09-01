@@ -26,9 +26,12 @@ const AdminLayout = () => {
   if (path.includes('/users')) pageTitle = "User Management";
   else if (path.includes('/quiz')) pageTitle = "Quiz Management";
   else if (path.includes('/contests')) pageTitle = "Contest Management";
-  else if (path.includes('/transactions')) pageTitle = "Transaction Management";
-  else if (path.includes('/withdrawals')) pageTitle = "Withdrawal Management";
+  else if (path.includes('/deposits')) pageTitle = "Wallet";
+  else if (path.includes('/withdrawals')) pageTitle = "Wallet";
+  else if (path.includes('/transactions')) pageTitle = "Transactions";
   else if (path.includes('/reports')) pageTitle = "Reports & Analytics";
+  else if (path.includes('/features') || path.includes('/faq') || path.includes('/privacy-policy') || path.includes('/terms-conditions') || path.includes('/refund-policy') || path.includes('/support-contact')) pageTitle = "Content & Support";
+  else if (path.includes('/settings') || path.includes('/profile')) pageTitle = "Settings";
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0f1117]">

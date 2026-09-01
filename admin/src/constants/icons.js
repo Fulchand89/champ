@@ -37,7 +37,11 @@ import {
   LifebuoyIcon,
   MagnifyingGlassIcon,
   QuestionMarkCircleIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  ArrowDownTrayIcon,
+  ArrowUpTrayIcon,
+  ArrowsRightLeftIcon,
+  WalletIcon,
 } from '@heroicons/react/24/outline'
 
 export const ICONS = {
@@ -80,4 +84,8 @@ export const ICONS = {
   SupportContact: LifebuoyIcon,
   Search: MagnifyingGlassIcon,
   FAQ: QuestionMarkCircleIcon,
+  Deposits: ArrowDownTrayIcon,
+  Withdrawals: ArrowUpTrayIcon,
+  Transactions: ArrowsRightLeftIcon,
+  Wallet: WalletIcon,
 }

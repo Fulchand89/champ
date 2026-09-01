@@ -16,8 +16,9 @@ const ScheduleContest = lazy(() => import('../pages/admin/ScheduleContest'))
 const ConfigureEntryFee = lazy(() => import('../pages/admin/ConfigureEntryFee'))
 const ConfigurePrizePool = lazy(() => import('../pages/admin/ConfigurePrizePool'))
 const MonitorLiveContests = lazy(() => import('../pages/admin/MonitorLiveContests'))
-const ManageTransactions = lazy(() => import('../pages/admin/ManageTransactions'))
-const VerifyWithdrawals = lazy(() => import('../pages/admin/VerifyWithdrawals'))
+const Transactions = lazy(() => import('../pages/admin/Transactions'))
+const Deposits = lazy(() => import('../pages/admin/Deposits'))
+const Withdrawals = lazy(() => import('../pages/admin/Withdrawals'))
 const ViewReports = lazy(() => import('../pages/admin/ViewReports'))
 const PrivacyPolicy = lazy(() => import('../pages/admin/PrivacyPolicy'))
 const TermsConditions = lazy(() => import('../pages/admin/TermsConditions'))
@@ -91,11 +92,15 @@ const AdminRoutes = {
     },
     {
       path: ROUTES.ADMIN.MANAGE_TRANSACTIONS.replace(ROUTES.ADMIN.ROOT + '/', ''),
-      element: <ManageTransactions />,
+      element: <Transactions />,
     },
     {
-      path: ROUTES.ADMIN.VERIFY_WITHDRAWALS.replace(ROUTES.ADMIN.ROOT + '/', ''),
-      element: <VerifyWithdrawals />,
+      path: ROUTES.ADMIN.DEPOSITS.replace(ROUTES.ADMIN.ROOT + '/', ''),
+      element: <Deposits />,
+    },
+    {
+      path: ROUTES.ADMIN.WITHDRAWALS.replace(ROUTES.ADMIN.ROOT + '/', ''),
+      element: <Withdrawals />,
     },
     {
       path: ROUTES.ADMIN.VIEW_REPORTS.replace(ROUTES.ADMIN.ROOT + '/', ''),

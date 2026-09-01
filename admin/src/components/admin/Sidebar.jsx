@@ -44,9 +44,11 @@ const NAV = [
     ],
   },
   {
-    section: 'WITHDRAWAL MANAGEMENT',
+    section: 'WALLET',
     items: [
-      { label: 'Verify Withdrawals', path: ROUTES.ADMIN.VERIFY_WITHDRAWALS, icon: 'Banknotes' },
+      { label: 'Deposits', path: ROUTES.ADMIN.DEPOSITS, icon: 'Deposits' },
+      { label: 'Withdrawals', path: ROUTES.ADMIN.WITHDRAWALS, icon: 'Withdrawals' },
+      { label: 'Transactions', path: ROUTES.ADMIN.TRANSACTIONS, icon: 'Transactions' },
     ],
   },
   {

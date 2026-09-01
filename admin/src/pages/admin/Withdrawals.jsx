@@ -4,7 +4,7 @@ import Table from '../../components/common/Table';
 import { withdrawalService } from '../../api/services/withdrawalService';
 import toast from 'react-hot-toast';
 
-const VerifyWithdrawals = () => {
+const Withdrawals = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [withdrawals, setWithdrawals] = useState([]);
@@ -72,8 +72,8 @@ const VerifyWithdrawals = () => {
       if (res?.success) {
         toast.success(
           type === 'approve'
-            ? `Withdrawal #${withdrawal.withdrawalId} Approved!`
-            : `Withdrawal #${withdrawal.withdrawalId} Rejected.`
+            ? `Withdrawal #${withdrawal.withdrawalId || withdrawal.id} Approved!`
+            : `Withdrawal #${withdrawal.withdrawalId || withdrawal.id} Rejected.`
         );
         fetchWithdrawals();
         setActionModal({ isOpen: false, type: 'approve', withdrawal: null, remarks: '', submitting: false });
@@ -91,7 +91,7 @@ const VerifyWithdrawals = () => {
       key: 'withdrawalId',
       label: 'Withdrawal ID',
       cellClassName: 'font-mono text-[#E94B4B] font-bold text-xs',
-      render: (val, row) => val || `WTH${String(row.id).padStart(3, '0')}`,
+      render: (val, row) => val || `WTH${String(row.id).padStart(4, '0')}`,
     },
     {
       key: 'user',
@@ -152,7 +152,7 @@ const VerifyWithdrawals = () => {
     },
     {
       key: 'actions',
-      label: 'Verification Actions',
+      label: 'Actions',
       headerClassName: 'text-center',
       cellClassName: 'text-center',
       render: (_, row) => {
@@ -192,9 +192,9 @@ const VerifyWithdrawals = () => {
       {/* Header */}
       <div className="bg-[#0f1117] text-white p-5 rounded-2xl shadow-sm border border-white/10 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-xl font-bold">Verify Withdrawals</h1>
+          <h1 className="text-xl font-bold">Withdrawals</h1>
           <p className="text-xs text-gray-400 mt-1">
-            Review, approve, or decline prize withdrawal requests submitted by quiz winners.
+            Review, verify, approve, or decline user prize withdrawal and payout requests.
           </p>
         </div>
       </div>
@@ -266,7 +266,7 @@ const VerifyWithdrawals = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-400">Withdrawal ID:</span>
                   <span className="font-mono text-[#E94B4B] font-bold">
-                    {actionModal.withdrawal.withdrawalId}
+                    {actionModal.withdrawal.withdrawalId || `WTH${actionModal.withdrawal.id}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -284,7 +284,7 @@ const VerifyWithdrawals = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-400">Destination:</span>
                   <span className="text-amber-400 font-medium truncate max-w-[200px]">
-                    {actionModal.withdrawal.payoutDetails}
+                    {actionModal.withdrawal.payoutDetails || 'Bank / UPI Transfer'}
                   </span>
                 </div>
               </div>
@@ -377,4 +377,4 @@ const VerifyWithdrawals = () => {
   );
 };
 
-export default VerifyWithdrawals;
+export default Withdrawals;
