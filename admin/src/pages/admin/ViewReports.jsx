@@ -99,7 +99,7 @@ const ViewReports = () => {
     {
       id: 'REP003',
       tabKey: 'contest-payments',
-      name: 'Contest-wise Payment Report',
+      name: 'Revenue Report',
       desc: 'Entry fee gross inflows, platform commission margins, and prize pool outflows.',
       range: 'Per-Tournament Statement',
       type: 'Financial & Margins',
@@ -456,7 +456,7 @@ const ViewReports = () => {
       { label: 'Net Platform Margin (INR)', key: 'netPlatformMargin' },
       { label: 'Settlement Status', key: 'settlementStatus' }
     ];
-    exportToCsv('Contest_Wise_Payment_Report', headers, filteredContestPayment);
+    exportToCsv('Revenue_Report', headers, filteredContestPayment);
   };
 
   const handleExportFinancialReport = () => {
@@ -1083,7 +1083,7 @@ const ViewReports = () => {
               : 'bg-[#0f1117] text-gray-400 hover:text-white border border-white/5 hover:border-white/10'
           }`}
         >
-          <CreditCard size={14} /> 3. Contest-wise Payment Report
+          <CreditCard size={14} /> 3. Revenue Report
         </button>
 
         <button
@@ -1381,7 +1381,7 @@ const ViewReports = () => {
                 <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search contest payment statements..."
+                  placeholder="Search revenue statements by contest, category..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-9 pr-4 py-2 w-full border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
