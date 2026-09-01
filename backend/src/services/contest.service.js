@@ -164,6 +164,7 @@ class ContestService {
       maxParticipants: data.maxParticipants !== undefined ? parseInt(data.maxParticipants, 10) : 100,
       minParticipants: data.minParticipants !== undefined ? parseInt(data.minParticipants, 10) : 2,
       durationMinutes: duration,
+      durationPerQuestion: data.durationPerQuestion !== undefined ? parseInt(data.durationPerQuestion, 10) : 15,
       image: data.image || null,
       numQuestions: data.numQuestions !== undefined ? parseInt(data.numQuestions, 10) : 10,
       prizeDistribution: data.prizeDistribution || null,
@@ -222,6 +223,7 @@ class ContestService {
     if (data.maxParticipants !== undefined) updates.maxParticipants = parseInt(data.maxParticipants, 10);
     if (data.minParticipants !== undefined) updates.minParticipants = parseInt(data.minParticipants, 10);
     if (data.durationMinutes !== undefined) updates.durationMinutes = parseInt(data.durationMinutes, 10);
+    if (data.durationPerQuestion !== undefined) updates.durationPerQuestion = parseInt(data.durationPerQuestion, 10);
     if (data.numQuestions !== undefined) updates.numQuestions = parseInt(data.numQuestions, 10);
     if (data.prizeDistribution !== undefined) updates.prizeDistribution = data.prizeDistribution;
     if (data.isActive !== undefined) updates.isActive = data.isActive === 'true' || data.isActive === true;

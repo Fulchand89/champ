@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Trophy, HelpCircle, Coins, Clock, Info, Calendar, Loader2, Upload, Image as ImageIcon } from 'lucide-react';
+import { Trophy, HelpCircle, Coins, Clock, Info, Calendar, Loader2, Upload, Users, Timer } from 'lucide-react';
 import { categoryService } from '../../api/services/categoryService';
 import { subjectService } from '../../api/services/subjectService';
 import { contestService } from '../../api/services/contestService';
-import { getImageUrl } from '../../api/services/api';
 import toast from 'react-hot-toast';
 
 const CreateContest = () => {
@@ -18,10 +17,12 @@ const CreateContest = () => {
   const [categoryId, setCategoryId] = useState('');
   const [subject, setSubject] = useState('');
   const [entryFee, setEntryFee] = useState('');
-  const [prizePool, setPrizePool] = useState('');
-  const [maxParticipants, setMaxParticipants] = useState('');
+  const [minParticipants, setMinParticipants] = useState('2');
+  const [maxParticipants, setMaxParticipants] = useState('100');
   const [startTime, setStartTime] = useState('');
-  const [numQuestions, setNumQuestions] = useState('10 Questions (Standard)');
+  const [durationMinutes, setDurationMinutes] = useState('15');
+  const [durationPerQuestion, setDurationPerQuestion] = useState('15');
+  const [numQuestions, setNumQuestions] = useState('10');
 
   // Image upload states
   const [imageFile, setImageFile] = useState(null);
@@ -93,8 +94,43 @@ const CreateContest = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!title.trim()) {
+      toast.error('Please enter contest title');
+      return;
+    }
+    if (!categoryId) {
+      toast.error('Please select a category');
+      return;
+    }
     if (!startTime) {
       toast.error('Please select start date and time');
+      return;
+    }
+
+    const minPart = parseInt(minParticipants, 10);
+    const maxPart = parseInt(maxParticipants, 10);
+    const durMin = parseInt(durationMinutes, 10);
+    const durSec = parseInt(durationPerQuestion, 10);
+    const totalQues = parseInt(numQuestions, 10);
+
+    if (isNaN(minPart) || minPart < 1) {
+      toast.error('Min participants must be at least 1');
+      return;
+    }
+    if (isNaN(maxPart) || maxPart < minPart) {
+      toast.error('Max participants must be greater than or equal to Min participants');
+      return;
+    }
+    if (isNaN(durMin) || durMin < 1) {
+      toast.error('Duration must be at least 1 minute');
+      return;
+    }
+    if (isNaN(durSec) || durSec < 5) {
+      toast.error('Duration per question must be at least 5 seconds');
+      return;
+    }
+    if (isNaN(totalQues) || totalQues < 1) {
+      toast.error('Number of questions must be at least 1');
       return;
     }
 
@@ -103,9 +139,7 @@ const CreateContest = () => {
 
     try {
       const start = new Date(startTime);
-      const questionCount = numQuestions.includes('30') ? 30 : (numQuestions.includes('20') ? 20 : 10);
-      const duration = numQuestions.includes('30') ? 30 : (numQuestions.includes('20') ? 20 : 15);
-      const end = new Date(start.getTime() + duration * 60 * 1000);
+      const end = new Date(start.getTime() + durMin * 60 * 1000);
 
       // Find subject ID if selected from list
       const matchedSubject = subjects.find(s => s.name === subject || String(s.id) === String(subject));
@@ -120,11 +154,11 @@ const CreateContest = () => {
       formData.append('entryFee', parseFloat(entryFee) || 0);
       formData.append('entryCoins', parseFloat(entryFee) ? Math.round(parseFloat(entryFee)) : 0);
       formData.append('platformCut', 10);
-      formData.append('prizePool', parseFloat(prizePool) || 0);
-      formData.append('maxParticipants', parseInt(maxParticipants, 10) || 100);
-      formData.append('minParticipants', 2);
-      formData.append('durationMinutes', duration);
-      formData.append('numQuestions', questionCount);
+      formData.append('minParticipants', minPart);
+      formData.append('maxParticipants', maxPart);
+      formData.append('durationMinutes', durMin);
+      formData.append('durationPerQuestion', durSec);
+      formData.append('numQuestions', totalQues);
       formData.append('status', 'scheduled');
       formData.append('isActive', true);
 
@@ -140,9 +174,12 @@ const CreateContest = () => {
         setCategoryId('');
         setSubject('');
         setEntryFee('');
-        setPrizePool('');
-        setMaxParticipants('');
+        setMinParticipants('2');
+        setMaxParticipants('100');
         setStartTime('');
+        setDurationMinutes('15');
+        setDurationPerQuestion('15');
+        setNumQuestions('10');
         setImageFile(null);
         setImagePreview('');
       }
@@ -168,9 +205,10 @@ const CreateContest = () => {
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Row 1: Title, Category, Subject */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-xs font-bold text-gray-300 mb-1.5">Contest Title</label>
+              <label className="block text-xs font-bold text-gray-300 mb-1.5">Contest Title *</label>
               <input
                 required
                 type="text"
@@ -182,7 +220,7 @@ const CreateContest = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-300 mb-1.5">Category</label>
+              <label className="block text-xs font-bold text-gray-300 mb-1.5">Category *</label>
               <select
                 required
                 value={categoryId}
@@ -264,51 +302,60 @@ const CreateContest = () => {
             </div>
           </div>
 
+          {/* Row 2: Entry Fee, Min Participants, Max Participants */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div>
               <label className="block text-xs font-bold text-gray-300 mb-1.5">Entry Fee (₹)</label>
               <div className="relative">
                 <Coins size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  required
                   type="number"
-                  placeholder="e.g. 50"
+                  min="0"
+                  placeholder="0 for Free or e.g. 50"
                   value={entryFee}
                   onChange={(e) => setEntryFee(e.target.value)}
                   className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
                 />
               </div>
             </div>
+
             <div>
-              <label className="block text-xs font-bold text-gray-300 mb-1.5">Total Prize Pool (₹)</label>
+              <label className="block text-xs font-bold text-gray-300 mb-1.5">Min Participants *</label>
               <div className="relative">
-                <Trophy size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500" />
+                <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-400" />
                 <input
                   required
                   type="number"
-                  placeholder="e.g. 5000"
-                  value={prizePool}
-                  onChange={(e) => setPrizePool(e.target.value)}
+                  min="1"
+                  placeholder="e.g. 2"
+                  value={minParticipants}
+                  onChange={(e) => setMinParticipants(e.target.value)}
                   className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
                 />
               </div>
             </div>
+
             <div>
-              <label className="block text-xs font-bold text-gray-300 mb-1.5">Max Participants</label>
-              <input
-                required
-                type="number"
-                placeholder="e.g. 100"
-                value={maxParticipants}
-                onChange={(e) => setMaxParticipants(e.target.value)}
-                className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
-              />
+              <label className="block text-xs font-bold text-gray-300 mb-1.5">Max Participants *</label>
+              <div className="relative">
+                <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" />
+                <input
+                  required
+                  type="number"
+                  min="2"
+                  placeholder="e.g. 100"
+                  value={maxParticipants}
+                  onChange={(e) => setMaxParticipants(e.target.value)}
+                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* Row 3: Contest Starts At, Duration (Minutes), Duration per Question (Seconds), Number of Questions */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
-              <label className="block text-xs font-bold text-gray-300 mb-1.5">Contest Starts At</label>
+              <label className="block text-xs font-bold text-gray-300 mb-1.5">Contest Starts At *</label>
               <div 
                 onClick={handleOpenPicker}
                 className="relative cursor-pointer"
@@ -323,18 +370,53 @@ const CreateContest = () => {
                 />
               </div>
             </div>
+
             <div>
-              <label className="block text-xs font-bold text-gray-300 mb-1.5">Number of Questions</label>
-              <select 
-                required 
-                value={numQuestions}
-                onChange={(e) => setNumQuestions(e.target.value)}
-                className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] cursor-pointer"
-              >
-                <option value="10 Questions (Standard)">10 Questions (Standard)</option>
-                <option value="20 Questions (Grand)">20 Questions (Grand)</option>
-                <option value="30 Questions (Ultra)">30 Questions (Ultra)</option>
-              </select>
+              <label className="block text-xs font-bold text-gray-300 mb-1.5">Duration (Minutes) *</label>
+              <div className="relative">
+                <Clock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400" />
+                <input
+                  required
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 15"
+                  value={durationMinutes}
+                  onChange={(e) => setDurationMinutes(e.target.value)}
+                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-300 mb-1.5">Duration per Question (Seconds) *</label>
+              <div className="relative">
+                <Timer size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-purple-400" />
+                <input
+                  required
+                  type="number"
+                  min="5"
+                  placeholder="e.g. 15"
+                  value={durationPerQuestion}
+                  onChange={(e) => setDurationPerQuestion(e.target.value)}
+                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-300 mb-1.5">Number of Questions *</label>
+              <div className="relative">
+                <HelpCircle size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  required
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 10"
+                  value={numQuestions}
+                  onChange={(e) => setNumQuestions(e.target.value)}
+                  className="block w-full pl-9 pr-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                />
+              </div>
             </div>
           </div>
 

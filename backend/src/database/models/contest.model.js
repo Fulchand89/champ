@@ -82,6 +82,11 @@ const Contest = sequelize.define('Contest', {
     allowNull: false,
     defaultValue: 15,
   },
+  durationPerQuestion: {
+    type: DataTypes.INTEGER,
+    defaultValue: 15,
+    comment: 'Duration per question in seconds',
+  },
   numQuestions: {
     type: DataTypes.INTEGER,
     defaultValue: 10,
