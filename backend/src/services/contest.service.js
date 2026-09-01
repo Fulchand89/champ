@@ -184,6 +184,11 @@ class ContestService {
       if (!topExists) topicId = null;
     }
 
+    // Try adding durationPerQuestion column proactively
+    try {
+      await sequelize.query("ALTER TABLE `contests` ADD COLUMN `durationPerQuestion` INT DEFAULT 15");
+    } catch (e) {}
+
     const contestFields = {
       title: data.title ? data.title.trim() : 'New Contest',
       description: data.description || '',
@@ -200,25 +205,57 @@ class ContestService {
       maxParticipants: data.maxParticipants !== undefined ? parseInt(data.maxParticipants, 10) : 100,
       minParticipants: data.minParticipants !== undefined ? parseInt(data.minParticipants, 10) : 2,
       durationMinutes: duration,
-      durationPerQuestion: data.durationPerQuestion !== undefined ? parseInt(data.durationPerQuestion, 10) : 15,
       image: data.image || null,
       numQuestions: data.numQuestions !== undefined ? parseInt(data.numQuestions, 10) : 10,
       prizeDistribution: data.prizeDistribution || null,
       isActive: data.isActive !== undefined ? (data.isActive === 'true' || data.isActive === true || data.isActive === '1' || data.isActive === 1) : true,
     };
 
+    if (data.durationPerQuestion !== undefined) {
+      contestFields.durationPerQuestion = parseInt(data.durationPerQuestion, 10);
+    }
+
     let contest;
     try {
       contest = await Contest.create(contestFields);
     } catch (createErr) {
-      if (createErr.message && (createErr.message.includes('Unknown column') || createErr.name === 'SequelizeDatabaseError')) {
-        console.warn('Unknown column encountered during Contest.create, retrying with core columns:', createErr.message);
+      console.warn('Contest.create exception caught, attempting fallback:', createErr.message);
+
+      if (createErr.message && createErr.message.includes('durationPerQuestion')) {
         delete contestFields.durationPerQuestion;
-        delete contestFields.entryCoins;
-        delete contestFields.platformCut;
-        delete contestFields.numQuestions;
-        delete contestFields.prizeDistribution;
-        contest = await Contest.create(contestFields);
+        try {
+          contest = await Contest.create(contestFields);
+        } catch (retryErr) {
+          console.warn('Contest.create retry failed, executing Raw SQL INSERT:', retryErr.message);
+          const now = new Date();
+          const [insertId] = await sequelize.query(
+            `INSERT INTO contests (title, description, categoryId, subjectId, topicId, status, startTime, endTime, entryFee, prizePool, maxParticipants, minParticipants, durationMinutes, image, isActive, createdAt, updatedAt) 
+             VALUES (:title, :description, :categoryId, :subjectId, :topicId, :status, :startTime, :endTime, :entryFee, :prizePool, :maxParticipants, :minParticipants, :durationMinutes, :image, :isActive, :createdAt, :updatedAt)`,
+            {
+              replacements: {
+                title: contestFields.title,
+                description: contestFields.description,
+                categoryId: contestFields.categoryId,
+                subjectId: contestFields.subjectId,
+                topicId: contestFields.topicId,
+                status: contestFields.status,
+                startTime: contestFields.startTime,
+                endTime: contestFields.endTime,
+                entryFee: contestFields.entryFee,
+                prizePool: contestFields.prizePool,
+                maxParticipants: contestFields.maxParticipants,
+                minParticipants: contestFields.minParticipants,
+                durationMinutes: contestFields.durationMinutes,
+                image: contestFields.image,
+                isActive: contestFields.isActive ? 1 : 0,
+                createdAt: now,
+                updatedAt: now,
+              },
+              type: sequelize.QueryTypes.INSERT
+            }
+          );
+          return this.getContestById(insertId);
+        }
       } else {
         throw createErr;
       }
