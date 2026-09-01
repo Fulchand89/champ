@@ -147,13 +147,11 @@ const ScheduleContest = () => {
     formData.append('startTime', new Date(startTime).toISOString());
     formData.append('endTime', new Date(endTime).toISOString());
     formData.append('entryFee', parseFloat(entryFee) || 0);
-    formData.append('entryCoins', parseFloat(entryFee) ? Math.round(parseFloat(entryFee)) : 0);
-    formData.append('platformCut', 10);
     formData.append('prizePool', parseFloat(prizePool) || 0);
     formData.append('maxParticipants', parseInt(maxParticipants, 10) || 100);
     formData.append('minParticipants', parseInt(minParticipants, 10) || 2);
     formData.append('durationMinutes', parseInt(durationMinutes, 10) || 15);
-    formData.append('isActive', isActive);
+    formData.append('isActive', String(isActive));
 
     if (imageFile) {
       formData.append('image', imageFile);
@@ -164,22 +162,40 @@ const ScheduleContest = () => {
     try {
       if (modalType === 'add') {
         const res = await contestService.createContest(formData);
-        if (res?.success) {
+        if (res?.success || res?.data) {
           toast.success('Contest scheduled successfully');
           fetchContestsAndCategories();
           setIsModalOpen(false);
+        } else {
+          toast.error(res?.message || 'Failed to schedule contest');
         }
       } else {
         const res = await contestService.updateContest(currentContest.id, formData);
-        if (res?.success) {
+        if (res?.success || res?.data) {
           toast.success('Contest updated successfully');
           fetchContestsAndCategories();
           setIsModalOpen(false);
+        } else {
+          toast.error(res?.message || 'Failed to update contest');
         }
       }
     } catch (err) {
       console.error('Error saving contest:', err);
-      const errMsg = err.response?.data?.message || err.response?.data?.errors?.[0]?.message || 'Error saving contest';
+      const data = err.response?.data;
+      let errMsg = 'Error saving contest';
+      if (typeof data === 'string') {
+        errMsg = data;
+      } else if (data?.sqlMessage) {
+        errMsg = data.sqlMessage;
+      } else if (data?.message) {
+        errMsg = data.message;
+      } else if (data?.error) {
+        errMsg = typeof data.error === 'string' ? data.error : (data.error.sqlMessage || data.error.message || JSON.stringify(data.error));
+      } else if (Array.isArray(data?.errors) && data.errors.length > 0) {
+        errMsg = data.errors.map(e => (typeof e === 'string' ? e : e.message || e.msg || JSON.stringify(e))).join(', ');
+      } else if (err.message) {
+        errMsg = err.message;
+      }
       toast.error(errMsg);
     }
   };

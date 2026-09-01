@@ -146,18 +146,16 @@ const CreateContest = () => {
 
       const formData = new FormData();
       formData.append('title', title.trim());
-      formData.append('description', subject ? `Subject: ${matchedSubject?.name || subject}` : (description || ''));
+      formData.append('description', subject ? `Subject: ${matchedSubject?.name || subject}` : '');
       if (categoryId) formData.append('categoryId', categoryId);
       formData.append('startTime', start.toISOString());
       formData.append('endTime', end.toISOString());
       formData.append('entryFee', parseFloat(entryFee) || 0);
-      formData.append('entryCoins', parseFloat(entryFee) ? Math.round(parseFloat(entryFee)) : 0);
-      formData.append('platformCut', 10);
       formData.append('prizePool', Math.max(0, (parseFloat(entryFee) || 0) * maxPart * 0.9));
       formData.append('minParticipants', minPart);
       formData.append('maxParticipants', maxPart);
       formData.append('durationMinutes', durMin);
-      formData.append('isActive', true);
+      formData.append('isActive', 'true');
 
       if (imageFile) {
         formData.append('image', imageFile);
@@ -188,10 +186,12 @@ const CreateContest = () => {
       let errMsg = 'Failed to create contest';
       if (typeof data === 'string') {
         errMsg = data;
+      } else if (data?.sqlMessage) {
+        errMsg = data.sqlMessage;
       } else if (data?.message) {
         errMsg = data.message;
       } else if (data?.error) {
-        errMsg = typeof data.error === 'string' ? data.error : JSON.stringify(data.error);
+        errMsg = typeof data.error === 'string' ? data.error : (data.error.sqlMessage || data.error.message || JSON.stringify(data.error));
       } else if (Array.isArray(data?.errors) && data.errors.length > 0) {
         errMsg = data.errors.map(e => (typeof e === 'string' ? e : e.message || e.msg || JSON.stringify(e))).join(', ');
       } else if (err.message) {
