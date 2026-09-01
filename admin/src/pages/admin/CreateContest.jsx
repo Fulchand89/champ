@@ -199,12 +199,13 @@ const CreateContest = () => {
       }
     } catch (err) {
       console.error('Error creating contest:', err);
+      console.error('Backend full error response:', err.response?.data);
       const data = err.response?.data;
-      let errMsg = 'Failed to create contest';
+      let errMsg = 'Failed to create contest (Server 500 Error)';
       if (typeof data === 'string') {
-        errMsg = data;
+        errMsg = data.includes('<!DOCTYPE') ? 'Backend server error (500) - Please check backend database logs' : data;
       } else if (data?.sqlMessage) {
-        errMsg = data.sqlMessage;
+        errMsg = `Database Error: ${data.sqlMessage}`;
       } else if (data?.message) {
         errMsg = data.message;
       } else if (data?.error) {
@@ -214,7 +215,7 @@ const CreateContest = () => {
       } else if (err.message) {
         errMsg = err.message;
       }
-      toast.error(errMsg);
+      toast.error(errMsg, { duration: 6000 });
     } finally {
       setSubmitting(false);
     }
