@@ -154,10 +154,10 @@ const CreateContest = () => {
       formData.append('entryFee', parseFloat(entryFee) || 0);
       formData.append('entryCoins', parseFloat(entryFee) ? Math.round(parseFloat(entryFee)) : 0);
       formData.append('platformCut', 10);
+      formData.append('prizePool', Math.max(0, (parseFloat(entryFee) || 0) * maxPart * 0.9));
       formData.append('minParticipants', minPart);
       formData.append('maxParticipants', maxPart);
       formData.append('durationMinutes', durMin);
-      formData.append('durationPerQuestion', durSec);
       formData.append('numQuestions', totalQues);
       formData.append('status', 'scheduled');
       formData.append('isActive', true);
