@@ -65,7 +65,6 @@ const NAV = [
   {
     section: 'SETTINGS',
     items: [
-      { label: 'My Profile', path: ROUTES.ADMIN.PROFILE, icon: 'User' },
       { label: 'Settings', path: ROUTES.ADMIN.SETTINGS, icon: 'Settings' },
     ],
   },

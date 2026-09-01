@@ -1,44 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
-  Bell,
   Save,
+  RotateCw,
+  Coins,
+  CreditCard,
+  Trophy,
+  Sliders,
   Globe,
   Upload,
   Trash2,
-  Settings as SettingsIcon,
-  CheckCircle,
-  RotateCw,
-  Shield,
-  Zap,
+  Clock,
   Users,
-  Trophy,
-  CreditCard,
+  ShieldCheck,
   AlertCircle,
   ImageIcon,
-  Lock,
   Mail,
-  Eye,
-  EyeOff,
-  KeyRound,
-  ShieldCheck,
-  Sliders,
-  Server,
-  Clock,
-  Coins,
-  DollarSign,
-  HelpCircle,
-  Activity,
-  Sparkles,
-  AlertTriangle,
   Phone,
   Calendar,
-  Volume2,
+  Zap,
+  CheckCircle2,
+  DollarSign,
+  Lock,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { systemSettingsService } from '../../api/services/systemSettingsService';
-import authService from '../../api/services/authService';
 import { initAdminSocket } from '../../api/services/adminSocketService';
-import { useAuth } from '../../hooks/useAuth';
 import { getImageUrl } from '../../utils/image';
 
 /* ── Toggle Switch Component ── */
@@ -76,13 +63,15 @@ function SectionCard({ icon: Icon, title, subtitle, children, badge, badgeColor 
           </div>
           <div>
             <h2 className="text-sm font-bold text-white flex items-center gap-2">{title}</h2>
-            {subtitle && <p className="text-[11px] text-white/50 mt-0.5">{subtitle}</p>}
+            {subtitle && <p className="text-xs text-gray-400 mt-0.5">{subtitle}</p>}
           </div>
         </div>
         {badge && (
-          <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0 self-start sm:self-auto border ${
-            badgeColor || 'bg-[#E94B4B]/15 text-[#E94B4B] border-[#E94B4B]/20'
-          }`}>
+          <span
+            className={`text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0 self-start sm:self-auto border ${
+              badgeColor || 'bg-[#E94B4B]/15 text-[#E94B4B] border-[#E94B4B]/20'
+            }`}
+          >
             {badge}
           </span>
         )}
@@ -92,47 +81,62 @@ function SectionCard({ icon: Icon, title, subtitle, children, badge, badgeColor 
   );
 }
 
-/* ── Notification Row Component ── */
-function NotifRow({ icon: Icon, title, desc, settingKey, settings, onToggle, color = 'text-[#E94B4B]' }) {
-  const isOn = settings[settingKey] !== false;
-  return (
-    <div className="flex items-center justify-between gap-4 py-3.5 border-b border-white/6 last:border-0 hover:bg-white/[0.01] px-2 rounded-xl transition-colors">
-      <div className="flex items-center gap-3.5 min-w-0">
-        <div className={`w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10 ${color}`}>
-          <Icon className="w-4.5 h-4.5" />
-        </div>
-        <div className="min-w-0">
-          <h4 className="text-xs font-semibold text-white leading-snug">{title}</h4>
-          <p className="text-[11px] text-white/45 mt-0.5 leading-relaxed break-words">{desc}</p>
-        </div>
-      </div>
-      <ToggleSwitch checked={isOn} onChange={() => onToggle(settingKey)} label={title} />
-    </div>
-  );
-}
+const Settings = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
 
-/* ── Main Settings Page ── */
-const SettingsPage = () => {
-  const { user, updateProfile } = useAuth();
+  const [activeTab, setActiveTab] = useState(
+    tabParam && ['deposit-limits', 'withdrawal-limits', 'contest-rules', 'platform-settings'].includes(tabParam)
+      ? tabParam
+      : 'deposit-limits'
+  );
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
   const [logoFile, setLogoFile] = useState(null);
-  const [activeTab, setActiveTab] = useState('general');
 
-  // Dynamic Live Stats from Backend
-  const [liveStats, setLiveStats] = useState({
-    totalUsers: 0,
-    totalContests: 0,
-    totalTransactions: 0,
-    pendingWithdrawals: 0,
-    systemStatus: 'Operational',
-    serverTime: new Date().toISOString(),
-  });
-
-  // Settings State
+  // Settings State for the 4 sections
   const [settings, setSettings] = useState({
-    // General & Branding
+    // ── 1. Deposit Limits ──
+    minDepositAmount: 10,
+    maxDepositAmount: 50000,
+    dailyDepositLimit: 100000,
+    monthlyDepositLimit: 1000000,
+    maxDepositTxnCountPerDay: 10,
+    depositBonusPercent: 0,
+    maxDepositBonusAmount: 500,
+    autoCreditDeposits: true,
+    allowUpiDeposit: true,
+    allowCardDeposit: true,
+    allowNetbankingDeposit: true,
+    allowWalletDeposit: true,
+
+    // ── 2. Withdrawal Limits ──
+    minWithdrawalAmount: 100,
+    maxWithdrawalAmount: 25000,
+    dailyWithdrawalLimit: 50000,
+    monthlyWithdrawalLimit: 500000,
+    maxFreeWithdrawalsPerMonth: 5,
+    withdrawalProcessingFeePercent: 0,
+    kycRequiredThreshold: 1000,
+    autoApproveWithdrawalsUnder: 0,
+    withdrawalCooldownHours: 24,
+
+    // ── 3. Contest Rules ──
+    defaultQuestionTimer: 30,
+    defaultEntryFee: 10,
+    maxParticipantsPerContest: 500,
+    minParticipantsToStart: 2,
+    autoCancelLowParticipation: true,
+    tieBreakerRule: 'speed_submission',
+    autoSettleContests: true,
+    lateJoinWindowSeconds: 10,
+    negativeMarking: false,
+    negativeMarkingPoints: 0.25,
+    shuffleQuestions: true,
+
+    // ── 4. Platform Settings ──
     platformName: 'KnowChamp',
     platformTagline: 'Play Quizzes, Learn & Win Real Cash Rewards',
     logoUrl: '/logo_knowchamp.png',
@@ -143,90 +147,54 @@ const SettingsPage = () => {
     currencyCode: 'INR',
     timezone: 'Asia/Kolkata (IST)',
     copyrightText: '© 2026 KnowChamp. All rights reserved.',
-
-    // Contest & Financial Rules
-    defaultQuestionTimer: 30,
-    defaultEntryFee: 10,
-    minWithdrawalAmount: 100,
-    maxWithdrawalAmount: 50000,
-    referralRewardAmount: 50,
-    signupBonus: 25,
-    autoSettleContests: true,
-    maxParticipantsPerContest: 500,
-
-    // Notifications & Alerts
-    emailNotifications: true,
-    realtimeSocketAlerts: true,
-    newBookingAlerts: true,
-    quotationAlerts: true,
-    settlementAlerts: true,
-    userRegistrationAlerts: true,
-    soundAlerts: false,
-
-    // System & Maintenance
     maintenanceMode: false,
     maintenanceMessage: 'We are currently performing scheduled maintenance. We will be back online shortly!',
     allowAdminDuringMaintenance: true,
-    debugMode: false,
-    sessionTimeoutMins: 60,
-    maxLoginAttempts: 5,
+    realtimeSocketSync: true,
   });
 
-  // Security Tab State
-  const [emailData, setEmailData] = useState({ newEmail: '' });
-  const [isSavingEmail, setIsSavingEmail] = useState(false);
-
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  });
-  const [showCurrentPw, setShowCurrentPw] = useState(false);
-  const [showNewPw, setShowNewPw] = useState(false);
-  const [showConfirmPw, setShowConfirmPw] = useState(false);
-  const [isSavingPassword, setIsSavingPassword] = useState(false);
-
-  // Sync email when user loads
+  // Sync tab param if search params change
   useEffect(() => {
-    if (user?.email) {
-      setEmailData({ newEmail: user.email });
+    if (tabParam && ['deposit-limits', 'withdrawal-limits', 'contest-rules', 'platform-settings'].includes(tabParam)) {
+      setActiveTab(tabParam);
     }
-  }, [user]);
+  }, [tabParam]);
 
-  // Fetch backend settings & live stats
-  const fetchBackendSettings = useCallback(async (isSilent = false) => {
+  const handleTabChange = (id) => {
+    setActiveTab(id);
+    setSearchParams({ tab: id });
+  };
+
+  // Fetch backend settings
+  const fetchSettings = useCallback(async (isSilent = false) => {
     try {
       if (!isSilent) setLoading(true);
       const res = await systemSettingsService.getSettings();
       if (res?.data) {
         const fetched = res.data;
         const logoPath = fetched.logoUrl ? getImageUrl(fetched.logoUrl) : '/logo_knowchamp.png';
-        setSettings(prev => ({
+        setSettings((prev) => ({
           ...prev,
           ...fetched,
           logoPreview: logoPath,
         }));
       }
-      if (res?.stats) {
-        setLiveStats(res.stats);
-      }
     } catch (err) {
       console.error('Fetch settings error:', err);
-      if (!isSilent) toast.error('Failed to load system settings');
+      if (!isSilent) toast.error('Failed to load settings');
     } finally {
       if (!isSilent) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchBackendSettings();
+    fetchSettings();
 
-    // Listen for real-time system setting update socket event
     const socket = initAdminSocket();
     const handleSettingsUpdate = (updatedSettings) => {
       if (updatedSettings) {
         const logoPath = updatedSettings.logoUrl ? getImageUrl(updatedSettings.logoUrl) : '/logo_knowchamp.png';
-        setSettings(prev => ({ ...prev, ...updatedSettings, logoPreview: logoPath }));
+        setSettings((prev) => ({ ...prev, ...updatedSettings, logoPreview: logoPath }));
       }
     };
 
@@ -234,14 +202,14 @@ const SettingsPage = () => {
     return () => {
       socket.off('system_settings_updated', handleSettingsUpdate);
     };
-  }, [fetchBackendSettings]);
+  }, [fetchSettings]);
 
   const handleChange = (key, value) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+    setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleToggle = (key) => {
-    setSettings(prev => ({ ...prev, [key]: !prev[key] }));
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleSaveSettings = async (e) => {
@@ -250,7 +218,6 @@ const SettingsPage = () => {
       setSaving(true);
       const formData = new FormData();
 
-      // Append all setting keys to form data
       Object.keys(settings).forEach((key) => {
         if (key !== 'logoPreview') {
           formData.append(key, String(settings[key]));
@@ -265,197 +232,70 @@ const SettingsPage = () => {
       if (res?.data) {
         const updated = res.data;
         const logoPath = updated.logoUrl ? getImageUrl(updated.logoUrl) : settings.logoPreview;
-        setSettings(prev => ({ ...prev, ...updated, logoPreview: logoPath }));
+        setSettings((prev) => ({ ...prev, ...updated, logoPreview: logoPath }));
       }
-      toast.success('Platform settings saved and synced successfully!');
+      toast.success('Settings saved and synced successfully!');
       setLogoFile(null);
     } catch (err) {
       console.error('Save settings error:', err);
-      toast.error('Failed to save settings. Please check your network and try again.');
+      toast.error('Failed to save settings. Please try again.');
     } finally {
       setSaving(false);
     }
   };
 
-  // Email Change Handler
-  const handleEmailChange = async (e) => {
-    e.preventDefault();
-    const trimmed = emailData.newEmail.trim();
-    if (!trimmed) return toast.error('Email address is required.');
-    if (!/\S+@\S+\.\S+/.test(trimmed)) return toast.error('Please enter a valid email address.');
-    if (trimmed === user?.email) return toast.error('New email is the same as current email.');
-    try {
-      setIsSavingEmail(true);
-      const data = new FormData();
-      data.append('name', user?.name || '');
-      data.append('email', trimmed);
-      await updateProfile(data);
-      toast.success('Login email updated successfully!');
-    } catch (err) {
-      const msg = err?.response?.data?.message || 'Failed to update email. Please try again.';
-      toast.error(msg);
-    } finally {
-      setIsSavingEmail(false);
-    }
-  };
-
-  // Password Change Handler
-  const handlePasswordChange = async (e) => {
-    e.preventDefault();
-    if (!passwordData.currentPassword) return toast.error('Please enter your current password.');
-    if (!passwordData.newPassword) return toast.error('Please enter a new password.');
-    if (passwordData.newPassword.length < 6) return toast.error('New password must be at least 6 characters.');
-    if (passwordData.newPassword !== passwordData.confirmPassword) return toast.error('New passwords do not match.');
-    try {
-      setIsSavingPassword(true);
-      const res = await authService.changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword,
-      });
-      toast.success(res?.message || 'Password updated successfully!');
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (err) {
-      const msg = err?.response?.data?.message || 'Failed to update password. Please try again.';
-      toast.error(msg);
-    } finally {
-      setIsSavingPassword(false);
-    }
-  };
-
   const TABS = [
-    { id: 'general', label: 'General & Branding', icon: Globe },
-    { id: 'contest', label: 'Contest & Financial', icon: Trophy },
-    { id: 'notifications', label: 'Alerts & Notifications', icon: Bell },
-    { id: 'maintenance', label: 'System & Maintenance', icon: Sliders },
-    { id: 'security', label: 'Security & Access', icon: ShieldCheck },
+    { id: 'deposit-limits', label: 'Deposit Limits', icon: Coins },
+    { id: 'withdrawal-limits', label: 'Withdrawal Limits', icon: CreditCard },
+    { id: 'contest-rules', label: 'Contest Rules', icon: Trophy },
+    { id: 'platform-settings', label: 'Platform Settings', icon: Sliders },
   ];
 
-  const activeNotifCount = [
-    settings.realtimeSocketAlerts,
-    settings.newBookingAlerts,
-    settings.quotationAlerts,
-    settings.settlementAlerts,
-    settings.userRegistrationAlerts !== false,
-    settings.emailNotifications,
-    settings.soundAlerts,
-  ].filter(Boolean).length;
-
   return (
-    <div className="space-y-6 w-full max-w-7xl mx-auto pb-10">
-
-      {/* ── Top Header Banner ── */}
-      <div className="bg-[#0f1117] rounded-2xl border border-white/10 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
-        <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-[#E94B4B]/15 border border-[#E94B4B]/30 flex items-center justify-center shadow-inner">
-            <SettingsIcon className="w-5 h-5 text-[#E94B4B]" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-bold text-white">Platform Settings & Control Center</h1>
-              {settings.maintenanceMode && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse">
-                  Maintenance Active
-                </span>
-              )}
-            </div>
-            <p className="text-[11px] text-white/50 mt-0.5">
-              Live dynamic configuration for {settings.platformName || 'KnowChamp'} platform preferences, rules & security.
-            </p>
-          </div>
+    <div className="space-y-6 w-full max-w-7xl mx-auto pb-12">
+      {/* ── Page Header ── */}
+      <div className="bg-[#0f1117] text-white p-5 rounded-2xl shadow-sm border border-white/10 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+        <div>
+          <h1 className="text-xl font-bold">Settings</h1>
+          <p className="text-xs text-gray-400 mt-1">
+            Configure deposit limits, withdrawal parameters, tournament gameplay rules, and platform preferences.
+          </p>
         </div>
 
-        {/* Dynamic Status Badges */}
-        <div className="flex items-center flex-wrap gap-2.5">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-xl">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
-            <span className="text-[11px] font-semibold text-green-400">
-              {settings.maintenanceMode ? 'Maintenance Mode' : 'Live System Online'}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#E94B4B]/10 border border-[#E94B4B]/20 rounded-xl">
-            <Bell className="w-3.5 h-3.5 text-[#E94B4B]" />
-            <span className="text-[11px] font-semibold text-[#E94B4B]">{activeNotifCount}/7 Alerts Active</span>
-          </div>
-
+        <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <button
             type="button"
-            onClick={() => fetchBackendSettings(false)}
+            onClick={() => fetchSettings(false)}
             disabled={loading}
-            title="Reload live settings from server"
+            title="Reload settings"
             className="p-2 border border-white/10 hover:bg-white/5 text-white/60 hover:text-white rounded-xl transition-all cursor-pointer disabled:opacity-50"
           >
             <RotateCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
+
+          <button
+            onClick={handleSaveSettings}
+            disabled={saving}
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2 text-white rounded-lg text-xs font-bold transition-all shadow-md cursor-pointer hover:opacity-90 disabled:opacity-50"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
+            <Save className="w-4 h-4" />
+            {saving ? 'Saving...' : 'Save Settings'}
+          </button>
         </div>
       </div>
 
-      {/* ── Dynamic System Overview Cards (Live Database Metrics) ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="bg-[#0f1117] rounded-xl border border-white/10 p-4 flex items-center gap-3.5 shadow-md">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
-            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
-          >
-            <Trophy className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Total Contests</p>
-            <p className="text-base font-bold text-white mt-0.5">{liveStats.totalContests ?? 0}</p>
-          </div>
-        </div>
-
-        <div className="bg-[#0f1117] rounded-xl border border-white/10 p-4 flex items-center gap-3.5 shadow-md">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
-            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
-          >
-            <Users className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Registered Users</p>
-            <p className="text-base font-bold text-white mt-0.5">{liveStats.totalUsers ?? 0}</p>
-          </div>
-        </div>
-
-        <div className="bg-[#0f1117] rounded-xl border border-white/10 p-4 flex items-center gap-3.5 shadow-md">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
-            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
-          >
-            <CreditCard className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Transactions</p>
-            <p className="text-base font-bold text-white mt-0.5">{liveStats.totalTransactions ?? 0}</p>
-          </div>
-        </div>
-
-        <div className="bg-[#0f1117] rounded-xl border border-white/10 p-4 flex items-center gap-3.5 shadow-md">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
-            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
-          >
-            <Activity className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Pending Payouts</p>
-            <p className="text-base font-bold text-white mt-0.5">{liveStats.pendingWithdrawals ?? 0}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Tab Navigation Bar ── */}
+      {/* ── Tabs Navigation ── */}
       <div className="flex items-center gap-1.5 bg-[#0f1117] border border-white/10 rounded-2xl p-1.5 overflow-x-auto no-scrollbar shadow-md">
-        {TABS.map(tab => {
+        {TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 shrink-0 cursor-pointer ${
+              onClick={() => handleTabChange(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 shrink-0 cursor-pointer ${
                 isActive
                   ? 'text-white shadow-lg font-bold'
                   : 'text-white/50 hover:text-white hover:bg-white/5'
@@ -469,24 +309,544 @@ const SettingsPage = () => {
         })}
       </div>
 
-      {/* ── Form Container ── */}
+      {/* ── Tab Content Forms ── */}
       <form onSubmit={handleSaveSettings} className="space-y-6">
 
         {/* ══════════════════════════════════════════════════════════════
-            TAB 1: GENERAL & BRANDING
+            SECTION 1: DEPOSIT LIMITS
            ══════════════════════════════════════════════════════════════ */}
-        {activeTab === 'general' && (
+        {activeTab === 'deposit-limits' && (
           <div className="space-y-6">
-            {/* Platform Brand & Identity */}
+            <SectionCard
+              icon={Coins}
+              title="Deposit Amount Boundaries"
+              subtitle="Set allowable deposit amount thresholds for player wallet additions."
+              badge="Financial Controls"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Min Deposit Amount ({settings.currencySymbol || '₹'}) <span className="text-[#E94B4B]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Coins className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="number"
+                      min={1}
+                      value={settings.minDepositAmount ?? 10}
+                      onChange={(e) => handleChange('minDepositAmount', Number(e.target.value))}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1.5">Minimum single transaction deposit allowed.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Max Deposit Amount ({settings.currencySymbol || '₹'}) <span className="text-[#E94B4B]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Coins className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="number"
+                      min={100}
+                      value={settings.maxDepositAmount ?? 50000}
+                      onChange={(e) => handleChange('maxDepositAmount', Number(e.target.value))}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1.5">Maximum single transaction deposit cap.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Daily Deposit Limit ({settings.currencySymbol || '₹'})
+                  </label>
+                  <input
+                    type="number"
+                    min={500}
+                    value={settings.dailyDepositLimit ?? 100000}
+                    onChange={(e) => handleChange('dailyDepositLimit', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Max total deposits per user per 24 hours.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Monthly Deposit Limit ({settings.currencySymbol || '₹'})
+                  </label>
+                  <input
+                    type="number"
+                    min={1000}
+                    value={settings.monthlyDepositLimit ?? 1000000}
+                    onChange={(e) => handleChange('monthlyDepositLimit', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Monthly cumulative deposit ceiling per user.</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-6 pt-5 border-t border-white/10">
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Daily Max Deposit Txn Count
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={settings.maxDepositTxnCountPerDay ?? 10}
+                    onChange={(e) => handleChange('maxDepositTxnCountPerDay', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Max number of deposit attempts allowed per day.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Promotional Deposit Bonus (%)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={settings.depositBonusPercent ?? 0}
+                    onChange={(e) => handleChange('depositBonusPercent', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Extra promotional bonus cash percentage credited on deposit.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Max Bonus Cap per Deposit ({settings.currencySymbol || '₹'})
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={settings.maxDepositBonusAmount ?? 500}
+                    onChange={(e) => handleChange('maxDepositBonusAmount', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Upper cap on bonus cash credited per transaction.</p>
+                </div>
+              </div>
+            </SectionCard>
+
+            <SectionCard
+              icon={Zap}
+              title="Deposit Gateway & Verification Rules"
+              subtitle="Configure payment methods and automated deposit settlement rules."
+              badge="Automation"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-4 py-2 border-b border-white/6">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white">Instant Auto-Credit Wallet on Success</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      Instantly credit player deposit balance upon payment gateway webhook confirmation.
+                    </p>
+                  </div>
+                  <ToggleSwitch
+                    checked={settings.autoCreditDeposits !== false}
+                    onChange={() => handleToggle('autoCreditDeposits')}
+                    label="Auto Credit Deposits"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-4 py-2 border-b border-white/6">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white">Allow UPI Payments (GPay, PhonePe, Paytm)</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Enable UPI QR code and intent flow on deposit checkout.</p>
+                  </div>
+                  <ToggleSwitch
+                    checked={settings.allowUpiDeposit !== false}
+                    onChange={() => handleToggle('allowUpiDeposit')}
+                    label="Allow UPI Deposit"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-4 py-2 border-b border-white/6">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white">Allow Debit & Credit Card Deposits</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Support Visa, Mastercard, and RuPay cards for wallet load.</p>
+                  </div>
+                  <ToggleSwitch
+                    checked={settings.allowCardDeposit !== false}
+                    onChange={() => handleToggle('allowCardDeposit')}
+                    label="Allow Card Deposit"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-4 py-2">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white">Allow Net Banking & Wallet Gateway</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5">Support major Indian banks and payment wallets.</p>
+                  </div>
+                  <ToggleSwitch
+                    checked={settings.allowNetbankingDeposit !== false}
+                    onChange={() => handleToggle('allowNetbankingDeposit')}
+                    label="Allow Net Banking Deposit"
+                  />
+                </div>
+              </div>
+            </SectionCard>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════
+            SECTION 2: WITHDRAWAL LIMITS
+           ══════════════════════════════════════════════════════════════ */}
+        {activeTab === 'withdrawal-limits' && (
+          <div className="space-y-6">
+            <SectionCard
+              icon={CreditCard}
+              title="Withdrawal Caps & Boundaries"
+              subtitle="Configure minimum, maximum single payout, daily and monthly withdrawal limits."
+              badge="Payout Rules"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Min Withdrawal ({settings.currencySymbol || '₹'}) <span className="text-[#E94B4B]">*</span>
+                  </label>
+                  <div className="relative">
+                    <CreditCard className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="number"
+                      min={10}
+                      value={settings.minWithdrawalAmount ?? 100}
+                      onChange={(e) => handleChange('minWithdrawalAmount', Number(e.target.value))}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1.5">Minimum balance required to request a payout.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Max Single Withdrawal ({settings.currencySymbol || '₹'}) <span className="text-[#E94B4B]">*</span>
+                  </label>
+                  <div className="relative">
+                    <CreditCard className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="number"
+                      min={100}
+                      value={settings.maxWithdrawalAmount ?? 25000}
+                      onChange={(e) => handleChange('maxWithdrawalAmount', Number(e.target.value))}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1.5">Maximum amount per single withdrawal request.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Daily Withdrawal Cap ({settings.currencySymbol || '₹'})
+                  </label>
+                  <input
+                    type="number"
+                    min={500}
+                    value={settings.dailyWithdrawalLimit ?? 50000}
+                    onChange={(e) => handleChange('dailyWithdrawalLimit', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Total maximum payout allowed per player in 24 hours.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Monthly Withdrawal Cap ({settings.currencySymbol || '₹'})
+                  </label>
+                  <input
+                    type="number"
+                    min={1000}
+                    value={settings.monthlyWithdrawalLimit ?? 500000}
+                    onChange={(e) => handleChange('monthlyWithdrawalLimit', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Cumulative monthly withdrawal limit per user account.</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-6 pt-5 border-t border-white/10">
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Max Free Withdrawals / Month
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={50}
+                    value={settings.maxFreeWithdrawalsPerMonth ?? 5}
+                    onChange={(e) => handleChange('maxFreeWithdrawalsPerMonth', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Monthly free withdrawal count before processing fee applies.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Withdrawal Fee / TDS (%)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={50}
+                    value={settings.withdrawalProcessingFeePercent ?? 0}
+                    onChange={(e) => handleChange('withdrawalProcessingFeePercent', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Deduction rate on net prize winnings or excess requests.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Withdrawal Cooldown Period (Hours)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={72}
+                    value={settings.withdrawalCooldownHours ?? 24}
+                    onChange={(e) => handleChange('withdrawalCooldownHours', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Hours to wait between consecutive withdrawal submissions.</p>
+                </div>
+              </div>
+            </SectionCard>
+
+            <SectionCard
+              icon={ShieldCheck}
+              title="Verification & Compliance Rules"
+              subtitle="Enforce KYC identification thresholds and automated verification rules."
+              badge="Compliance"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Mandatory KYC Threshold ({settings.currencySymbol || '₹'})
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={settings.kycRequiredThreshold ?? 1000}
+                    onChange={(e) => handleChange('kycRequiredThreshold', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Withdrawals equal or above this amount strictly require verified PAN / Aadhaar.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Auto-Approve Threshold ({settings.currencySymbol || '₹'})
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={settings.autoApproveWithdrawalsUnder ?? 0}
+                    onChange={(e) => handleChange('autoApproveWithdrawalsUnder', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Instant payout for verified accounts under this amount (Set 0 for manual approval).</p>
+                </div>
+              </div>
+            </SectionCard>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════
+            SECTION 3: CONTEST RULES
+           ══════════════════════════════════════════════════════════════ */}
+        {activeTab === 'contest-rules' && (
+          <div className="space-y-6">
+            <SectionCard
+              icon={Trophy}
+              title="Gameplay & Timer Settings"
+              subtitle="Define default question timers, participant capacities, and late join policies."
+              badge="Game Mechanics"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Default Question Timer (Seconds) <span className="text-[#E94B4B]">*</span>
+                  </label>
+                  <div className="relative">
+                    <Clock className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="number"
+                      min={5}
+                      max={300}
+                      value={settings.defaultQuestionTimer ?? 30}
+                      onChange={(e) => handleChange('defaultQuestionTimer', Number(e.target.value))}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1.5">Default timer per question in quiz rooms.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Default Entry Fee ({settings.currencySymbol || '₹'})
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={settings.defaultEntryFee ?? 10}
+                    onChange={(e) => handleChange('defaultEntryFee', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Default entry price for new contests.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Max Participants / Room
+                  </label>
+                  <div className="relative">
+                    <Users className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="number"
+                      min={2}
+                      max={10000}
+                      value={settings.maxParticipantsPerContest ?? 500}
+                      onChange={(e) => handleChange('maxParticipantsPerContest', Number(e.target.value))}
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                    />
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-1.5">Room player capacity ceiling.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Min Participants to Start
+                  </label>
+                  <input
+                    type="number"
+                    min={2}
+                    value={settings.minParticipantsToStart ?? 2}
+                    onChange={(e) => handleChange('minParticipantsToStart', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Minimum players required before contest starts.</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-6 pt-5 border-t border-white/10">
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Tie-Breaker Rule Policy
+                  </label>
+                  <select
+                    value={settings.tieBreakerRule || 'speed_submission'}
+                    onChange={(e) => handleChange('tieBreakerRule', e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] cursor-pointer"
+                  >
+                    <option value="speed_submission">Fastest Answering Speed Wins (Recommended)</option>
+                    <option value="equal_split">Split Prize Pool Equally Among Tied Players</option>
+                    <option value="accuracy_priority">Accuracy Rate First, Then Submission Speed</option>
+                  </select>
+                  <p className="text-[11px] text-gray-400 mt-1.5">Leaderboard resolution policy when participants achieve identical scores.</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/80 mb-2">
+                    Late Join Window (Seconds)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={60}
+                    value={settings.lateJoinWindowSeconds ?? 10}
+                    onChange={(e) => handleChange('lateJoinWindowSeconds', Number(e.target.value))}
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
+                  />
+                  <p className="text-[11px] text-gray-400 mt-1.5">Grace period in seconds to join after countdown begins.</p>
+                </div>
+              </div>
+            </SectionCard>
+
+            <SectionCard
+              icon={ShieldCheck}
+              title="Fair-Play & Settlement Rules"
+              subtitle="Configure anti-cheat protections, automatic prize settlement, and cancellation refunds."
+              badge="Fair Play"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-4 py-2 border-b border-white/6">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white">Auto-Settle Finished Contests & Distribute Winnings</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      Automatically calculate rankings and credit winnings directly to user wallets upon contest completion.
+                    </p>
+                  </div>
+                  <ToggleSwitch
+                    checked={settings.autoSettleContests !== false}
+                    onChange={() => handleToggle('autoSettleContests')}
+                    label="Auto Settle Contests"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-4 py-2 border-b border-white/6">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white">Randomize & Shuffle Questions / Options</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      Prevent screen mirroring and collusion by shuffling question and option orders per player.
+                    </p>
+                  </div>
+                  <ToggleSwitch
+                    checked={settings.shuffleQuestions !== false}
+                    onChange={() => handleToggle('shuffleQuestions')}
+                    label="Shuffle Questions"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-4 py-2 border-b border-white/6">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white">Auto-Cancel & 100% Refund on Low Participation</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      Automatically cancel contest and refund entry fee if minimum player threshold is not reached.
+                    </p>
+                  </div>
+                  <ToggleSwitch
+                    checked={settings.autoCancelLowParticipation !== false}
+                    onChange={() => handleToggle('autoCancelLowParticipation')}
+                    label="Auto Cancel Low Participation"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-4 py-2">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white">Enable Negative Marking Penalty</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      Deduct points ({settings.negativeMarkingPoints || 0.25} pts) for incorrect answer submissions.
+                    </p>
+                  </div>
+                  <ToggleSwitch
+                    checked={settings.negativeMarking === true}
+                    onChange={() => handleToggle('negativeMarking')}
+                    label="Negative Marking"
+                  />
+                </div>
+              </div>
+            </SectionCard>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════
+            SECTION 4: PLATFORM SETTINGS
+           ══════════════════════════════════════════════════════════════ */}
+        {activeTab === 'platform-settings' && (
+          <div className="space-y-6">
             <SectionCard
               icon={Globe}
-              title="Brand & Platform Identity"
-              subtitle="Configure your brand name, tagline, and platform logo displayed across Web & Apps."
-              badge="Core Identity"
+              title="Brand Identity & Assets"
+              subtitle="Manage official platform name, tagline, and brand logo."
+              badge="Identity"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                
-                {/* Platform Name & Tagline */}
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-semibold text-white/80 mb-2">
@@ -498,37 +858,30 @@ const SettingsPage = () => {
                       onChange={(e) => handleChange('platformName', e.target.value)}
                       placeholder="e.g. KnowChamp"
                       required
-                      className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] transition-all"
                     />
-                    <p className="text-[11px] text-white/35 mt-1.5">
-                      Used in browser titles, email templates, push headers, and invoices.
-                    </p>
+                    <p className="text-[11px] text-gray-400 mt-1.5">Shown across app title bar, browser headers, and system notifications.</p>
                   </div>
 
                   <div>
                     <label className="block text-xs font-semibold text-white/80 mb-2">
-                      Platform Tagline / Slogan
+                      Platform Tagline
                     </label>
                     <input
                       type="text"
                       value={settings.platformTagline || ''}
                       onChange={(e) => handleChange('platformTagline', e.target.value)}
                       placeholder="e.g. Play Quizzes, Learn & Win Real Cash Rewards"
-                      className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
+                      className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] transition-all"
                     />
-                    <p className="text-[11px] text-white/35 mt-1.5">
-                      Sub-heading displayed across user onboarding and social share metadata.
-                    </p>
                   </div>
                 </div>
 
-                {/* Logo Upload Card */}
                 <div>
                   <label className="block text-xs font-semibold text-white/80 mb-2">
                     Official Platform Logo
                   </label>
                   <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 bg-white/5 rounded-xl border border-white/10">
-                    {/* Preview Box */}
                     <div className="w-20 h-20 rounded-xl bg-black/40 border border-white/15 flex items-center justify-center overflow-hidden shrink-0 relative p-2 shadow-inner">
                       {imgLoading && (
                         <div className="absolute inset-0 bg-white/10 animate-pulse rounded-xl flex items-center justify-center">
@@ -550,10 +903,12 @@ const SettingsPage = () => {
                       />
                     </div>
 
-                    {/* Upload / Remove Actions */}
                     <div className="flex-1 min-w-0 space-y-3">
                       <div className="flex flex-wrap items-center gap-2">
-                        <label className="inline-flex items-center gap-2 px-3.5 py-2 text-white text-xs font-bold rounded-xl transition-all cursor-pointer hover:opacity-90 shadow-sm" style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}>
+                        <label
+                          className="inline-flex items-center gap-2 px-3.5 py-2 text-white text-xs font-bold rounded-xl transition-all cursor-pointer hover:opacity-90 shadow-sm"
+                          style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+                        >
                           <Upload className="w-3.5 h-3.5" />
                           <span>Upload New Logo</span>
                           <input
@@ -570,7 +925,7 @@ const SettingsPage = () => {
                                 setLogoFile(file);
                                 handleChange('logoPreview', url);
                                 setImgLoading(false);
-                                toast.success('Logo selected. Click "Save Platform Settings" to apply.');
+                                toast.success('Logo selected. Click "Save Settings" to apply.');
                               }
                             }}
                             className="hidden"
@@ -586,12 +941,12 @@ const SettingsPage = () => {
                                 const formData = new FormData();
                                 formData.append('logoUrl', '/logo_knowchamp.png');
                                 await systemSettingsService.updateSettings(formData);
-                                setSettings(prev => ({
+                                setSettings((prev) => ({
                                   ...prev,
                                   logoUrl: '/logo_knowchamp.png',
                                   logoPreview: '/logo_knowchamp.png',
                                 }));
-                                toast.success('Logo reset to default KnowChamp asset.');
+                                toast.success('Logo reset to default.');
                               } catch {
                                 toast.error('Failed to reset logo.');
                               }
@@ -599,58 +954,24 @@ const SettingsPage = () => {
                             className="inline-flex items-center gap-1.5 px-3 py-2 border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 text-xs font-bold rounded-xl transition-all cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
-                            <span>Reset Default</span>
+                            <span>Reset</span>
                           </button>
                         )}
                       </div>
-                      <p className="text-[11px] text-white/40">Supported formats: PNG, SVG, WEBP, JPG (Max 2MB)</p>
+                      <p className="text-[11px] text-gray-400">Supported formats: PNG, SVG, WEBP, JPG (Max 2MB)</p>
                     </div>
                   </div>
                 </div>
-
               </div>
             </SectionCard>
 
-            {/* Support & Localization */}
             <SectionCard
-              icon={HelpCircle}
-              title="Contact, Support & Localization"
-              subtitle="Configure public helpdesk contact details, default currency, and time formatting."
-              badge="Support"
+              icon={Sliders}
+              title="System Operations & Maintenance"
+              subtitle="Configure maintenance mode window, socket synchronization, and currency."
+              badge="Operations"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Official Support Email
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="email"
-                      value={settings.supportEmail || ''}
-                      onChange={(e) => handleChange('supportEmail', e.target.value)}
-                      placeholder="support@knowchamp.com"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Support Helpline / Phone
-                  </label>
-                  <div className="relative">
-                    <Phone className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={settings.supportPhone || ''}
-                      onChange={(e) => handleChange('supportPhone', e.target.value)}
-                      placeholder="+91 98765 43210"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                    />
-                  </div>
-                </div>
-
                 <div>
                   <label className="block text-xs font-semibold text-white/80 mb-2">
                     Currency Symbol & Code
@@ -661,14 +982,14 @@ const SettingsPage = () => {
                       value={settings.currencySymbol || '₹'}
                       onChange={(e) => handleChange('currencySymbol', e.target.value)}
                       placeholder="₹"
-                      className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white text-center focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
+                      className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white text-center focus:outline-none focus:border-[#E94B4B] transition-all"
                     />
                     <input
                       type="text"
                       value={settings.currencyCode || 'INR'}
                       onChange={(e) => handleChange('currencyCode', e.target.value)}
                       placeholder="INR"
-                      className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white text-center focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
+                      className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white text-center focus:outline-none focus:border-[#E94B4B] transition-all"
                     />
                   </div>
                 </div>
@@ -684,12 +1005,12 @@ const SettingsPage = () => {
                       value={settings.timezone || 'Asia/Kolkata (IST)'}
                       onChange={(e) => handleChange('timezone', e.target.value)}
                       placeholder="Asia/Kolkata (IST)"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
                     />
                   </div>
                 </div>
 
-                <div className="sm:col-span-2">
+                <div>
                   <label className="block text-xs font-semibold text-white/80 mb-2">
                     Copyright Notice
                   </label>
@@ -698,673 +1019,62 @@ const SettingsPage = () => {
                     value={settings.copyrightText || '© 2026 KnowChamp. All rights reserved.'}
                     onChange={(e) => handleChange('copyrightText', e.target.value)}
                     placeholder="© 2026 KnowChamp. All rights reserved."
-                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
+                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] transition-all"
                   />
                 </div>
               </div>
-            </SectionCard>
-          </div>
-        )}
 
-        {/* ══════════════════════════════════════════════════════════════
-            TAB 2: CONTEST & FINANCIAL RULES
-           ══════════════════════════════════════════════════════════════ */}
-        {activeTab === 'contest' && (
-          <div className="space-y-6">
-            <SectionCard
-              icon={Trophy}
-              title="Contest & Gameplay Defaults"
-              subtitle="Set default gameplay parameters, timers, and automatic contest settlement rules."
-              badge="Game Mechanics"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Default Question Timer (Seconds)
-                  </label>
-                  <div className="relative">
-                    <Clock className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="number"
-                      min={5}
-                      max={300}
-                      value={settings.defaultQuestionTimer || 30}
-                      onChange={(e) => handleChange('defaultQuestionTimer', Number(e.target.value))}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                    />
-                  </div>
-                  <p className="text-[11px] text-white/35 mt-1.5">Seconds allowed per question in standard quizzes.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Default Entry Fee ({settings.currencySymbol || '₹'})
-                  </label>
-                  <div className="relative">
-                    <Coins className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="number"
-                      min={0}
-                      value={settings.defaultEntryFee || 10}
-                      onChange={(e) => handleChange('defaultEntryFee', Number(e.target.value))}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                    />
-                  </div>
-                  <p className="text-[11px] text-white/35 mt-1.5">Default entry price when creating new contests.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Max Participants Per Contest
-                  </label>
-                  <div className="relative">
-                    <Users className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="number"
-                      min={10}
-                      max={10000}
-                      value={settings.maxParticipantsPerContest || 500}
-                      onChange={(e) => handleChange('maxParticipantsPerContest', Number(e.target.value))}
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                    />
-                  </div>
-                  <p className="text-[11px] text-white/35 mt-1.5">Maximum concurrent players per live room.</p>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-5 border-t border-white/10 flex items-center justify-between gap-4">
-                <div>
-                  <h4 className="text-xs font-semibold text-white">Auto-Settle Finished Contests</h4>
-                  <p className="text-[11px] text-white/45 mt-0.5">
-                    Automatically distribute winnings to player wallets when a contest ends and ranks calculate.
-                  </p>
-                </div>
-                <ToggleSwitch
-                  checked={settings.autoSettleContests !== false}
-                  onChange={() => handleToggle('autoSettleContests')}
-                  label="Auto Settle Contests"
-                />
-              </div>
-            </SectionCard>
-
-            <SectionCard
-              icon={DollarSign}
-              title="Financial Limits & Bonus Rewards"
-              subtitle="Configure withdrawal boundaries, referral bonuses, and new user welcome rewards."
-              badge="Financial Controls"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Min Withdrawal ({settings.currencySymbol || '₹'})
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    value={settings.minWithdrawalAmount || 100}
-                    onChange={(e) => handleChange('minWithdrawalAmount', Number(e.target.value))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                  />
-                  <p className="text-[11px] text-white/35 mt-1.5">Minimum payout request threshold.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Max Withdrawal ({settings.currencySymbol || '₹'})
-                  </label>
-                  <input
-                    type="number"
-                    min={100}
-                    value={settings.maxWithdrawalAmount || 50000}
-                    onChange={(e) => handleChange('maxWithdrawalAmount', Number(e.target.value))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                  />
-                  <p className="text-[11px] text-white/35 mt-1.5">Maximum per transaction withdrawal.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Referral Bonus ({settings.currencySymbol || '₹'})
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={settings.referralRewardAmount || 50}
-                    onChange={(e) => handleChange('referralRewardAmount', Number(e.target.value))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                  />
-                  <p className="text-[11px] text-white/35 mt-1.5">Credited to referrer upon friend's first contest.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Signup Welcome Bonus ({settings.currencySymbol || '₹'})
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    value={settings.signupBonus || 25}
-                    onChange={(e) => handleChange('signupBonus', Number(e.target.value))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                  />
-                  <p className="text-[11px] text-white/35 mt-1.5">Instant bonus cash credited on registration.</p>
-                </div>
-              </div>
-            </SectionCard>
-          </div>
-        )}
-
-        {/* ══════════════════════════════════════════════════════════════
-            TAB 3: ALERTS & NOTIFICATIONS
-           ══════════════════════════════════════════════════════════════ */}
-        {activeTab === 'notifications' && (
-          <div className="space-y-6">
-            <SectionCard
-              icon={Zap}
-              title="Real-Time Admin Alert Channels"
-              subtitle="Control which events trigger instant live alerts, socket pushes, and header notifications."
-              badge={`${activeNotifCount} Active Channels`}
-            >
-              <div className="divide-y divide-white/5">
-                <NotifRow
-                  icon={Bell}
-                  title="Real-Time Header Notifications"
-                  desc="Display live push notifications immediately in the admin top-bar bell dropdown."
-                  settingKey="realtimeSocketAlerts"
-                  settings={settings}
-                  onToggle={handleToggle}
-                  color="text-[#E94B4B]"
-                />
-                <NotifRow
-                  icon={Trophy}
-                  title="New Contest & Live Match Activity"
-                  desc="Trigger an alert when a new contest is scheduled, opened, or goes live."
-                  settingKey="newBookingAlerts"
-                  settings={settings}
-                  onToggle={handleToggle}
-                  color="text-amber-400"
-                />
-                <NotifRow
-                  icon={CreditCard}
-                  title="Transactions & Fee Deposits"
-                  desc="Notify on new wallet recharges, contest fee collections, and payment gateway webhooks."
-                  settingKey="quotationAlerts"
-                  settings={settings}
-                  onToggle={handleToggle}
-                  color="text-blue-400"
-                />
-                <NotifRow
-                  icon={CheckCircle}
-                  title="Withdrawal Settlement & Payout Requests"
-                  desc="Alert administrators when a user submits a cash withdrawal request or a payout settles."
-                  settingKey="settlementAlerts"
-                  settings={settings}
-                  onToggle={handleToggle}
-                  color="text-green-400"
-                />
-                <NotifRow
-                  icon={Users}
-                  title="User Registrations & Onboarding"
-                  desc="Alert when a new player completes registration or updates their profile credentials."
-                  settingKey="userRegistrationAlerts"
-                  settings={settings}
-                  onToggle={handleToggle}
-                  color="text-purple-400"
-                />
-                <NotifRow
-                  icon={Mail}
-                  title="Email Notifications Dispatch"
-                  desc="Send transactional emails to players for prize wins, receipts, and security alerts."
-                  settingKey="emailNotifications"
-                  settings={settings}
-                  onToggle={handleToggle}
-                  color="text-cyan-400"
-                />
-                <NotifRow
-                  icon={Volume2}
-                  title="Sound Alert on Live Events"
-                  desc="Play a subtle audio chime when a critical real-time alert is received in the dashboard."
-                  settingKey="soundAlerts"
-                  settings={settings}
-                  onToggle={handleToggle}
-                  color="text-yellow-400"
-                />
-              </div>
-            </SectionCard>
-
-            <div className="bg-[#0f1117] rounded-xl border border-white/10 p-4 flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-white/30 shrink-0" />
-              <p className="text-[11px] text-white/40 leading-relaxed">
-                Notification preferences synchronize across all active admin browser sessions instantly via WebSockets.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* ══════════════════════════════════════════════════════════════
-            TAB 4: SYSTEM & MAINTENANCE
-           ══════════════════════════════════════════════════════════════ */}
-        {activeTab === 'maintenance' && (
-          <div className="space-y-6">
-            <SectionCard
-              icon={Sliders}
-              title="Maintenance Mode & Traffic Controls"
-              subtitle="Temporarily pause public user access to perform server upgrades, database syncs, or migrations."
-              badge={settings.maintenanceMode ? 'Active (Locked)' : 'Normal Operations'}
-              badgeColor={settings.maintenanceMode ? 'bg-amber-500/15 text-amber-400 border-amber-500/30' : 'bg-green-500/15 text-green-400 border-green-500/30'}
-            >
-              <div className="space-y-5">
-                {/* Maintenance Mode Toggle Row */}
-                <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
-                  <div className="flex items-center gap-3.5">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
-                      settings.maintenanceMode ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-white/5 text-white/40 border-white/10'
-                    }`}>
-                      <AlertTriangle className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-xs font-bold text-white">Enable Platform Maintenance Mode</h3>
-                      <p className="text-[11px] text-white/45 mt-0.5">
-                        When enabled, user mobile & web apps will display the maintenance splash screen.
-                      </p>
-                    </div>
+              <div className="mt-6 pt-5 border-t border-white/10 space-y-4">
+                <div className="flex items-center justify-between gap-4 py-2 border-b border-white/6">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white">Maintenance Mode</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      Show maintenance message on user mobile app and disable new contest entries.
+                    </p>
                   </div>
                   <ToggleSwitch
                     checked={settings.maintenanceMode === true}
                     onChange={() => handleToggle('maintenanceMode')}
-                    label="Enable Platform Maintenance Mode"
+                    label="Maintenance Mode"
                   />
                 </div>
 
-                {/* Maintenance Message */}
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Maintenance Notice Message
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={settings.maintenanceMessage || ''}
-                    onChange={(e) => handleChange('maintenanceMessage', e.target.value)}
-                    placeholder="We are currently performing scheduled maintenance. We will be back online shortly!"
-                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all resize-none"
+                {settings.maintenanceMode && (
+                  <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                    <label className="block text-xs font-semibold text-amber-400 mb-1.5">
+                      Maintenance Banner Message
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={settings.maintenanceMessage || ''}
+                      onChange={(e) => handleChange('maintenanceMessage', e.target.value)}
+                      placeholder="Enter maintenance message displayed to users..."
+                      className="w-full px-3.5 py-2 rounded-lg border border-amber-500/30 bg-black/40 text-xs text-white placeholder-white/25 focus:outline-none focus:border-amber-400 transition-all resize-none"
+                    />
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between gap-4 py-2">
+                  <div>
+                    <h4 className="text-xs font-semibold text-white">Real-Time Socket Sync</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      Broadcast real-time setting updates, live contestant counts, and contest leaderboards.
+                    </p>
+                  </div>
+                  <ToggleSwitch
+                    checked={settings.realtimeSocketSync !== false}
+                    onChange={() => handleToggle('realtimeSocketSync')}
+                    label="Realtime Socket Sync"
                   />
-                  <p className="text-[11px] text-white/35 mt-1.5">Displayed prominently to users on the app maintenance screen.</p>
-                </div>
-
-                {/* Sub Toggles */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <div className="flex items-center justify-between p-3.5 bg-white/5 rounded-xl border border-white/8">
-                    <div>
-                      <h4 className="text-xs font-semibold text-white">Allow Admin Panel Access</h4>
-                      <p className="text-[10px] text-white/40 mt-0.5">Allow admins to log in during maintenance mode.</p>
-                    </div>
-                    <ToggleSwitch
-                      checked={settings.allowAdminDuringMaintenance !== false}
-                      onChange={() => handleToggle('allowAdminDuringMaintenance')}
-                      label="Allow Admin Panel Access"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between p-3.5 bg-white/5 rounded-xl border border-white/8">
-                    <div>
-                      <h4 className="text-xs font-semibold text-white">Verbose Debug Logging</h4>
-                      <p className="text-[10px] text-white/40 mt-0.5">Log detailed API queries and socket telemetry.</p>
-                    </div>
-                    <ToggleSwitch
-                      checked={settings.debugMode === true}
-                      onChange={() => handleToggle('debugMode')}
-                      label="Verbose Debug Logging"
-                    />
-                  </div>
-                </div>
-              </div>
-            </SectionCard>
-
-            {/* Server Diagnostics Card */}
-            <SectionCard
-              icon={Server}
-              title="System Diagnostics & Server State"
-              subtitle="Live runtime health metrics and environment diagnostic parameters."
-              badge="Node Environment"
-            >
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div className="p-3.5 bg-white/5 rounded-xl border border-white/10">
-                  <p className="text-[10px] text-white/40 font-medium">Database Status</p>
-                  <p className="text-xs font-bold text-green-400 mt-1 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                    Connected (MySQL)
-                  </p>
-                </div>
-
-                <div className="p-3.5 bg-white/5 rounded-xl border border-white/10">
-                  <p className="text-[10px] text-white/40 font-medium">WebSockets</p>
-                  <p className="text-xs font-bold text-green-400 mt-1 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                    Active (Socket.io)
-                  </p>
-                </div>
-
-                <div className="p-3.5 bg-white/5 rounded-xl border border-white/10">
-                  <p className="text-[10px] text-white/40 font-medium">Server Time</p>
-                  <p className="text-xs font-semibold text-white mt-1 truncate">
-                    {new Date().toLocaleTimeString()}
-                  </p>
-                </div>
-
-                <div className="p-3.5 bg-white/5 rounded-xl border border-white/10">
-                  <p className="text-[10px] text-white/40 font-medium">App Version</p>
-                  <p className="text-xs font-bold text-amber-400 mt-1">v2.4.0 (Enterprise)</p>
                 </div>
               </div>
             </SectionCard>
           </div>
         )}
-
-        {/* ══════════════════════════════════════════════════════════════
-            TAB 5: SECURITY & CREDENTIALS
-           ══════════════════════════════════════════════════════════════ */}
-        {activeTab === 'security' && (
-          <div className="space-y-6">
-            {/* Change Login Email */}
-            <SectionCard
-              icon={Mail}
-              title="Change Admin Login Email"
-              subtitle="Update the email address used to sign in to the administrative portal."
-              badge="Credentials"
-            >
-              <div className="space-y-4">
-                {/* Current Email (read-only) */}
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Current Admin Email
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-white/30 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={user?.email || 'admin@knowchamp.com'}
-                      disabled
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/8 bg-white/4 text-sm font-medium text-white/40 cursor-not-allowed"
-                    />
-                  </div>
-                </div>
-
-                {/* New Email */}
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    New Email Address <span className="text-[#E94B4B]">*</span>
-                  </label>
-                  <div className="relative">
-                    <Mail className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="email"
-                      value={emailData.newEmail}
-                      onChange={(e) => setEmailData({ newEmail: e.target.value })}
-                      placeholder="Enter new email address"
-                      required
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                    />
-                  </div>
-                  <p className="text-[11px] text-white/35 mt-1.5">
-                    You will need to use this new email address on your next login session.
-                  </p>
-                </div>
-
-                <div className="flex justify-end pt-2">
-                  <button
-                    type="button"
-                    onClick={handleEmailChange}
-                    disabled={isSavingEmail}
-                    className="flex items-center gap-2 px-5 py-2.5 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed hover:opacity-90"
-                    style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
-                  >
-                    {isSavingEmail ? (
-                      <><RotateCw className="w-4 h-4 animate-spin" /><span>Saving...</span></>
-                    ) : (
-                      <><Save className="w-4 h-4" /><span>Update Email Address</span></>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </SectionCard>
-
-            {/* Change Password */}
-            <SectionCard
-              icon={Lock}
-              title="Change Admin Password"
-              subtitle="Set a strong, fresh password to protect access to the admin console."
-              badge="Authentication"
-            >
-              <div className="space-y-4">
-                {/* Current Password */}
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Current Password <span className="text-[#E94B4B]">*</span>
-                  </label>
-                  <div className="relative">
-                    <Lock className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type={showCurrentPw ? 'text' : 'password'}
-                      value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                      placeholder="Enter current password"
-                      required
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowCurrentPw(!showCurrentPw)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 cursor-pointer transition-colors"
-                    >
-                      {showCurrentPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* New Password */}
-                  <div>
-                    <label className="block text-xs font-semibold text-white/80 mb-2">
-                      New Password <span className="text-[#E94B4B]">*</span>
-                    </label>
-                    <div className="relative">
-                      <KeyRound className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type={showNewPw ? 'text' : 'password'}
-                        value={passwordData.newPassword}
-                        onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                        placeholder="Min 6 characters"
-                        required
-                        minLength={6}
-                        className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPw(!showNewPw)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 cursor-pointer transition-colors"
-                      >
-                        {showNewPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Confirm New Password */}
-                  <div>
-                    <label className="block text-xs font-semibold text-white/80 mb-2">
-                      Confirm New Password <span className="text-[#E94B4B]">*</span>
-                    </label>
-                    <div className="relative">
-                      <KeyRound className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type={showConfirmPw ? 'text' : 'password'}
-                        value={passwordData.confirmPassword}
-                        onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        placeholder="Re-enter new password"
-                        required
-                        minLength={6}
-                        className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white placeholder-white/25 focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPw(!showConfirmPw)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 cursor-pointer transition-colors"
-                      >
-                        {showConfirmPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Password Notice */}
-                <div className="flex items-start gap-2.5 p-3 bg-white/4 rounded-xl border border-white/8">
-                  <ShieldCheck className="w-4 h-4 text-[#E94B4B] shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-white/45 leading-relaxed">
-                    Choose at least <span className="text-white/70 font-semibold">6-8 characters</span> with a mix of letters, numbers, and symbols.
-                  </p>
-                </div>
-
-                <div className="flex justify-end pt-2">
-                  <button
-                    type="button"
-                    onClick={handlePasswordChange}
-                    disabled={isSavingPassword}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {isSavingPassword ? (
-                      <><RotateCw className="w-4 h-4 animate-spin" /><span>Updating...</span></>
-                    ) : (
-                      <><KeyRound className="w-4 h-4 text-[#E94B4B]" /><span>Update Password</span></>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </SectionCard>
-
-            {/* Session & Rate Limit Policies */}
-            <SectionCard
-              icon={Shield}
-              title="Session & Access Security Policies"
-              subtitle="Configure session auto-inactivity timeouts and brute-force lock thresholds."
-              badge="Security Rules"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Session Inactivity Timeout (Minutes)
-                  </label>
-                  <input
-                    type="number"
-                    min={5}
-                    max={1440}
-                    value={settings.sessionTimeoutMins || 60}
-                    onChange={(e) => handleChange('sessionTimeoutMins', Number(e.target.value))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                  />
-                  <p className="text-[11px] text-white/35 mt-1.5">Auto log out admins after idle duration.</p>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-white/80 mb-2">
-                    Max Failed Login Attempts
-                  </label>
-                  <input
-                    type="number"
-                    min={3}
-                    max={20}
-                    value={settings.maxLoginAttempts || 5}
-                    onChange={(e) => handleChange('maxLoginAttempts', Number(e.target.value))}
-                    className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-white focus:outline-none focus:border-[#E94B4B] focus:ring-1 focus:ring-[#E94B4B]/30 transition-all"
-                  />
-                  <p className="text-[11px] text-white/35 mt-1.5">Temporary IP lock after consecutive failures.</p>
-                </div>
-              </div>
-            </SectionCard>
-          </div>
-        )}
-
-        {/* ── Global Save Bar ── */}
-        <div className="sticky bottom-4 z-20 bg-[#0f1117]/95 backdrop-blur-md rounded-2xl border border-white/15 p-4 flex flex-wrap items-center justify-between gap-3 shadow-2xl">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => fetchBackendSettings(false)}
-              disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 border border-white/10 hover:bg-white/5 text-white/60 hover:text-white rounded-xl text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
-            >
-              <RotateCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>Reload</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={async () => {
-                if (window.confirm('Reset all platform settings to default values?')) {
-                  try {
-                    setSaving(true);
-                    const defaultPayload = new FormData();
-                    defaultPayload.append('platformName', 'KnowChamp');
-                    defaultPayload.append('platformTagline', 'Play Quizzes, Learn & Win Real Cash Rewards');
-                    defaultPayload.append('logoUrl', '/logo_knowchamp.png');
-                    defaultPayload.append('supportEmail', 'support@knowchamp.com');
-                    defaultPayload.append('supportPhone', '+91 98765 43210');
-                    defaultPayload.append('currencySymbol', '₹');
-                    defaultPayload.append('currencyCode', 'INR');
-                    defaultPayload.append('timezone', 'Asia/Kolkata (IST)');
-                    defaultPayload.append('defaultQuestionTimer', '30');
-                    defaultPayload.append('defaultEntryFee', '10');
-                    defaultPayload.append('minWithdrawalAmount', '100');
-                    defaultPayload.append('maxWithdrawalAmount', '50000');
-                    defaultPayload.append('referralRewardAmount', '50');
-                    defaultPayload.append('signupBonus', '25');
-                    defaultPayload.append('autoSettleContests', 'true');
-                    defaultPayload.append('realtimeSocketAlerts', 'true');
-                    defaultPayload.append('emailNotifications', 'true');
-                    defaultPayload.append('maintenanceMode', 'false');
-
-                    const res = await systemSettingsService.updateSettings(defaultPayload);
-                    if (res?.data) {
-                      setSettings(prev => ({ ...prev, ...res.data, logoPreview: '/logo_knowchamp.png' }));
-                    }
-                    toast.success('Reset settings to factory defaults.');
-                  } catch {
-                    toast.error('Failed to reset settings.');
-                  } finally {
-                    setSaving(false);
-                  }
-                }
-              }}
-              className="flex items-center gap-1.5 px-3 py-2 text-white/40 hover:text-red-400 text-xs font-semibold transition-colors cursor-pointer"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Reset Defaults</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="submit"
-              disabled={saving}
-              className="flex items-center gap-2 px-6 py-2.5 text-white rounded-xl text-xs font-bold transition-all shadow-lg cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed hover:opacity-95 transform active:scale-95"
-              style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
-            >
-              {saving ? (
-                <>
-                  <RotateCw className="w-4 h-4 animate-spin" />
-                  <span>Saving & Broadcasting...</span>
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  <span>Save Platform Settings</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
 
       </form>
     </div>
   );
 };
 
-export default SettingsPage;
+export default Settings;

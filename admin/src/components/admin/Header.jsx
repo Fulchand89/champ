@@ -34,6 +34,10 @@ const searchableNav = [
   { label: 'Terms & Conditions', path: ROUTES.ADMIN.TERMS_CONDITIONS, category: 'Content & Support' },
   { label: 'Refund Policy', path: ROUTES.ADMIN.REFUND_POLICY, category: 'Content & Support' },
   { label: 'Contact Support', path: ROUTES.ADMIN.SUPPORT_CONTACT, category: 'Content & Support' },
+  { label: 'Deposit Limits', path: `${ROUTES.ADMIN.SETTINGS}?tab=deposit-limits`, category: 'Settings' },
+  { label: 'Withdrawal Limits', path: `${ROUTES.ADMIN.SETTINGS}?tab=withdrawal-limits`, category: 'Settings' },
+  { label: 'Contest Rules', path: `${ROUTES.ADMIN.SETTINGS}?tab=contest-rules`, category: 'Settings' },
+  { label: 'Platform Settings', path: `${ROUTES.ADMIN.SETTINGS}?tab=platform-settings`, category: 'Settings' },
   { label: 'Settings', path: ROUTES.ADMIN.SETTINGS, category: 'Settings' },
 ]
 
