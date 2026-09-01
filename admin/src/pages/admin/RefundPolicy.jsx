@@ -181,108 +181,81 @@ const RefundPolicy = () => {
   };
 
   return (
-    <div className="font-sans max-w-5xl pb-16 space-y-6">
+    <div className="space-y-6">
       {/* ── Main Header Card ── */}
-      <div className="bg-[#0f1117] rounded-2xl border border-white/10 p-5 sm:p-6 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-[#E94B4B]/5 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 relative z-10">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E94B4B]/10 text-[#E94B4B] border border-[#E94B4B]/20 flex items-center gap-1.5">
-                <RotateCcw className="w-3.5 h-3.5" />
-                Legal &amp; Compliance
-              </span>
-              <span className="text-xs text-white/50">•</span>
-              <span className="text-xs text-white/50 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                Live Version: <strong className="text-white font-mono">{currentVersionTag}</strong>
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Refund &amp; Cancellation Policy
-            </h1>
-            <p className="text-sm text-white/60 mt-1 max-w-2xl">
-              Configure and maintain cancellation rules, wallet deposit refund conditions, and contest fee reversal policies for the KnowChamp platform.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button
-              onClick={handleAddNew}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#E94B4B] to-[#911616] hover:brightness-110 text-white font-semibold text-sm shadow-lg shadow-[#E94B4B]/20 active:scale-95 transition-all"
-            >
-              <Plus className="w-4 h-4 stroke-[2.5]" />
-              Update Policy
-            </button>
-          </div>
+      <div className="bg-[#0f1117] text-white p-5 rounded-2xl shadow-sm border border-white/10 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+        <div>
+          <h1 className="text-xl font-bold">Refund Policy</h1>
+          <p className="text-xs text-gray-400 mt-1">
+            Configure and maintain cancellation rules, wallet deposit refund conditions, and contest fee reversal policies.
+          </p>
         </div>
 
-        {/* ── Type Selector Tabs ── */}
-        <div className="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center p-1 bg-white/5 border border-white/10 rounded-xl w-full sm:w-auto">
-            <button
-              onClick={() => setActiveType('customer')}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                activeType === 'customer'
-                  ? 'bg-[#E94B4B] text-white shadow-md'
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              Player App (Customer)
-            </button>
-            <button
-              onClick={() => setActiveType('driver')}
-              className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                activeType === 'driver'
-                  ? 'bg-[#E94B4B] text-white shadow-md'
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Trophy className="w-3.5 h-3.5" />
-              Contest Hosts &amp; Creators
-            </button>
-          </div>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <button
+            onClick={handleAddNew}
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all shadow-md cursor-pointer hover:opacity-90"
+            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+          >
+            <Plus className="w-4 h-4" />
+            <span>Update Policy</span>
+          </button>
+        </div>
+      </div>
 
-          <div className="flex items-center gap-4 text-xs text-white/50">
-            <span className="flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-white/40" />
-              {wordCount} Words
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-white/40" />
-              ~{estimatedReadTime} min read
-            </span>
-          </div>
+      {/* ── Type Selector Tabs ── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-[#0f1117] border border-white/10 p-1.5 rounded-xl flex items-center gap-1.5 shadow-md w-full sm:w-fit overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => setActiveType('customer')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer outline-none select-none whitespace-nowrap flex-1 sm:flex-initial text-center ${
+              activeType === 'customer'
+                ? 'text-white shadow-sm'
+                : 'text-white/60 hover:text-white hover:bg-white/5'
+            }`}
+            style={activeType === 'customer' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
+          >
+            Player App (Customer)
+          </button>
+          <button
+            onClick={() => setActiveType('driver')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer outline-none select-none whitespace-nowrap flex-1 sm:flex-initial text-center ${
+              activeType === 'driver'
+                ? 'text-white shadow-sm'
+                : 'text-white/60 hover:text-white hover:bg-white/5'
+            }`}
+            style={activeType === 'driver' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
+          >
+            Contest Hosts &amp; Creators
+          </button>
+        </div>
+
+        <div className="flex items-center gap-3 text-xs text-gray-400">
+          <span>~{wordCount} words</span>
+          <span>•</span>
+          <span>~{estimatedReadTime} min read</span>
         </div>
       </div>
 
       {/* ── Active Policy Preview Card ── */}
       <div className="bg-[#0f1117] rounded-2xl border border-white/10 p-5 sm:p-6 shadow-xl space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#E94B4B]">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-white flex items-center gap-2">
-                Published {activeType === 'customer' ? 'Player' : 'Host'} Refund Policy
-                <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                    isActive
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                      : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                  }`}
-                >
-                  {isActive ? 'Active on App' : 'Disabled'}
-                </span>
-              </h2>
-              <p className="text-xs text-white/50 mt-0.5">
-                Last modified: {activePolicy?.publishedAt ? new Date(activePolicy.publishedAt).toLocaleString() : 'System Default'}
-              </p>
-            </div>
+          <div>
+            <h2 className="text-base font-bold text-white flex items-center gap-2">
+              Published {activeType === 'customer' ? 'Player' : 'Host'} Refund Policy
+              <span
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                  isActive
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                    : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                }`}
+              >
+                {isActive ? 'Active on App' : 'Disabled'}
+              </span>
+            </h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Last modified: {activePolicy?.publishedAt ? new Date(activePolicy.publishedAt).toLocaleString() : 'System Default'}
+            </p>
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -317,9 +290,8 @@ const RefundPolicy = () => {
       {/* ── Version History & Audit Log ── */}
       <div className="bg-[#0f1117] rounded-2xl border border-white/10 p-5 sm:p-6 shadow-xl space-y-4">
         <div className="flex justify-between items-center pb-3 border-b border-white/10">
-          <div className="flex items-center gap-2.5">
-            <History className="w-5 h-5 text-white/60" />
-            <h3 className="text-base font-semibold text-white">Version History &amp; Revisions</h3>
+          <div>
+            <h3 className="text-sm font-bold text-white">Version History &amp; Revisions</h3>
           </div>
           <span className="text-xs text-white/40">{history.length} Revisions Recorded</span>
         </div>

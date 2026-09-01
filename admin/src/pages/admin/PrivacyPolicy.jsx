@@ -192,158 +192,119 @@ const PrivacyPolicy = () => {
   };
 
   return (
-    <div className="font-sans max-w-5xl pb-16 space-y-6">
+    <div className="space-y-6">
       {/* ── Main Header Card ── */}
-      <div className="bg-[#0f1117] rounded-2xl border border-white/10 p-5 sm:p-6 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-[#E94B4B]/5 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 relative z-10">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#E94B4B]/15 border border-[#E94B4B]/20 flex items-center justify-center shrink-0 shadow-inner">
-              <ShieldCheck className="w-6 h-6 text-[#E94B4B]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Privacy Policy Management</h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#E94B4B]/15 text-[#E94B4B] border border-[#E94B4B]/25">
-                  KnowChamp Legal
-                </span>
-              </div>
-              <p className="text-xs sm:text-sm text-white/50 mt-1">
-                Configure, revise, and publish legal privacy policies and data protection terms for KnowChamp players &amp; hosts.
-              </p>
-            </div>
-          </div>
+      <div className="bg-[#0f1117] text-white p-5 rounded-2xl shadow-sm border border-white/10 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+        <div>
+          <h1 className="text-xl font-bold">Privacy Policy</h1>
+          <p className="text-xs text-gray-400 mt-1">
+            Configure, revise, and publish legal privacy policies and data protection terms for KnowChamp players &amp; hosts.
+          </p>
+        </div>
 
-          <div className="flex items-center gap-2.5 w-full lg:w-auto">
-            {!showEditor ? (
+        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          {!showEditor ? (
+            <button
+              onClick={handleAddNew}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all shadow-md cursor-pointer hover:opacity-90"
+              style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create New Version</span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
-                onClick={handleAddNew}
-                className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 active:scale-95 text-white rounded-xl text-sm font-bold transition-all shadow-lg cursor-pointer hover:opacity-90"
+                onClick={() => setShowEditor(false)}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 border border-white/10 text-white/70 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+                Discard
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={publishing}
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 text-white rounded-lg text-xs font-bold transition-all shadow-md disabled:opacity-60 cursor-pointer hover:opacity-90"
                 style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
               >
-                <Plus className="w-4 h-4" />
-                <span>Create New Version</span>
+                <Save className="w-4 h-4" />
+                {publishing ? 'Publishing...' : 'Save & Publish'}
               </button>
-            ) : (
-              <div className="flex items-center gap-2 w-full lg:w-auto">
-                <button
-                  onClick={() => setShowEditor(false)}
-                  className="flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 border border-white/10 text-white/70 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                  Discard
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={publishing}
-                  className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 active:scale-95 text-white rounded-xl text-xs font-bold transition-all shadow-lg disabled:opacity-60 cursor-pointer hover:opacity-90"
-                  style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
-                >
-                  <Save className="w-4 h-4" />
-                  {publishing ? 'Publishing...' : 'Save & Publish'}
-                </button>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* ── Audience Segment Tabs ── */}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="bg-[#0f1117] border border-white/10 p-1.5 rounded-2xl flex items-center gap-1.5 shadow-md w-full sm:w-fit overflow-x-auto no-scrollbar">
-            <button
-              type="button"
-              onClick={() => { setActiveType('customer'); setSelectedHistoryItem(null); }}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer outline-none select-none whitespace-nowrap flex-1 sm:flex-initial justify-center sm:justify-start ${
-                activeType === 'customer'
-                  ? 'text-white shadow-md'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
-              }`}
-              style={activeType === 'customer' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
-            >
-              <UserCheck className="w-4 h-4 shrink-0" />
-              <span>Player / User App Policy</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => { setActiveType('driver'); setSelectedHistoryItem(null); }}
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer outline-none select-none whitespace-nowrap flex-1 sm:flex-initial justify-center sm:justify-start ${
-                activeType === 'driver'
-                  ? 'text-white shadow-md'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
-              }`}
-              style={activeType === 'driver' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
-            >
-              <Trophy className="w-4 h-4 shrink-0" />
-              <span>Contest &amp; Host Policy</span>
-            </button>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-[#0f1117] border border-white/10 p-1.5 rounded-xl flex items-center gap-1.5 shadow-md w-full sm:w-fit overflow-x-auto no-scrollbar">
+          <button
+            type="button"
+            onClick={() => { setActiveType('customer'); setSelectedHistoryItem(null); }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer outline-none select-none whitespace-nowrap flex-1 sm:flex-initial text-center ${
+              activeType === 'customer'
+                ? 'text-white shadow-sm'
+                : 'text-white/60 hover:text-white hover:bg-white/5'
+            }`}
+            style={activeType === 'customer' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
+          >
+            Player / User App Policy
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveType('driver'); setSelectedHistoryItem(null); }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer outline-none select-none whitespace-nowrap flex-1 sm:flex-initial text-center ${
+              activeType === 'driver'
+                ? 'text-white shadow-sm'
+                : 'text-white/60 hover:text-white hover:bg-white/5'
+            }`}
+            style={activeType === 'driver' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
+          >
+            Contest &amp; Host Policy
+          </button>
+        </div>
 
-          <div className="flex items-center gap-3 text-xs text-white/40">
-            <span className="flex items-center gap-1">
-              <BookOpen className="w-3.5 h-3.5 text-[#E94B4B]" />
-              ~{wordCount} words
-            </span>
-            <span className="w-1 h-1 rounded-full bg-white/20" />
-            <span className="flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-blue-400" />
-              ~{estimatedReadTime} min read
-            </span>
-          </div>
+        <div className="flex items-center gap-3 text-xs text-gray-400">
+          <span>~{wordCount} words</span>
+          <span>•</span>
+          <span>~{estimatedReadTime} min read</span>
         </div>
       </div>
 
       {/* ── Metadata / Overview Metrics ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-[#0f1117] border border-white/10 p-4 rounded-2xl flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#E94B4B]/15 border border-[#E94B4B]/20 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-5 h-5 text-[#E94B4B]" />
-          </div>
-          <div>
-            <span className="text-[11px] text-white/40 font-medium block">Policy Scope</span>
-            <span className="text-sm font-bold text-white capitalize">
-              {activeType === 'customer' ? 'Player App Policy' : 'Quiz Host Policy'}
+        <div className="bg-[#0f1117] border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Policy Scope</p>
+          <p className="text-sm font-bold text-white mt-1 capitalize">
+            {activeType === 'customer' ? 'Player App Policy' : 'Quiz Host Policy'}
+          </p>
+        </div>
+
+        <div className="bg-[#0f1117] border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active Version</p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E94B4B]/15 text-[#E94B4B] border border-[#E94B4B]/20">
+              {currentVersionTag}
             </span>
+            <span className="text-xs text-gray-400">Live on Apps</span>
           </div>
         </div>
 
-        <div className="bg-[#0f1117] border border-white/10 p-4 rounded-2xl flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#E94B4B]/15 border border-[#E94B4B]/20 flex items-center justify-center shrink-0">
-            <History className="w-5 h-5 text-[#E94B4B]" />
-          </div>
-          <div>
-            <span className="text-[11px] text-white/40 font-medium block">Active Version</span>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E94B4B]/15 text-[#E94B4B] border border-[#E94B4B]/20">
-                {currentVersionTag}
-              </span>
-              <span className="text-[10px] text-white/30">Live on Apps</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-[#0f1117] border border-white/10 p-4 rounded-2xl flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-green-500/15 border border-green-500/20 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5 text-green-400" />
-          </div>
-          <div className="flex-1">
-            <span className="text-[11px] text-white/40 font-medium block">Status</span>
-            <div className="flex items-center justify-between mt-0.5">
-              <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${
-                isActive ? 'text-green-400' : 'text-white/40'
-              }`}>
-                <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-400 animate-pulse' : 'bg-white/30'}`} />
-                {isActive ? 'Live & Enforced' : 'Draft / Inactive'}
-              </span>
-              <button
-                onClick={() => activePolicy && handleToggleStatus(activePolicy)}
-                className="text-[10px] text-white/50 hover:text-white underline cursor-pointer"
-              >
-                {isActive ? 'Deactivate' : 'Activate'}
-              </button>
-            </div>
+        <div className="bg-[#0f1117] border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</p>
+          <div className="flex items-center justify-between mt-1">
+            <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${
+              isActive ? 'text-green-400' : 'text-gray-400'
+            }`}>
+              <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-400' : 'bg-gray-500'}`} />
+              {isActive ? 'Live & Enforced' : 'Draft / Inactive'}
+            </span>
+            <button
+              onClick={() => activePolicy && handleToggleStatus(activePolicy)}
+              className="text-xs text-gray-400 hover:text-white underline cursor-pointer"
+            >
+              {isActive ? 'Deactivate' : 'Activate'}
+            </button>
           </div>
         </div>
       </div>
@@ -369,7 +330,7 @@ const PrivacyPolicy = () => {
                   }`}
                   style={editorViewTab === 'write' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
                 >
-                  Write / Edit
+                  Editor
                 </button>
                 <button
                   type="button"
@@ -379,66 +340,65 @@ const PrivacyPolicy = () => {
                   }`}
                   style={editorViewTab === 'preview' ? { background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' } : {}}
                 >
-                  App Live Preview
+                  Preview
                 </button>
               </div>
-
-              <button
-                onClick={() => setShowEditor(false)}
-                className="p-1.5 text-white/40 hover:text-white hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
             </div>
           </div>
 
-          {editorViewTab === 'write' ? (
-            <div className="quill-editor-wrapper bg-white min-h-[480px]">
-              <ReactQuill
-                theme="snow"
-                value={editorContent}
-                onChange={setEditorContent}
-                modules={QUILL_MODULES}
-                placeholder="Write KnowChamp privacy policy terms using headings, bullets, and bold text..."
-                className="font-sans min-h-[450px]"
-              />
-            </div>
-          ) : (
-            <div className="p-6 bg-[#0a0c12] min-h-[480px] max-h-[600px] overflow-y-auto no-scrollbar">
-              <div className="max-w-2xl mx-auto bg-[#0f1117] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-inner">
-                <div className="flex items-center justify-between pb-4 mb-5 border-b border-white/10">
-                  <div className="flex items-center gap-2.5">
-                    <Smartphone className="w-4 h-4 text-[#E94B4B]" />
-                    <span className="text-xs font-bold text-white/70">Mobile App Preview</span>
-                  </div>
-                  <span className="text-[10px] text-green-400 bg-green-500/10 px-2.5 py-0.5 rounded-full border border-green-500/20">
-                    Live Rendering
-                  </span>
+          <div className="p-5 space-y-4">
+            {editorViewTab === 'write' ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">
+                    Version Description / Change Summary *
+                  </label>
+                  <input
+                    type="text"
+                    value={changelogNotes}
+                    onChange={(e) => setChangelogNotes(e.target.value)}
+                    placeholder="e.g. Updated privacy policy for 2026 data compliance"
+                    className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B] transition-colors"
+                  />
                 </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white/60 uppercase tracking-wider mb-1.5">
+                    Document Body (Rich Text)
+                  </label>
+                  <div className="rounded-xl overflow-hidden border border-white/10 bg-[#090b15]">
+                    <ReactQuill
+                      theme="snow"
+                      value={editorContent}
+                      onChange={setEditorContent}
+                      modules={QUILL_MODULES}
+                      className="text-white min-h-[300px]"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-6 bg-[#090b15] rounded-xl border border-white/5 max-h-[450px] overflow-y-auto">
                 <div
-                  className="ql-editor-content text-white/90 text-sm leading-relaxed"
+                  className="prose prose-invert max-w-none text-sm text-white/90"
                   dangerouslySetInnerHTML={{ __html: editorContent }}
                 />
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="px-5 py-3.5 border-t border-white/10 bg-white/2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div className="flex items-start sm:items-center gap-2 text-xs text-white/40">
-              <AlertCircle className="w-3.5 h-3.5 text-amber-400 mt-0.5 sm:mt-0 shrink-0" />
-              <span>Publishing creates a new revision version and immediately updates the live mobile app.</span>
-            </div>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
               <button
+                type="button"
                 onClick={() => setShowEditor(false)}
-                className="flex-1 sm:flex-initial px-4 py-2 border border-white/10 text-white/70 hover:bg-white/5 rounded-xl text-xs font-semibold cursor-pointer transition-colors text-center"
+                className="px-4 py-2 border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={publishing}
-                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2 text-white rounded-xl text-xs font-bold shadow-md cursor-pointer transition-all disabled:opacity-60 hover:opacity-90"
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2 text-white rounded-lg text-xs font-bold shadow-md cursor-pointer transition-all disabled:opacity-60 hover:opacity-90"
                 style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
               >
                 <Save className="w-3.5 h-3.5" />
@@ -453,24 +413,19 @@ const PrivacyPolicy = () => {
       {!showEditor && (
         <div className="bg-[#0f1117] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
           <div className="px-5 py-4 border-b border-white/10 flex flex-wrap items-center justify-between gap-3 bg-white/2">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-green-500/15 border border-green-500/20 flex items-center justify-center shrink-0">
-                <CheckCircle2 className="w-4 h-4 text-green-400" />
-              </div>
-              <div>
-                <h3 className="font-bold text-white text-sm">
-                  Live Published Policy — {activeType === 'customer' ? 'Player App' : 'Contest Host'}
-                </h3>
-                <p className="text-[11px] text-white/40">
-                  Version {currentVersionTag} • Active &amp; served to KnowChamp mobile apps
-                </p>
-              </div>
+            <div>
+              <h3 className="font-bold text-white text-sm">
+                Live Published Policy — {activeType === 'customer' ? 'Player App' : 'Contest Host'}
+              </h3>
+              <p className="text-xs text-gray-400 mt-0.5">
+                Version {currentVersionTag} • Active &amp; served to KnowChamp mobile apps
+              </p>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={handleCopyContent}
-                className="flex items-center gap-1.5 px-3 py-1.5 border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white rounded-xl text-xs font-medium transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white rounded-lg text-xs font-medium transition-colors cursor-pointer"
                 title="Copy policy content"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -478,7 +433,7 @@ const PrivacyPolicy = () => {
               </button>
               <button
                 onClick={handleAddNew}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer hover:opacity-90"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 text-white rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer hover:opacity-90"
                 style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
               >
                 <Edit3 className="w-3.5 h-3.5" />
@@ -498,17 +453,12 @@ const PrivacyPolicy = () => {
 
       {/* ── Revision History Section ── */}
       <div className="bg-[#0f1117] border border-white/10 rounded-2xl overflow-hidden shadow-xl">
-        <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#E94B4B]/15 border border-[#E94B4B]/20 flex items-center justify-center shrink-0">
-              <History className="w-4 h-4 text-[#E94B4B]" />
-            </div>
-            <div>
-              <h3 className="font-bold text-white text-sm">Policy Revision History</h3>
-              <p className="text-[11px] text-white/45">
-                Audit trail and previous publications of {activeType === 'customer' ? 'Player App' : 'Contest Host'} policy
-              </p>
-            </div>
+        <div className="px-5 py-4 border-b border-white/10 flex flex-wrap items-center justify-between gap-3 bg-white/2">
+          <div>
+            <h3 className="font-bold text-white text-sm">Policy Revision History</h3>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Audit trail and previous publications of {activeType === 'customer' ? 'Player App' : 'Contest Host'} policy
+            </p>
           </div>
           <span className="px-3 py-1 bg-[#E94B4B]/15 text-[#E94B4B] border border-[#E94B4B]/20 rounded-full text-xs font-semibold">
             {history.length} Revisions

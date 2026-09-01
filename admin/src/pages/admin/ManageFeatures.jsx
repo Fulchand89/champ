@@ -246,9 +246,7 @@ const ManageFeatures = () => {
     <div className="space-y-6">
       <div className="bg-[#0f1117] text-white p-5 rounded-2xl shadow-sm border border-white/10 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <Sparkles className="text-[#E94B4B]" /> Manage Features
-          </h1>
+          <h1 className="text-xl font-bold">Manage Features</h1>
           <p className="text-xs text-gray-400 mt-1">Configure and manage home page Choose Us section features and contest mappings.</p>
         </div>
         <button

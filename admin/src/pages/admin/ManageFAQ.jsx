@@ -235,41 +235,17 @@ const ManageFAQ = () => {
 
       {/* ── Stats Overview ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-2xl bg-[#0f1117] border border-white/10 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total FAQs</p>
-            <p className="text-2xl font-bold text-white mt-1">{totalFaqs}</p>
-          </div>
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
-            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
-          >
-            <HelpCircle className="w-5 h-5" />
-          </div>
+        <div className="p-4 rounded-2xl bg-[#0f1117] border border-white/10 flex flex-col justify-between">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total FAQs</p>
+          <p className="text-2xl font-bold text-white mt-1">{totalFaqs}</p>
         </div>
-        <div className="p-4 rounded-2xl bg-[#0f1117] border border-white/10 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active FAQs</p>
-            <p className="text-2xl font-bold text-white mt-1">{activeFaqs}</p>
-          </div>
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
-            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
-          >
-            <Check className="w-5 h-5" />
-          </div>
+        <div className="p-4 rounded-2xl bg-[#0f1117] border border-white/10 flex flex-col justify-between">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Active FAQs</p>
+          <p className="text-2xl font-bold text-green-400 mt-1">{activeFaqs}</p>
         </div>
-        <div className="p-4 rounded-2xl bg-[#0f1117] border border-white/10 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Inactive FAQs</p>
-            <p className="text-2xl font-bold text-white mt-1">{inactiveFaqs}</p>
-          </div>
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-white shadow-sm"
-            style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
-          >
-            <X className="w-5 h-5" />
-          </div>
+        <div className="p-4 rounded-2xl bg-[#0f1117] border border-white/10 flex flex-col justify-between">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Inactive FAQs</p>
+          <p className="text-2xl font-bold text-gray-400 mt-1">{inactiveFaqs}</p>
         </div>
       </div>
 
