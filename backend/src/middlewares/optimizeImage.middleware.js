@@ -1,7 +1,5 @@
-const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
-const ApiError = require('../shared/exceptions/ApiError');
 
 const optimizeImage = async (req, res, next) => {
   const filesToProcess = [];
@@ -21,13 +19,22 @@ const optimizeImage = async (req, res, next) => {
 
   if (filesToProcess.length === 0) return next();
 
+  let sharp;
+  try {
+    sharp = require('sharp');
+  } catch (err) {
+    console.warn('Sharp module not available on this environment, bypassing image optimization:', err.message);
+    return next();
+  }
+
   try {
     await Promise.all(filesToProcess.map(async (file) => {
-      // Only process actual raster images (skip SVG, CSV, etc.)
-      const ext = path.extname(file.originalname).toLowerCase();
+      if (!file || !file.path || !fs.existsSync(file.path)) return;
+
+      const ext = path.extname(file.originalname || '').toLowerCase();
       if (
         file.mimetype === 'image/svg+xml' ||
-        (!file.mimetype.startsWith('image/') && !['.jpg', '.jpeg', '.png', '.webp'].includes(ext))
+        (!file.mimetype?.startsWith('image/') && !['.jpg', '.jpeg', '.png', '.webp'].includes(ext))
       ) {
         return;
       }
@@ -38,34 +45,32 @@ const optimizeImage = async (req, res, next) => {
       const newFilename = `${parsedPath.name}-opt.webp`;
       const newPath = path.join(parsedPath.dir, newFilename);
 
-      // Compress and optimize image to WebP with max 800x800 bounding box
-      await sharp(originalPath)
-        .resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true }) 
-        .webp({ quality: 85, effort: 4 })
-        .toFile(newPath);
-
-      // Clean up raw unoptimized file
       try {
+        await sharp(originalPath)
+          .resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true }) 
+          .webp({ quality: 85, effort: 4 })
+          .toFile(newPath);
+
         if (fs.existsSync(originalPath) && originalPath !== newPath) {
-          fs.unlinkSync(originalPath);
+          try { fs.unlinkSync(originalPath); } catch (err) {}
         }
-      } catch (err) {
-        console.error(`Failed to delete raw image: ${originalPath}`, err);
-      }
 
-      file.path = newPath;
-      file.filename = newFilename;
-      file.mimetype = 'image/webp';
-      
-      try {
-        file.size = fs.statSync(newPath).size;
-      } catch (statErr) {}
+        file.path = newPath;
+        file.filename = newFilename;
+        file.mimetype = 'image/webp';
+        
+        try {
+          file.size = fs.statSync(newPath).size;
+        } catch (statErr) {}
+      } catch (sharpErr) {
+        console.warn(`Sharp processing skipped for ${file.originalname}:`, sharpErr.message);
+      }
     }));
 
     next();
   } catch (error) {
-    console.error('Image optimization failed:', error);
-    next(new ApiError(500, `Failed to optimize image: ${error.message}`));
+    console.warn('Image optimization notice:', error.message);
+    next();
   }
 };
 
