@@ -126,10 +126,10 @@ function NavItem({ item, collapsed, onItemClick }) {
         onMouseLeave={handleMouseLeave}
         title={item.label}
         className={() =>
-          `flex items-center h-[44px] rounded-[12px] whitespace-nowrap overflow-hidden transition-all duration-150 ease-in-out ${collapsed ? 'justify-center px-0' : 'gap-3 px-3'
+          `flex items-center h-[40px] rounded-[10px] whitespace-nowrap overflow-hidden transition-all duration-150 ease-in-out ${collapsed ? 'justify-center px-0' : 'gap-2.5 px-2.5'
           } ${active
-            ? `bg-[#0f1117] border border-white/10 ${THEME.classes.sidebarTextActive} font-semibold text-[13.5px] shadow-[0_4px_12px_rgba(0,0,0,0.08)]`
-            : 'bg-transparent text-white/90 font-medium text-[13.5px] hover:bg-white/10 hover:text-white'
+            ? `bg-[#0f1117] border border-white/10 ${THEME.classes.sidebarTextActive} font-semibold text-[13px] shadow-[0_4px_12px_rgba(0,0,0,0.08)]`
+            : 'bg-transparent text-white/90 font-medium text-[13px] hover:bg-white/10 hover:text-white'
           }`
         }
       >
@@ -137,12 +137,12 @@ function NavItem({ item, collapsed, onItemClick }) {
           <>
             {Icon && (
               <Icon
-                className={`w-5 h-5 shrink-0 stroke-[1.8] ${active ? THEME.classes.sidebarIconActive : 'text-white/80'
+                className={`w-[18px] h-[18px] shrink-0 stroke-[1.8] ${active ? THEME.classes.sidebarIconActive : 'text-white/80'
                   }`}
               />
             )}
             {!collapsed && (
-              <span className="truncate">
+              <span className="truncate leading-none">
                 {item.label}
               </span>
             )}
@@ -225,8 +225,8 @@ export default function Sidebar({ collapsed, onToggle }) {
       <aside
         className={`h-screen ${THEME.classes.sidebarBg} flex flex-col transition-all duration-300 ease-in-out overflow-hidden shrink-0 z-50 fixed md:static top-0 left-0 ${
           collapsed 
-            ? '-translate-x-full md:translate-x-0 md:w-[72px] md:min-w-[72px] w-[260px]' 
-            : 'translate-x-0 w-[260px] min-w-[260px]'
+            ? '-translate-x-full md:translate-x-0 md:w-[72px] md:min-w-[72px] w-[245px]' 
+            : 'translate-x-0 w-[245px] min-w-[245px]'
         }`}
       >
         {/* ── Logo ── */}
@@ -272,7 +272,7 @@ export default function Sidebar({ collapsed, onToggle }) {
 
         {/* ── Navigation ── */}
         <nav
-          className={`flex-1 overflow-y-auto py-2 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] ${collapsed ? 'px-3' : 'px-3.5'
+          className={`flex-1 overflow-y-auto py-2 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] ${collapsed ? 'px-2.5' : 'px-2.5'
             }`}
         >
           {NAV.map((entry, i) => {
@@ -285,10 +285,10 @@ export default function Sidebar({ collapsed, onToggle }) {
 
             /* Section group */
             return (
-              <div key={i} className={`${i === 0 ? 'mt-0' : 'mt-5'}`}>
+              <div key={i} className={`${i === 0 ? 'mt-0' : 'mt-4'}`}>
                 {/* Section title */}
                 {!collapsed && (
-                  <p className="text-[11px] font-semibold tracking-[1px] text-white/70 uppercase mb-1.5 ml-1">
+                  <p className="text-[10.5px] font-semibold tracking-[0.5px] text-white/65 uppercase mb-1.5 ml-2">
                     {entry.section}
                   </p>
                 )}
@@ -308,14 +308,14 @@ export default function Sidebar({ collapsed, onToggle }) {
         </nav>
 
         {/* ── Collapse button ── */}
-        <div className={`pt-3 pb-5 border-t border-white/15 ${collapsed ? 'px-3' : 'px-3.5'
+        <div className={`pt-2.5 pb-4 border-t border-white/15 ${collapsed ? 'px-2.5' : 'px-2.5'
           }`}>
           <button
             onClick={onToggle}
-            className={`flex items-center h-[44px] w-full rounded-[14px] bg-transparent border-none text-white/90 text-[13.5px] font-medium cursor-pointer transition-colors duration-150 ease-in-out hover:bg-white/12 ${collapsed ? 'justify-center px-0' : 'gap-3 px-3'
+            className={`flex items-center h-[40px] w-full rounded-[10px] bg-transparent border-none text-white/90 text-[13px] font-medium cursor-pointer transition-colors duration-150 ease-in-out hover:bg-white/10 hover:text-white ${collapsed ? 'justify-center px-0' : 'gap-2.5 px-2.5'
               }`}
           >
-            <ChevronIcon className="w-5 h-5 shrink-0 stroke-[1.8]" />
+            <ChevronIcon className="w-[18px] h-[18px] shrink-0 stroke-[1.8]" />
             {!collapsed && <span>Collapse</span>}
           </button>
         </div>
