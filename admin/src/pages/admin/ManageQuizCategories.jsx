@@ -276,11 +276,12 @@ const ManageQuizCategories = () => {
         else if (catName.includes('general') || catName.includes('gk') || catName.includes('knowledge')) fallbackImg = '/cat-general.png';
 
         const imgPath = (row.image && typeof row.image === 'string' && row.image.trim()) ? row.image : ((row.icon && typeof row.icon === 'string' && row.icon.trim() && (row.icon.startsWith('/') || row.icon.startsWith('http') || row.icon.startsWith('data:'))) ? row.icon : fallbackImg);
+        const resolvedImgPath = getImageUrl(imgPath) || fallbackImg;
         return (
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
               <img
-                src={getImageUrl(imgPath)}
+                src={resolvedImgPath}
                 alt={val}
                 className="w-full h-full object-contain p-1"
                 onError={(e) => {

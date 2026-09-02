@@ -69,33 +69,36 @@ const detectMimeFromBase64 = (base64Data, declaredMime) => {
 };
 
 /**
- * Resolves uploaded backend image paths (/uploads/...) and public local assets safely.
- * Also corrects wrong MIME types in data URIs (e.g. WebP bytes stored as image/png).
+ * Resolves image paths/data-URIs to displayable URLs.
+ * - Corrects wrong MIME types in stored data URIs (e.g. WebP bytes stored as image/png).
+ * - Resolves /uploads/ paths to full backend URLs.
+ * - Returns empty string for null/invalid input so callers can use || fallback.
  */
 export const getImageUrl = (imgPath) => {
   if (!imgPath || typeof imgPath !== 'string') return '';
   const cleanStr = imgPath.trim().replace(/[\r\n\s]+/g, '');
+  if (!cleanStr) return '';
 
+  // ── Data URI ────────────────────────────────────────────────────────────────
   if (cleanStr.startsWith('data:')) {
-    // Parse:  data:<mime>;base64,<data>
     const commaIdx = cleanStr.indexOf(',');
-    if (commaIdx === -1) return cleanStr; // malformed — return as-is
+    if (commaIdx === -1) return ''; // malformed
 
-    const header = cleanStr.slice(5, commaIdx);   // e.g. "image/png;base64"
+    const header = cleanStr.slice(5, commaIdx);       // e.g. "image/png;base64"
     const base64Data = cleanStr.slice(commaIdx + 1);
 
-    // Only attempt correction for base64-encoded data (not data:...;charset=... etc.)
-    if (header.includes(';base64') && base64Data.length > 16) {
-      const declaredMime = header.split(';')[0].trim(); // e.g. "image/png"
+    if (!base64Data || base64Data.length < 16) return ''; // too short to be a real image
+
+    if (header.includes(';base64')) {
+      const declaredMime = header.split(';')[0].trim();
       const realMime = detectMimeFromBase64(base64Data, declaredMime);
-      if (realMime !== declaredMime) {
-        // MIME mismatch detected — return URI with corrected MIME type
-        return `data:${realMime};base64,${base64Data}`;
-      }
+      // Return corrected URI (no-op if MIME was already correct)
+      return `data:${realMime};base64,${base64Data}`;
     }
     return cleanStr;
   }
 
+  // ── Absolute HTTP(S) / blob URL ──────────────────────────────────────────────
   if (
     cleanStr.startsWith('http://') ||
     cleanStr.startsWith('https://') ||
@@ -104,12 +107,14 @@ export const getImageUrl = (imgPath) => {
     return cleanStr;
   }
 
+  // ── /uploads/ path — prefix with backend origin ──────────────────────────────
   if (cleanStr.startsWith('/uploads/') || cleanStr.startsWith('uploads/')) {
     const cleanPath = cleanStr.startsWith('/') ? cleanStr : `/${cleanStr}`;
     const backendOrigin = RAW_BASE_URL.replace(/\/api\/v1\/?$/, '');
     return `${backendOrigin}${cleanPath}`;
   }
 
+  // ── Public asset paths (e.g. /cat-sports.png) — return as-is ────────────────
   return cleanStr;
 };
 

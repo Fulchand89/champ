@@ -265,11 +265,12 @@ const ScheduleContest = () => {
         else if (catName.includes('general') || catName.includes('gk') || catName.includes('knowledge')) fallbackImg = '/cat-general.png';
 
         const imgPath = (row.image && typeof row.image === 'string' && row.image.trim()) ? row.image : ((row.category?.image && typeof row.category.image === 'string' && row.category.image.trim()) ? row.category.image : (row.category?.icon ? row.category.icon : fallbackImg));
+        const resolvedImgPath = getImageUrl(imgPath) || fallbackImg;
         return (
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
               <img
-                src={getImageUrl(imgPath)}
+                src={resolvedImgPath}
                 alt={val}
                 className="w-full h-full object-contain p-1"
                 onError={(e) => {
