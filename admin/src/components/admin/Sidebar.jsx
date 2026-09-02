@@ -121,7 +121,7 @@ function NavItem({ item, collapsed, onItemClick }) {
         onMouseLeave={handleMouseLeave}
         title={item.label}
         className={() =>
-          `flex items-center h-[40px] rounded-[10px] whitespace-nowrap overflow-hidden transition-all duration-150 ease-in-out ${collapsed ? 'justify-center px-0' : 'gap-2.5 px-2.5'
+          `flex items-center min-h-[40px] h-[40px] rounded-[10px] whitespace-nowrap transition-all duration-150 ease-in-out ${collapsed ? 'justify-center px-0' : 'gap-2.5 px-3'
           } ${active
             ? `bg-[#0f1117] border border-white/10 ${THEME.classes.sidebarTextActive} font-semibold text-[13px] shadow-[0_4px_12px_rgba(0,0,0,0.08)]`
             : 'bg-transparent text-white/90 font-medium text-[13px] hover:bg-white/10 hover:text-white'
@@ -137,7 +137,7 @@ function NavItem({ item, collapsed, onItemClick }) {
               />
             )}
             {!collapsed && (
-              <span className="truncate leading-none">
+              <span className="truncate leading-normal py-0.5">
                 {item.label}
               </span>
             )}
@@ -220,8 +220,8 @@ export default function Sidebar({ collapsed, onToggle }) {
       <aside
         className={`h-screen ${THEME.classes.sidebarBg} flex flex-col transition-all duration-300 ease-in-out overflow-hidden shrink-0 z-50 fixed md:static top-0 left-0 ${
           collapsed 
-            ? '-translate-x-full md:translate-x-0 md:w-[72px] md:min-w-[72px] w-[245px]' 
-            : 'translate-x-0 w-[245px] min-w-[245px]'
+            ? '-translate-x-full md:translate-x-0 md:w-[72px] md:min-w-[72px] w-[260px]' 
+            : 'translate-x-0 w-[260px] min-w-[260px]'
         }`}
       >
         {/* ── Logo ── */}
@@ -283,7 +283,7 @@ export default function Sidebar({ collapsed, onToggle }) {
               <div key={i} className={`${i === 0 ? 'mt-0' : 'mt-4'}`}>
                 {/* Section title */}
                 {!collapsed && (
-                  <p className="text-[10.5px] font-semibold tracking-[0.5px] text-white/65 uppercase mb-1.5 ml-2">
+                  <p className="text-[10.5px] font-semibold tracking-[0.5px] text-white/65 uppercase mb-1.5 ml-2 leading-normal">
                     {entry.section}
                   </p>
                 )}
@@ -307,11 +307,11 @@ export default function Sidebar({ collapsed, onToggle }) {
           }`}>
           <button
             onClick={onToggle}
-            className={`flex items-center h-[40px] w-full rounded-[10px] bg-transparent border-none text-white/90 text-[13px] font-medium cursor-pointer transition-colors duration-150 ease-in-out hover:bg-white/10 hover:text-white ${collapsed ? 'justify-center px-0' : 'gap-2.5 px-2.5'
+            className={`flex items-center min-h-[40px] h-[40px] w-full rounded-[10px] bg-transparent border-none text-white/90 text-[13px] font-medium cursor-pointer transition-colors duration-150 ease-in-out hover:bg-white/10 hover:text-white ${collapsed ? 'justify-center px-0' : 'gap-2.5 px-3'
               }`}
           >
             <ChevronIcon className="w-[18px] h-[18px] shrink-0 stroke-[1.8]" />
-            {!collapsed && <span>Collapse</span>}
+            {!collapsed && <span className="leading-normal py-0.5">Collapse</span>}
           </button>
         </div>
       </aside>
