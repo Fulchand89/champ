@@ -182,6 +182,11 @@ const ManageUsers = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!selectedUser) return;
+    const isTargetAdmin = selectedUser.role === 'admin' || selectedUser.role === 'super_admin';
+    if (isTargetAdmin && !formData.isActive) {
+      toast.error('Admin accounts are protected and cannot be blocked!');
+      return;
+    }
     setIsSaving(true);
     try {
       const res = await userService.updateUser(selectedUser.rawId, {
@@ -189,7 +194,7 @@ const ManageUsers = () => {
         mobile: formData.mobile,
         city: formData.city,
         role: formData.role,
-        isActive: formData.isActive,
+        isActive: isTargetAdmin ? true : formData.isActive,
       });
       if (res?.success) {
         toast.success('User updated successfully');
@@ -208,6 +213,10 @@ const ManageUsers = () => {
 
   // Handle Toggle Status
   const handleToggleStatus = async (user) => {
+    if (user.role === 'admin' || user.role === 'super_admin') {
+      toast.error('Admin accounts are protected and cannot be blocked!');
+      return;
+    }
     try {
       const res = await userService.toggleUserStatus(user.rawId);
       if (res?.success) {
@@ -225,12 +234,21 @@ const ManageUsers = () => {
 
   // Open Delete Confirmation
   const confirmDelete = (user) => {
+    if (user.role === 'admin' || user.role === 'super_admin') {
+      toast.error('Admin accounts are protected and cannot be deleted!');
+      return;
+    }
     setUserToDelete(user);
     setDeleteModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
     if (!userToDelete) return;
+    if (userToDelete.role === 'admin' || userToDelete.role === 'super_admin') {
+      toast.error('Admin accounts are protected and cannot be deleted!');
+      setDeleteModalOpen(false);
+      return;
+    }
     setIsDeleting(true);
     try {
       const res = await userService.deleteUser(userToDelete.rawId);
@@ -291,17 +309,27 @@ const ManageUsers = () => {
     { 
       key: 'name', 
       label: 'Name', 
-      render: (_, row) => (
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-[#E94B4B]/15 border border-[#E94B4B]/30 flex items-center justify-center font-bold text-xs text-[#E94B4B] shrink-0">
-            {row.name ? row.name.charAt(0).toUpperCase() : 'U'}
+      render: (_, row) => {
+        const isAdmin = row.role === 'admin' || row.role === 'super_admin';
+        return (
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-[#E94B4B]/15 border border-[#E94B4B]/30 flex items-center justify-center font-bold text-xs text-[#E94B4B] shrink-0">
+              {row.name ? row.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <p className="font-semibold text-white text-sm leading-tight">{row.name}</p>
+                {isAdmin && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    ADMIN
+                  </span>
+                )}
+              </div>
+              <p className="text-white/40 text-xs mt-0.5">{row.email}</p>
+            </div>
           </div>
-          <div>
-            <p className="font-semibold text-white text-sm leading-tight">{row.name}</p>
-            <p className="text-white/40 text-xs mt-0.5">{row.email}</p>
-          </div>
-        </div>
-      )
+        );
+      }
     },
     { key: 'mobile', label: 'Mobile' },
     { key: 'city', label: 'City' },
@@ -313,51 +341,73 @@ const ManageUsers = () => {
       label: 'Status',
       headerClassName: 'text-center',
       cellClassName: 'text-center',
-      render: (_, row) => (
-        <button
-          onClick={() => handleToggleStatus(row)}
-          title={`Click to ${row.isActive ? 'block' : 'activate'} user`}
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-            row.isActive 
-              ? 'bg-green-500/15 text-green-400 border border-green-500/30 hover:bg-green-500/25' 
-              : 'bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25'
-          }`}
-        >
-          {row.isActive ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
-          <span>{row.status}</span>
-        </button>
-      )
+      render: (_, row) => {
+        const isAdmin = row.role === 'admin' || row.role === 'super_admin';
+        if (isAdmin) {
+          return (
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30 cursor-not-allowed"
+              title="Admin accounts are protected and cannot be blocked"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Protected</span>
+            </span>
+          );
+        }
+        return (
+          <button
+            onClick={() => handleToggleStatus(row)}
+            title={`Click to ${row.isActive ? 'block' : 'activate'} user`}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+              row.isActive 
+                ? 'bg-green-500/15 text-green-400 border border-green-500/30 hover:bg-green-500/25' 
+                : 'bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25'
+            }`}
+          >
+            {row.isActive ? <UserCheck className="w-3 h-3" /> : <UserX className="w-3 h-3" />}
+            <span>{row.status}</span>
+          </button>
+        );
+      }
     },
     {
       key: 'actions',
       label: 'Actions',
       headerClassName: 'text-center',
       cellClassName: 'text-center',
-      render: (_, row) => (
-        <div className="flex items-center justify-center gap-1.5">
-          <button
-            onClick={() => openViewModal(row)}
-            className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all cursor-pointer"
-            title="View Details"
-          >
-            <Eye size={15} />
-          </button>
-          <button
-            onClick={() => openEditModal(row)}
-            className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all cursor-pointer"
-            title="Edit User"
-          >
-            <Edit3 size={15} />
-          </button>
-          <button
-            onClick={() => confirmDelete(row)}
-            className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-400 transition-all cursor-pointer"
-            title="Delete User"
-          >
-            <Trash2 size={15} />
-          </button>
-        </div>
-      )
+      render: (_, row) => {
+        const isAdmin = row.role === 'admin' || row.role === 'super_admin';
+        return (
+          <div className="flex items-center justify-center gap-1.5">
+            <button
+              onClick={() => openViewModal(row)}
+              className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all cursor-pointer"
+              title="View Details"
+            >
+              <Eye size={15} />
+            </button>
+            <button
+              onClick={() => openEditModal(row)}
+              className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all cursor-pointer"
+              title="Edit User"
+            >
+              <Edit3 size={15} />
+            </button>
+            <button
+              onClick={() => confirmDelete(row)}
+              disabled={isAdmin}
+              className={`p-1.5 rounded-lg border border-white/10 transition-all ${
+                isAdmin 
+                  ? 'bg-white/5 text-white/20 cursor-not-allowed opacity-50' 
+                  : 'bg-white/5 hover:bg-red-500/10 text-white/40 hover:text-red-400 cursor-pointer'
+              }`}
+              title={isAdmin ? "Admin accounts are protected and cannot be deleted" : "Delete User"}
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
+        );
+      }
     }
   ];
 
@@ -797,14 +847,26 @@ const ManageUsers = () => {
                 <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
                   Account Status
                 </label>
-                <select
-                  value={formData.isActive ? 'active' : 'blocked'}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.value === 'active' }))}
-                  className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
-                >
-                  <option value="active">Active</option>
-                  <option value="blocked">Blocked</option>
-                </select>
+                {(selectedUser?.role === 'admin' || selectedUser?.role === 'super_admin') ? (
+                  <div>
+                    <input
+                      type="text"
+                      disabled
+                      value="Active (Protected Admin)"
+                      className="w-full px-3.5 py-2.5 text-sm bg-blue-500/10 border border-blue-500/30 rounded-xl text-blue-400 font-bold cursor-not-allowed"
+                    />
+                    <p className="text-[11px] text-amber-400/80 mt-1">Admin accounts are protected and cannot be deactivated.</p>
+                  </div>
+                ) : (
+                  <select
+                    value={formData.isActive ? 'active' : 'blocked'}
+                    onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.value === 'active' }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
+                  >
+                    <option value="active">Active</option>
+                    <option value="blocked">Blocked</option>
+                  </select>
+                )}
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-white/10">

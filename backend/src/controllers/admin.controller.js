@@ -1431,12 +1431,22 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 
   const { name, mobile, city, role, isActive } = req.body;
+
+  // Protect Admin / Super Admin users from being deactivated
+  const isTargetAdmin = user.role === 'admin' || user.role === 'super_admin';
+  if (isTargetAdmin && (isActive === false || isActive === 'false' || isActive === 0)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Admin accounts are protected and cannot be blocked or deactivated.',
+    });
+  }
+
   const updates = {};
   if (name !== undefined) updates.name = name.trim();
   if (mobile !== undefined) updates.mobile = mobile.trim();
   if (city !== undefined) updates.city = city.trim();
   if (role !== undefined) updates.role = role;
-  if (isActive !== undefined) updates.isActive = isActive;
+  if (isActive !== undefined) updates.isActive = isTargetAdmin ? true : isActive;
 
   const updatedUser = await authRepository.update(user, updates);
 
@@ -1452,6 +1462,14 @@ const toggleUserStatus = asyncHandler(async (req, res) => {
   const user = await User.findByPk(id);
   if (!user) {
     return res.status(404).json({ success: false, message: 'User not found' });
+  }
+
+  // Protect Admin / Super Admin users from being blocked
+  if (user.role === 'admin' || user.role === 'super_admin') {
+    return res.status(400).json({
+      success: false,
+      message: 'Admin accounts are protected and cannot be blocked or deactivated.',
+    });
   }
 
   const newStatus = !user.isActive;
@@ -1480,6 +1498,15 @@ const deleteUser = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({ success: false, message: 'User not found' });
   }
+
+  // Protect Admin / Super Admin users from being deleted
+  if (user.role === 'admin' || user.role === 'super_admin') {
+    return res.status(400).json({
+      success: false,
+      message: 'Admin accounts are protected and cannot be deleted.',
+    });
+  }
+
   const userName = user.name;
   const userEmail = user.email;
   await authRepository.delete(user);
