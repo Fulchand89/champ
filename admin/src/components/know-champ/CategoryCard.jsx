@@ -18,47 +18,13 @@ const CategoryCard = ({ name = '', image, icon, colorClass, borderGlowClass, isL
   }
 
   const resolveImage = () => {
-    // 1. If custom uploaded image (Data URI, /uploads/, or external http URL)
-    if (
-      image &&
-      typeof image === 'string' &&
-      image !== '/cat-general.png' &&
-      image !== 'cat-general.png' &&
-      (image.startsWith('data:') ||
-        image.startsWith('/uploads/') ||
-        image.startsWith('uploads/') ||
-        image.startsWith('http://') ||
-        image.startsWith('https://'))
-    ) {
+    if (image && typeof image === 'string' && image.trim() !== '') {
       return image;
     }
-
-    // 2. Preset image matching based on category name
-    const n = (name || '').toLowerCase();
-    if (n.includes('science') || n.includes('health') || n.includes('medic') || n.includes('doctor')) {
-      return '/cat-science.png';
+    if (icon && typeof icon === 'string' && icon.trim() !== '' && (icon.startsWith('data:') || icon.startsWith('/') || icon.startsWith('http'))) {
+      return icon;
     }
-    if (n.includes('tech') || n.includes('computer') || n.includes('code') || n.includes('robot') || n.includes('software') || n.includes('programming')) {
-      return '/cat-technology.png';
-    }
-    if (n.includes('sport') || n.includes('cricket') || n.includes('football') || n.includes('game') || n.includes('play')) {
-      return '/cat-sports.png';
-    }
-    if (n.includes('entertain') || n.includes('movie') || n.includes('music') || n.includes('cinema') || n.includes('song') || n.includes('film')) {
-      return '/cat-entertainment.png';
-    }
-    if (n.includes('history') || n.includes('past') || n.includes('ancient')) {
-      return '/cat-history.png';
-    }
-    if (n.includes('current') || n.includes('news') || n.includes('affair') || n.includes('today')) {
-      return '/cat-current.png';
-    }
-    if (n.includes('math') || n.includes('logic') || n.includes('reason')) {
-      return '/Knowledge.png';
-    }
-
-    // 3. Fallback to provided image or default
-    return (typeof image === 'string' && image) || '/cat-general.png';
+    return '/cat-general.png';
   };
 
   const finalImg = resolveImage();

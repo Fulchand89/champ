@@ -264,11 +264,7 @@ const ScheduleContest = () => {
         else if (catName.includes('math') || catName.includes('logic')) fallbackImg = '/Knowledge.png';
         else if (catName.includes('general') || catName.includes('gk') || catName.includes('knowledge')) fallbackImg = '/cat-general.png';
 
-        const isUrlPath = (pathStr) => pathStr && typeof pathStr === 'string' && (
-          pathStr.startsWith('/') || pathStr.startsWith('http') || pathStr.startsWith('uploads/') || pathStr.startsWith('data:')
-        );
-
-        const imgPath = isUrlPath(row.image) ? row.image : (isUrlPath(row.category?.image) ? row.category.image : (isUrlPath(row.category?.icon) ? row.category.icon : fallbackImg));
+        const imgPath = (row.image && typeof row.image === 'string' && row.image.trim()) ? row.image : ((row.category?.image && typeof row.category.image === 'string' && row.category.image.trim()) ? row.category.image : (row.category?.icon ? row.category.icon : fallbackImg));
         return (
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">

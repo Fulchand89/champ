@@ -84,26 +84,10 @@ const Contest = () => {
     let img = null;
     let icon = iconVal || '📚';
 
-    // 1. Direct custom image paths/URLs (custom uploaded image takes top priority)
-    const isCustomUpload = imgVal && typeof imgVal === 'string' && imgVal !== '/cat-general.png' && imgVal !== 'cat-general.png' && (
-      imgVal.startsWith('/uploads/') ||
-      imgVal.startsWith('uploads/') ||
-      imgVal.startsWith('data:') ||
-      imgVal.startsWith('http://') ||
-      imgVal.startsWith('https://')
-    );
-
-    const isCustomIcon = iconVal && typeof iconVal === 'string' && (
-      iconVal.startsWith('/uploads/') ||
-      iconVal.startsWith('uploads/') ||
-      iconVal.startsWith('data:') ||
-      iconVal.startsWith('http://') ||
-      iconVal.startsWith('https://')
-    );
-
-    if (isCustomUpload) {
+    // 1. Uploaded category image takes absolute top priority!
+    if (imgVal && typeof imgVal === 'string' && imgVal.trim() !== '') {
       img = imgVal;
-    } else if (isCustomIcon) {
+    } else if (iconVal && typeof iconVal === 'string' && (iconVal.startsWith('data:') || iconVal.startsWith('/') || iconVal.startsWith('http') || iconVal.startsWith('uploads/'))) {
       img = iconVal;
     } 
     // 2. Preset image mappings based on icon emoji or keyword
