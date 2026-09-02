@@ -24,7 +24,7 @@ export const getImageUrl = (urlOrObj) => {
   if (!urlOrObj) return null;
   const url = typeof urlOrObj === 'string' ? urlOrObj : urlOrObj?.url || urlOrObj?.path || urlOrObj?.file;
   if (!url) return null;
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:') || url.startsWith('data:')) return url;
   const cleanPath = url.startsWith('/') ? url : `/${url}`;
   return `${BACKEND_BASE_URL}${cleanPath}`;
 };
