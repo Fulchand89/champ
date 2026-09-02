@@ -485,18 +485,7 @@ const ManageQuizCategories = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-gray-300 mb-1.5">Card Hover Border Color</label>
-                <select
-                  value={colorClass}
-                  onChange={(e) => setColorClass(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
-                >
-                  {COLOR_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
+
 
               {/* Category Live Card Preview */}
               <div>
@@ -530,7 +519,6 @@ const ManageQuizCategories = () => {
                   <div className="text-xs space-y-1">
                     <p className="font-semibold text-white">{name || 'Category Name'}</p>
                     <p className="text-gray-400 text-[11px]">Slug: <span className="text-gray-300 font-mono">{slug || 'slug'}</span></p>
-                    <p className="text-gray-400 text-[11px]">Border: <span className="text-red-400 font-medium">{COLOR_OPTIONS.find(c => c.value === colorClass)?.label || 'Red'}</span></p>
                   </div>
                 </div>
               </div>
