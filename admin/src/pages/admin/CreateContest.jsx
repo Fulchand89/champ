@@ -85,18 +85,29 @@ const CreateContest = () => {
   // Fetch topics dynamically when subject or category changes
   useEffect(() => {
     const fetchTopics = async () => {
+      if (!categoryId && !subject) {
+        setTopics([]);
+        return;
+      }
       setLoadingTopics(true);
       try {
-        const matchedSubject = subjects.find(s => s.name === subject || String(s.id) === String(subject));
+        const matchedSubject = subjects.find(s => String(s.id) === String(subject));
         const subId = matchedSubject ? matchedSubject.id : null;
         const res = await topicService.getTopics(subId);
+        
+        let fetchedTopics = [];
         if (res?.success && Array.isArray(res.data)) {
-          setTopics(res.data);
+          fetchedTopics = res.data;
         } else if (Array.isArray(res)) {
-          setTopics(res);
-        } else {
-          setTopics([]);
+          fetchedTopics = res;
         }
+
+        // Only show topics for the selected category if no specific subject is selected
+        if (!subId && categoryId) {
+          fetchedTopics = fetchedTopics.filter(t => String(t.subject?.categoryId) === String(categoryId));
+        }
+
+        setTopics(fetchedTopics);
       } catch (err) {
         console.error('Error loading topics:', err);
         setTopics([]);
@@ -202,11 +213,11 @@ const CreateContest = () => {
       const end = new Date(start.getTime() + durMin * 60 * 1000);
 
       // Find subject ID if selected from list
-      const matchedSubject = subjects.find(s => s.name === subject || String(s.id) === String(subject));
+      const matchedSubject = subjects.find(s => String(s.id) === String(subject));
       const topicIds = selectedTopics.map(t => t.id);
 
       const descParts = [];
-      if (matchedSubject?.name || subject) descParts.push(`Subject: ${matchedSubject?.name || subject}`);
+      if (matchedSubject) descParts.push(`Subject: ${matchedSubject.name}`);
       if (selectedTopics.length > 0) descParts.push(`Topics: ${selectedTopics.map(t => t.name).join(', ')}`);
 
       const jsonPayload = {
@@ -348,7 +359,7 @@ const CreateContest = () => {
               >
                 <option value="">{loadingSubjects ? 'Loading subjects...' : (subjects.length > 0 ? 'Select Subject' : 'General / All Topics')}</option>
                 {subjects.length > 0 && subjects.map((sub) => (
-                  <option key={sub.id} value={sub.name}>
+                  <option key={sub.id} value={sub.id}>
                     {sub.name}
                   </option>
                 ))}
