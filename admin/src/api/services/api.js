@@ -31,14 +31,71 @@ const api = axios.create({
 });
 
 /**
- * Resolves uploaded backend image paths (/uploads/...) and public local assets safely
+ * Detects the real image MIME type from a base64 string by inspecting magic bytes.
+ * Returns the corrected MIME type, or the original if it cannot be determined.
+ */
+const detectMimeFromBase64 = (base64Data, declaredMime) => {
+  try {
+    // Only need the first 12 bytes to identify all supported formats
+    const sample = atob(base64Data.slice(0, 16));
+    const b = (i) => sample.charCodeAt(i);
+
+    // WebP: RIFF????WEBP  (bytes 0-3 = 52 49 46 46, bytes 8-11 = 57 45 42 50)
+    if (
+      b(0) === 0x52 && b(1) === 0x49 && b(2) === 0x46 && b(3) === 0x46 &&
+      b(8) === 0x57 && b(9) === 0x45 && b(10) === 0x42 && b(11) === 0x50
+    ) return 'image/webp';
+
+    // PNG: \x89PNG
+    if (b(0) === 0x89 && b(1) === 0x50 && b(2) === 0x4E && b(3) === 0x47)
+      return 'image/png';
+
+    // JPEG: \xFF\xD8
+    if (b(0) === 0xFF && b(1) === 0xD8)
+      return 'image/jpeg';
+
+    // GIF: GIF8
+    if (b(0) === 0x47 && b(1) === 0x49 && b(2) === 0x46)
+      return 'image/gif';
+
+    // SVG: starts with '<' (after optional UTF-8 BOM)
+    const text = sample.trimStart();
+    if (text.startsWith('<'))
+      return 'image/svg+xml';
+  } catch (_) {
+    // atob can throw on malformed base64 — fall through to declared
+  }
+  return declaredMime;
+};
+
+/**
+ * Resolves uploaded backend image paths (/uploads/...) and public local assets safely.
+ * Also corrects wrong MIME types in data URIs (e.g. WebP bytes stored as image/png).
  */
 export const getImageUrl = (imgPath) => {
   if (!imgPath || typeof imgPath !== 'string') return '';
-  const cleanStr = imgPath.trim();
+  const cleanStr = imgPath.trim().replace(/[\r\n\s]+/g, '');
+
   if (cleanStr.startsWith('data:')) {
-    return cleanStr.replace(/[\r\n\s]+/g, '');
+    // Parse:  data:<mime>;base64,<data>
+    const commaIdx = cleanStr.indexOf(',');
+    if (commaIdx === -1) return cleanStr; // malformed — return as-is
+
+    const header = cleanStr.slice(5, commaIdx);   // e.g. "image/png;base64"
+    const base64Data = cleanStr.slice(commaIdx + 1);
+
+    // Only attempt correction for base64-encoded data (not data:...;charset=... etc.)
+    if (header.includes(';base64') && base64Data.length > 16) {
+      const declaredMime = header.split(';')[0].trim(); // e.g. "image/png"
+      const realMime = detectMimeFromBase64(base64Data, declaredMime);
+      if (realMime !== declaredMime) {
+        // MIME mismatch detected — return URI with corrected MIME type
+        return `data:${realMime};base64,${base64Data}`;
+      }
+    }
+    return cleanStr;
   }
+
   if (
     cleanStr.startsWith('http://') ||
     cleanStr.startsWith('https://') ||
@@ -46,11 +103,13 @@ export const getImageUrl = (imgPath) => {
   ) {
     return cleanStr;
   }
+
   if (cleanStr.startsWith('/uploads/') || cleanStr.startsWith('uploads/')) {
     const cleanPath = cleanStr.startsWith('/') ? cleanStr : `/${cleanStr}`;
     const backendOrigin = RAW_BASE_URL.replace(/\/api\/v1\/?$/, '');
     return `${backendOrigin}${cleanPath}`;
   }
+
   return cleanStr;
 };
 

@@ -55,12 +55,49 @@ const processUploadedFile = (file, fallbackDir = 'others') => {
     }
 
     if (fileBuf) {
-      const ext = path.extname(file.originalname || file.filename || '').toLowerCase();
-      let mimeType = file.mimetype || 'image/png';
-      if (ext === '.svg') mimeType = 'image/svg+xml';
-      else if (ext === '.jpg' || ext === '.jpeg') mimeType = 'image/jpeg';
-      else if (ext === '.png') mimeType = 'image/png';
-      else if (ext === '.webp') mimeType = 'image/webp';
+      // Use file.mimetype as the primary source — the optimizeImage middleware already
+      // sets this to 'image/webp' after converting, so trust it over the original filename
+      // extension which may still say .png or .jpg.
+      let mimeType = (file.mimetype && file.mimetype !== 'application/octet-stream')
+        ? file.mimetype
+        : null;
+
+      if (!mimeType) {
+        // Fall back to extension only when mimetype is absent or generic
+        const ext = path.extname(file.originalname || file.filename || '').toLowerCase();
+        if (ext === '.svg') mimeType = 'image/svg+xml';
+        else if (ext === '.jpg' || ext === '.jpeg') mimeType = 'image/jpeg';
+        else if (ext === '.webp') mimeType = 'image/webp';
+        else if (ext === '.png') mimeType = 'image/png';
+        else mimeType = 'image/png'; // safe last-resort
+      }
+
+      // Final safety net: inspect magic bytes to confirm actual format.
+      // This catches any case where the buffer was converted to WebP but the
+      // mimetype string was not updated (e.g. sharp path-based conversion).
+      if (fileBuf.length >= 12) {
+        const isWebP =
+          fileBuf[0] === 0x52 && fileBuf[1] === 0x49 &&
+          fileBuf[2] === 0x46 && fileBuf[3] === 0x46 &&
+          fileBuf[8] === 0x57 && fileBuf[9] === 0x45 &&
+          fileBuf[10] === 0x42 && fileBuf[11] === 0x50;
+        if (isWebP) mimeType = 'image/webp';
+      }
+      if (fileBuf.length >= 8) {
+        const isPng =
+          fileBuf[0] === 0x89 && fileBuf[1] === 0x50 &&
+          fileBuf[2] === 0x4E && fileBuf[3] === 0x47;
+        if (isPng) mimeType = 'image/png';
+      }
+      if (fileBuf.length >= 3) {
+        const isJpeg = fileBuf[0] === 0xFF && fileBuf[1] === 0xD8;
+        if (isJpeg) mimeType = 'image/jpeg';
+      }
+      if (fileBuf.length >= 5) {
+        const isSvg = fileBuf.slice(0, 5).toString('utf8').trimStart().startsWith('<');
+        if (isSvg) mimeType = 'image/svg+xml';
+      }
+
       const cleanB64 = fileBuf.toString('base64').replace(/[\r\n\s]+/g, '');
       return `data:${mimeType};base64,${cleanB64}`;
     }
