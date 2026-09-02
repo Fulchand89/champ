@@ -21,6 +21,7 @@ const ManageQuizCategories = () => {
   const [description, setDescription] = useState('');
   const [colorClass, setColorClass] = useState('hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.25)]');
   const [isActive, setIsActive] = useState(true);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
   // Mandatory Image Upload States
   const [imageFile, setImageFile] = useState(null);
@@ -112,15 +113,6 @@ const ManageQuizCategories = () => {
     setName(val);
     if (modalType === 'add') {
       setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
-    }
-  };
-
-  const handleCategorySelect = (selectedName) => {
-    if (selectedName === '__custom__') {
-      setName('');
-      setSlug('');
-    } else {
-      handleNameChange(selectedName);
     }
   };
 
@@ -392,36 +384,49 @@ const ManageQuizCategories = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
-              {/* Category Dropdown & Custom Input */}
-              <div>
+              {/* Category Name Searchable Input */}
+              <div className="relative">
                 <label className="block text-xs font-bold text-gray-300 mb-1.5">
                   Category Name <span className="text-red-500">*</span>
                 </label>
                 
-                {/* Standard Categories Dropdown */}
-                <select
-                  value={STANDARD_CATEGORIES.includes(name) ? name : (name ? '__custom__' : '')}
-                  onChange={(e) => handleCategorySelect(e.target.value)}
-                  className="block w-full px-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B] mb-2 cursor-pointer"
-                >
-                  <option value="">-- Select Category from Dropdown --</option>
-                  {STANDARD_CATEGORIES.map((catName) => (
-                    <option key={catName} value={catName}>
-                      {catName}
-                    </option>
-                  ))}
-                  <option value="__custom__">✎ Custom Category Name...</option>
-                </select>
-
-                {/* Name Input */}
-                <input
-                  required
-                  type="text"
-                  placeholder="e.g. Sports or custom name..."
-                  value={name}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  className="block w-full px-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
-                />
+                <div className="relative">
+                  <input
+                    required
+                    type="text"
+                    placeholder="e.g. Sports or custom name..."
+                    value={name}
+                    onChange={(e) => {
+                      handleNameChange(e.target.value);
+                      setShowCategoryDropdown(true);
+                    }}
+                    onFocus={() => setShowCategoryDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowCategoryDropdown(false), 200)}
+                    className="block w-full px-3 py-2 border border-white/15 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]"
+                  />
+                  
+                  {showCategoryDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-[#1a1d27] border border-white/10 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                      {STANDARD_CATEGORIES.filter(c => c.toLowerCase().includes(name.toLowerCase())).map((catName) => (
+                        <div
+                          key={catName}
+                          onClick={() => {
+                            handleNameChange(catName);
+                            setShowCategoryDropdown(false);
+                          }}
+                          className="px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
+                        >
+                          {catName}
+                        </div>
+                      ))}
+                      {name && STANDARD_CATEGORIES.filter(c => c.toLowerCase().includes(name.toLowerCase())).length === 0 && (
+                        <div className="px-3 py-2 text-sm text-gray-500 italic">
+                          No matches found. Using custom category "{name}"
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
