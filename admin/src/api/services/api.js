@@ -91,11 +91,10 @@ export const getImageUrl = (imgPath) => {
     if (!base64Data || base64Data.length < 48) return '';
 
     if (header.includes(';base64')) {
-      // Detect truncation: valid base64 length must be a multiple of 4 (after stripping padding).
-      // A truncated string (e.g. cut at VARCHAR(255)) will almost never align to 4.
-      // We check the raw length after removing any trailing '=' padding chars.
+      // Detect truncation: a valid base64 string without padding will have length % 4 of 0, 2, or 3.
+      // If it is 1, the string is definitely truncated or malformed.
       const stripped = base64Data.replace(/=+$/, '');
-      if (stripped.length % 4 !== 0) return ''; // truncated — drop it, use fallback image
+      if (stripped.length % 4 === 1) return ''; // truncated — drop it, use fallback image
 
       const declaredMime = header.split(';')[0].trim();
       const realMime = detectMimeFromBase64(base64Data, declaredMime);
