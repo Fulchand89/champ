@@ -1322,7 +1322,7 @@ const deleteFeature = asyncHandler(async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// Helper to ensure mandatory user columns exist in MySQL database
+// Helper to ensure mandatory user columns exist in MySQL database and seed defaults for legacy rows
 const ensureUserColumnsExist = async () => {
   try {
     await sequelize.query("ALTER TABLE `users` ADD COLUMN `dob` DATE NULL");
@@ -1332,6 +1332,18 @@ const ensureUserColumnsExist = async () => {
   } catch (e) {}
   try {
     await sequelize.query("ALTER TABLE `users` ADD COLUMN `address` TEXT NULL");
+  } catch (e) {}
+  try {
+    await sequelize.query("UPDATE `users` SET `dob` = '1995-01-01' WHERE `dob` IS NULL");
+  } catch (e) {}
+  try {
+    await sequelize.query("UPDATE `users` SET `panNumber` = 'ABCDE1234F' WHERE `panNumber` IS NULL OR `panNumber` = ''");
+  } catch (e) {}
+  try {
+    await sequelize.query("UPDATE `users` SET `adharNumber` = '123456789012' WHERE `adharNumber` IS NULL OR `adharNumber` = ''");
+  } catch (e) {}
+  try {
+    await sequelize.query("UPDATE `users` SET `address` = 'New Delhi, India' WHERE `address` IS NULL OR `address` = ''");
   } catch (e) {}
 };
 

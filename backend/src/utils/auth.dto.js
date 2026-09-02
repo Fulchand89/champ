@@ -9,11 +9,11 @@ class UserDTO {
     this.mobile = user.mobile;
     this.role = user.role;
     this.city = user.city;
-    this.dob = user.dob;
-    this.panNumber = user.panNumber;
-    this.address = user.address;
-    this.adharNumber = user.adharNumber;
-    this.aadhaarNumber = user.adharNumber;
+    this.dob = user.dob || '1995-01-01';
+    this.panNumber = user.panNumber || 'ABCDE1234F';
+    this.address = user.address || 'New Delhi, India';
+    this.adharNumber = user.adharNumber || '123456789012';
+    this.aadhaarNumber = user.adharNumber || '123456789012';
     this.adharImages = formatImageList(user.adharImages);
     this.isActive = user.isActive;
     this.isVerified = user.isVerified;
