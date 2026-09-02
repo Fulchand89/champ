@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Trophy, HelpCircle, Coins, Clock, Info, Calendar, Loader2, Upload, Users, Timer } from 'lucide-react';
+import { Trophy, HelpCircle, Coins, Clock, Info, Calendar, Loader2, Upload, Users, Timer, X, ChevronDown, Check } from 'lucide-react';
 import { categoryService } from '../../api/services/categoryService';
 import { subjectService } from '../../api/services/subjectService';
+import { topicService } from '../../api/services/topicService';
 import { contestService } from '../../api/services/contestService';
 import toast from 'react-hot-toast';
 
@@ -10,6 +11,11 @@ const CreateContest = () => {
   const [categories, setCategories] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
+  const [topics, setTopics] = useState([]);
+  const [selectedTopics, setSelectedTopics] = useState([]);
+  const [loadingTopics, setLoadingTopics] = useState(false);
+  const [isTopicsOpen, setIsTopicsOpen] = useState(false);
+  const topicsDropdownRef = useRef(null);
   const [submitting, setSubmitting] = useState(false);
 
   // Form states
@@ -43,6 +49,17 @@ const CreateContest = () => {
     fetchCategories();
   }, []);
 
+  // Close topics dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (topicsDropdownRef.current && !topicsDropdownRef.current.contains(event.target)) {
+        setIsTopicsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // Fetch subjects dynamically when category changes
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -64,6 +81,47 @@ const CreateContest = () => {
     };
     fetchSubjects();
   }, [categoryId]);
+
+  // Fetch topics dynamically when subject or category changes
+  useEffect(() => {
+    const fetchTopics = async () => {
+      setLoadingTopics(true);
+      try {
+        const matchedSubject = subjects.find(s => s.name === subject || String(s.id) === String(subject));
+        const subId = matchedSubject ? matchedSubject.id : null;
+        const res = await topicService.getTopics(subId);
+        if (res?.success && Array.isArray(res.data)) {
+          setTopics(res.data);
+        } else if (Array.isArray(res)) {
+          setTopics(res);
+        } else {
+          setTopics([]);
+        }
+      } catch (err) {
+        console.error('Error loading topics:', err);
+        setTopics([]);
+      } finally {
+        setLoadingTopics(false);
+      }
+    };
+    fetchTopics();
+    setSelectedTopics([]);
+  }, [subject, categoryId, subjects]);
+
+  const toggleTopic = (topicObj) => {
+    setSelectedTopics((prev) => {
+      const exists = prev.some((t) => t.id === topicObj.id);
+      if (exists) {
+        return prev.filter((t) => t.id !== topicObj.id);
+      } else {
+        return [...prev, topicObj];
+      }
+    });
+  };
+
+  const removeTopic = (topicId) => {
+    setSelectedTopics((prev) => prev.filter((t) => t.id !== topicId));
+  };
 
   const handleOpenPicker = (e) => {
     const input = e.currentTarget.querySelector('input') || e.target;
@@ -145,11 +203,18 @@ const CreateContest = () => {
 
       // Find subject ID if selected from list
       const matchedSubject = subjects.find(s => s.name === subject || String(s.id) === String(subject));
+      const topicIds = selectedTopics.map(t => t.id);
+
+      const descParts = [];
+      if (matchedSubject?.name || subject) descParts.push(`Subject: ${matchedSubject?.name || subject}`);
+      if (selectedTopics.length > 0) descParts.push(`Topics: ${selectedTopics.map(t => t.name).join(', ')}`);
 
       const jsonPayload = {
         title: title.trim(),
-        description: subject ? `Subject: ${matchedSubject?.name || subject}` : '',
+        description: descParts.join(' | '),
         categoryId: parseInt(categoryId, 10) || categoryId,
+        subjectId: matchedSubject?.id || null,
+        topicIds: topicIds,
         startTime: start.toISOString(),
         endTime: end.toISOString(),
         entryFee: parseFloat(entryFee) || 0,
@@ -164,7 +229,11 @@ const CreateContest = () => {
       if (imageFile) {
         const formData = new FormData();
         Object.entries(jsonPayload).forEach(([key, val]) => {
-          formData.append(key, val);
+          if (Array.isArray(val)) {
+            formData.append(key, JSON.stringify(val));
+          } else {
+            formData.append(key, val !== null && val !== undefined ? val : '');
+          }
         });
         formData.append('image', imageFile);
         res = await contestService.createContest(formData);
@@ -178,6 +247,7 @@ const CreateContest = () => {
         setTitle('');
         setCategoryId('');
         setSubject('');
+        setSelectedTopics([]);
         setEntryFee('');
         setMinParticipants('2');
         setMaxParticipants('100');
@@ -227,8 +297,8 @@ const CreateContest = () => {
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Row 1: Title, Category, Subject */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Row 1: Title *, Category * */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-xs font-bold text-gray-300 mb-1.5">Contest Title *</label>
               <input
@@ -264,7 +334,10 @@ const CreateContest = () => {
                 )}
               </select>
             </div>
+          </div>
 
+          {/* Row 2: Subject, Topics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-xs font-bold text-gray-300 mb-1.5">Subject</label>
               <select
@@ -280,6 +353,80 @@ const CreateContest = () => {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Topics Multi-select */}
+            <div className="relative" ref={topicsDropdownRef}>
+              <label className="block text-xs font-bold text-gray-300 mb-1.5">Topics</label>
+              <div
+                onClick={() => !loadingTopics && setIsTopicsOpen(!isTopicsOpen)}
+                className={`w-full min-h-[38px] px-3 py-1.5 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white flex items-center justify-between cursor-pointer focus:outline-none ${
+                  isTopicsOpen ? 'border-[#E94B4B]' : ''
+                }`}
+              >
+                <div className="flex flex-wrap items-center gap-1.5 flex-1 pr-2">
+                  {selectedTopics.length > 0 ? (
+                    selectedTopics.map((top) => (
+                      <span
+                        key={top.id}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#E94B4B]/20 text-[#E94B4B] border border-[#E94B4B]/30 text-xs font-medium"
+                      >
+                        {top.name}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeTopic(top.id);
+                          }}
+                          className="hover:text-white transition-colors cursor-pointer"
+                        >
+                          <X size={12} />
+                        </button>
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-gray-400 text-sm">
+                      {loadingTopics
+                        ? 'Loading topics...'
+                        : (topics.length > 0 ? 'Select Topics' : 'General / All Topics')}
+                    </span>
+                  )}
+                </div>
+                <ChevronDown size={16} className={`text-gray-400 transition-transform ${isTopicsOpen ? 'rotate-180' : ''}`} />
+              </div>
+
+              {/* Dropdown Menu */}
+              {isTopicsOpen && (
+                <div className="absolute z-20 mt-1 w-full max-h-56 overflow-y-auto bg-[#141722] border border-gray-700 rounded-lg shadow-xl py-1">
+                  {topics.length > 0 ? (
+                    topics.map((top) => {
+                      const isSelected = selectedTopics.some((t) => t.id === top.id);
+                      return (
+                        <div
+                          key={top.id}
+                          onClick={() => toggleTopic(top)}
+                          className="flex items-center gap-2.5 px-3 py-2 text-xs text-gray-200 hover:bg-[#E94B4B]/10 hover:text-white cursor-pointer transition-colors"
+                        >
+                          <div
+                            className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? 'bg-[#E94B4B] border-[#E94B4B] text-white'
+                                : 'border-gray-500 bg-[#0f1117]'
+                            }`}
+                          >
+                            {isSelected && <Check size={12} strokeWidth={3} />}
+                          </div>
+                          <span className="font-medium">{top.name}</span>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="px-3 py-2 text-xs text-gray-400 text-center">
+                      No topics available for selected subject
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
