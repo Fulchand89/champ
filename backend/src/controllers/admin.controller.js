@@ -43,6 +43,26 @@ const writeJsonFile = (filePath, data) => {
   }
 };
 
+// Helper to process uploaded file into persistent Data URI or relative path
+const processUploadedFile = (file, fallbackDir = 'others') => {
+  if (!file) return null;
+  try {
+    if (file.path && fs.existsSync(file.path)) {
+      const fileBuf = fs.readFileSync(file.path);
+      const ext = path.extname(file.originalname || file.filename || '').toLowerCase();
+      let mimeType = file.mimetype || 'image/png';
+      if (ext === '.svg') mimeType = 'image/svg+xml';
+      else if (ext === '.jpg' || ext === '.jpeg') mimeType = 'image/jpeg';
+      else if (ext === '.png') mimeType = 'image/png';
+      else if (ext === '.webp') mimeType = 'image/webp';
+      return `data:${mimeType};base64,${fileBuf.toString('base64')}`;
+    }
+  } catch (err) {
+    console.warn('Error converting file to Data URI:', err.message);
+  }
+  return `/uploads/${fallbackDir}/${file.filename}`;
+};
+
 // Helper to parse booleans
 const parseBool = (val) => {
   if (val === 'true' || val === true) return true;
@@ -182,7 +202,7 @@ const updateSettings = asyncHandler(async (req, res) => {
 
   // Handle optional logo file upload
   if (req.file) {
-    currentSettings.logoUrl = `/uploads/others/${req.file.filename}`;
+    currentSettings.logoUrl = processUploadedFile(req.file, 'others');
   } else if (updates.logoUrl) {
     currentSettings.logoUrl = updates.logoUrl;
   }
@@ -754,7 +774,7 @@ const createCategory = asyncHandler(async (req, res) => {
 
   let imageUrl = null;
   if (req.file) {
-    imageUrl = `/uploads/categories/${req.file.filename}`;
+    imageUrl = processUploadedFile(req.file, 'categories');
   } else if (req.body.image && typeof req.body.image === 'string' && req.body.image.trim()) {
     imageUrl = req.body.image.trim();
   }
@@ -797,7 +817,7 @@ const updateCategory = asyncHandler(async (req, res) => {
         try { fs.unlinkSync(oldPath); } catch (e) { }
       }
     }
-    imageUrl = `/uploads/categories/${req.file.filename}`;
+    imageUrl = processUploadedFile(req.file, 'categories');
   } else if (req.body.image && typeof req.body.image === 'string' && req.body.image.trim()) {
     imageUrl = req.body.image.trim();
   } else if (removeImage === 'true' || removeImage === true) {
@@ -1104,7 +1124,7 @@ const createContest = asyncHandler(async (req, res) => {
 
   const contestPayload = { ...req.body };
   if (req.file) {
-    contestPayload.image = `/uploads/contests/${req.file.filename}`;
+    contestPayload.image = processUploadedFile(req.file, 'contests');
   }
 
   const contest = await contestService.createContest(contestPayload);
@@ -1132,7 +1152,7 @@ const updateContest = asyncHandler(async (req, res) => {
         try { fs.unlinkSync(oldPath); } catch (e) { }
       }
     }
-    contestPayload.image = `/uploads/contests/${req.file.filename}`;
+    contestPayload.image = processUploadedFile(req.file, 'contests');
   } else if (req.body.removeImage === 'true' || req.body.removeImage === true) {
     const existing = await contestService.getContestById(req.params.id);
     if (existing && existing.image && typeof existing.image === 'string' && existing.image.startsWith('/uploads/')) {

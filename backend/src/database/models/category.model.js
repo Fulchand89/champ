@@ -22,10 +22,10 @@ const Category = sequelize.define('Category', {
     unique: true,
   },
   image: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.TEXT('long'),
     allowNull: true,
     defaultValue: null,
-    comment: 'URL/path of the uploaded category image',
+    comment: 'URL/path or Base64 Data URI of the uploaded category image',
   },
   icon: {
     type: DataTypes.STRING(255),

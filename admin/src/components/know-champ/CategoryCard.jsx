@@ -17,7 +17,10 @@ const CategoryCard = ({ name, image, colorClass, borderGlowClass, isLoading, onC
     );
   }
 
-  const rawImg = image || '/cat-general.png';
+  const isUrlPath = (pathStr) => pathStr && typeof pathStr === 'string' && (
+    pathStr.startsWith('/') || pathStr.startsWith('http') || pathStr.startsWith('uploads/') || pathStr.startsWith('data:')
+  );
+  const rawImg = isUrlPath(image) ? image : '/cat-general.png';
 
   return (
     <motion.div

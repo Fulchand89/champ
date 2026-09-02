@@ -16,10 +16,10 @@ const Contest = sequelize.define('Contest', {
     allowNull: true,
   },
   image: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.TEXT('long'),
     allowNull: true,
     defaultValue: null,
-    comment: 'URL/path of the uploaded contest image',
+    comment: 'URL/path or Base64 Data URI of the uploaded contest image',
   },
   categoryId: {
     type: DataTypes.INTEGER,
