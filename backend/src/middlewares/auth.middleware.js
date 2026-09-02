@@ -46,6 +46,11 @@ const authMiddleware = async (req, res, next) => {
       throw new UnauthorizedError(messages.UNAUTHORIZED);
     }
 
+    // Admin & Super Admin accounts are protected and always active
+    if (user.role === 'admin' || user.role === 'super_admin') {
+      user.isActive = true;
+    }
+
     if (!user.isActive) {
       throw new UnauthorizedError(messages.ACCOUNT_INACTIVE || messages.UNAUTHORIZED);
     }

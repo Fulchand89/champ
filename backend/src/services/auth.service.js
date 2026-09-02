@@ -115,6 +115,11 @@ const loginUser = async (email, password, reqIp = '127.0.0.1', deviceAgent = 'We
     throw new UnauthorizedError(messages.INVALID_CREDENTIALS);
   }
 
+  // Admin & Super Admin accounts are protected and always active
+  if (user.role === 'admin' || user.role === 'super_admin') {
+    user.isActive = true;
+  }
+
   // Check if user is active
   if (!user.isActive) {
     throw new UnauthorizedError(messages.ACCOUNT_INACTIVE);
@@ -443,6 +448,11 @@ const googleAuthUser = async (idToken, mobile, role = 'user', additionalData = {
     if (Object.keys(updates).length > 0) {
       user = await authRepository.update(user, updates);
     }
+  }
+
+  // Admin & Super Admin accounts are protected and always active
+  if (user.role === 'admin' || user.role === 'super_admin') {
+    user.isActive = true;
   }
 
   // Check if account is active
