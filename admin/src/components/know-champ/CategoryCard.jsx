@@ -18,12 +18,50 @@ const CategoryCard = ({ name = '', image, icon, colorClass, borderGlowClass, isL
   }
 
   const resolveImage = () => {
-    if (image && typeof image === 'string' && image.trim() !== '') {
+    // 1. Custom uploaded image (Data URI, /uploads/, blob, or http URL)
+    if (
+      image &&
+      typeof image === 'string' &&
+      image.trim() !== '' &&
+      image !== '/cat-general.png' &&
+      image !== 'cat-general.png'
+    ) {
       return image;
     }
-    if (icon && typeof icon === 'string' && icon.trim() !== '' && (icon.startsWith('data:') || icon.startsWith('/') || icon.startsWith('http'))) {
+    if (
+      icon &&
+      typeof icon === 'string' &&
+      icon.trim() !== '' &&
+      (icon.startsWith('data:') || icon.startsWith('/') || icon.startsWith('http') || icon.startsWith('uploads/'))
+    ) {
       return icon;
     }
+
+    // 2. Preset image matching based on category name when no custom image was uploaded
+    const n = (name || '').toLowerCase();
+    if (n.includes('science') || n.includes('health') || n.includes('medic') || n.includes('doctor')) {
+      return '/cat-science.png';
+    }
+    if (n.includes('tech') || n.includes('computer') || n.includes('code') || n.includes('robot') || n.includes('software') || n.includes('programming')) {
+      return '/cat-technology.png';
+    }
+    if (n.includes('sport') || n.includes('cricket') || n.includes('football') || n.includes('game') || n.includes('play')) {
+      return '/cat-sports.png';
+    }
+    if (n.includes('entertain') || n.includes('movie') || n.includes('music') || n.includes('cinema') || n.includes('song') || n.includes('film')) {
+      return '/cat-entertainment.png';
+    }
+    if (n.includes('history') || n.includes('past') || n.includes('ancient')) {
+      return '/cat-history.png';
+    }
+    if (n.includes('current') || n.includes('news') || n.includes('affair') || n.includes('today')) {
+      return '/cat-current.png';
+    }
+    if (n.includes('math') || n.includes('logic') || n.includes('reason')) {
+      return '/Knowledge.png';
+    }
+
+    // 3. Default fallback
     return '/cat-general.png';
   };
 

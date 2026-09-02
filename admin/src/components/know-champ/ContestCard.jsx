@@ -66,12 +66,37 @@ const ContestCard = ({
     );
   }
 
-  const effectiveImage =
-    (image && typeof image === 'string' && image.trim() !== '') ? image :
-    (contest?.image && typeof contest.image === 'string' && contest.image.trim() !== '') ? contest.image :
-    (contest?.category?.image && typeof contest.category.image === 'string' && contest.category.image.trim() !== '') ? contest.category.image :
-    (contest?.category?.icon && typeof contest.category.icon === 'string' && contest.category.icon.trim() !== '') ? contest.category.icon :
-    '/cat-general.png';
+  const resolveContestImage = () => {
+    // 1. Contest's own custom uploaded image
+    if (image && typeof image === 'string' && image.trim() !== '' && image !== '/cat-general.png' && image !== 'cat-general.png') {
+      return image;
+    }
+    if (contest?.image && typeof contest.image === 'string' && contest.image.trim() !== '' && contest.image !== '/cat-general.png' && contest.image !== 'cat-general.png') {
+      return contest.image;
+    }
+
+    // 2. Category's custom uploaded image
+    if (contest?.category?.image && typeof contest.category.image === 'string' && contest.category.image.trim() !== '' && contest.category.image !== '/cat-general.png' && contest.category.image !== 'cat-general.png') {
+      return contest.category.image;
+    }
+    if (contest?.category?.icon && typeof contest.category.icon === 'string' && (contest.category.icon.startsWith('data:') || contest.category.icon.startsWith('/') || contest.category.icon.startsWith('http') || contest.category.icon.startsWith('uploads/'))) {
+      return contest.category.icon;
+    }
+
+    // 3. Preset image matching based on Category / Contest Name
+    const cat = (category || contest?.category?.name || title || '').toLowerCase();
+    if (cat.includes('science') || cat.includes('health') || cat.includes('doctor')) return '/cat-science.png';
+    if (cat.includes('tech') || cat.includes('computer') || cat.includes('code') || cat.includes('robot') || cat.includes('software')) return '/cat-technology.png';
+    if (cat.includes('sport') || cat.includes('cricket') || cat.includes('football') || cat.includes('game')) return '/cat-sports.png';
+    if (cat.includes('entertain') || cat.includes('movie') || cat.includes('music') || cat.includes('film')) return '/cat-entertainment.png';
+    if (cat.includes('history') || cat.includes('past') || cat.includes('ancient')) return '/cat-history.png';
+    if (cat.includes('current') || cat.includes('news') || cat.includes('affair') || cat.includes('today')) return '/cat-current.png';
+    if (cat.includes('math') || cat.includes('logic') || cat.includes('reason')) return '/Knowledge.png';
+
+    return '/cat-general.png';
+  };
+
+  const effectiveImage = resolveContestImage();
 
   const headerBgColor = (() => {
     const cat = (category || '').toLowerCase();
