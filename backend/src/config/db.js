@@ -94,9 +94,21 @@ const connectDB = async (retries = 5, delay = 2000) => {
         await sequelize.authenticate();
         logger.info(`${MESSAGES.DB_CONNECTED} on port ${port}`);
 
+        // Ensure mandatory user columns (dob, panNumber, address) exist in MySQL users table
+        try {
+          await sequelize.query("ALTER TABLE `users` ADD COLUMN `dob` DATE NULL");
+        } catch (e) {}
+        try {
+          await sequelize.query("ALTER TABLE `users` ADD COLUMN `panNumber` VARCHAR(20) NULL");
+        } catch (e) {}
+        try {
+          await sequelize.query("ALTER TABLE `users` ADD COLUMN `address` TEXT NULL");
+        } catch (e) {}
+
         // Ensure database models & essential tables
         try {
           const { Category, Subject, Topic, Contest, Feature, FAQ, FeeTier, PrizePoolTemplate, ContestParticipant, Question, QuestionOption, Transaction, Withdrawal, User } = require('../database');
+          await User.sync({ alter: false });
           await Category.sync({ alter: false });
           await Subject.sync({ alter: false });
           await Topic.sync({ alter: false });

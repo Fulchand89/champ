@@ -1322,10 +1322,21 @@ const deleteFeature = asyncHandler(async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// 12. USER MANAGEMENT CONTROLLERS
-// ═══════════════════════════════════════════════════════════════════
+// Helper to ensure mandatory user columns exist in MySQL database
+const ensureUserColumnsExist = async () => {
+  try {
+    await sequelize.query("ALTER TABLE `users` ADD COLUMN `dob` DATE NULL");
+  } catch (e) {}
+  try {
+    await sequelize.query("ALTER TABLE `users` ADD COLUMN `panNumber` VARCHAR(20) NULL");
+  } catch (e) {}
+  try {
+    await sequelize.query("ALTER TABLE `users` ADD COLUMN `address` TEXT NULL");
+  } catch (e) {}
+};
 
 const getUsers = asyncHandler(async (req, res) => {
+  await ensureUserColumnsExist();
   const users = await User.findAll({
     order: [['createdAt', 'DESC']]
   });
@@ -1410,6 +1421,7 @@ const getUserById = asyncHandler(async (req, res) => {
 });
 
 const createUser = asyncHandler(async (req, res) => {
+  await ensureUserColumnsExist();
   const { name, email, dob, panNumber, aadhaarNumber, adharNumber, address, mobile, password, city, role = 'user', isActive = true } = req.body;
   if (!name || !email) {
     return res.status(400).json({ success: false, message: 'Name and email are required' });
