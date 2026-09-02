@@ -58,9 +58,9 @@ export default function Header({ onMenuClick, collapsed, title }) {
   const notificationRef = useRef(null)
 
   // Fetch admin notifications from backend API (limit 10 for header preview)
-  const fetchNotifications = useCallback(async () => {
+  const fetchNotifications = useCallback(async (isBackground = false) => {
     try {
-      setLoadingNotifs(true)
+      if (!isBackground) setLoadingNotifs(true)
       const res = await adminNotificationService.getNotifications({ page: 1, limit: 10 })
       if (res?.data) {
         setNotifications(res.data.notifications || [])
@@ -69,7 +69,7 @@ export default function Header({ onMenuClick, collapsed, title }) {
     } catch (err) {
       console.error('Failed to fetch admin notifications:', err)
     } finally {
-      setLoadingNotifs(false)
+      if (!isBackground) setLoadingNotifs(false)
     }
   }, [])
 
@@ -78,6 +78,11 @@ export default function Header({ onMenuClick, collapsed, title }) {
 
     // Initialize Admin WebSocket Connection
     const socket = initAdminSocket()
+
+    // Background polling fallback (updates every 30 seconds)
+    const pollingInterval = setInterval(() => {
+      fetchNotifications(true)
+    }, 30000)
 
     // 1. Listen for new direct user notification
     const handleNewNotif = (newNotif) => {
@@ -103,12 +108,13 @@ export default function Header({ onMenuClick, collapsed, title }) {
     socket.on('admin_notification_update', handleAdminBroadcast)
 
     return () => {
+      clearInterval(pollingInterval)
       socket.off('new_notification', handleNewNotif)
       socket.off('new_admin_notification', handleNewNotif)
       socket.off('unread_count_update', handleUnreadUpdate)
       socket.off('admin_notification_update', handleAdminBroadcast)
     }
-  }, [])
+  }, [fetchNotifications])
 
   const handleMarkAllRead = async () => {
     try {
