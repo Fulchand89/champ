@@ -78,7 +78,7 @@ const ViewReports = () => {
       id: 'REP001',
       tabKey: 'user-participation',
       name: 'User Participation Report',
-      desc: 'Player engagement, tournaments joined, quiz completion rates, and rewards won.',
+      desc: 'Player engagement, Contests joined, quiz completion rates, and rewards won.',
       range: 'All Time / Filterable',
       type: 'Engagement & Users',
       format: 'CSV, Excel, PDF',
@@ -89,7 +89,7 @@ const ViewReports = () => {
       id: 'REP002',
       tabKey: 'contest-report',
       name: 'Contest Report',
-      desc: 'Tournaments catalog, live vs scheduled statuses, capacity fill rates, and revenue.',
+      desc: 'Contests catalog, live vs scheduled statuses, capacity fill rates, and revenue.',
       range: 'All Time / Live',
       type: 'Contest Metrics',
       format: 'CSV, Excel, PDF',
@@ -101,7 +101,7 @@ const ViewReports = () => {
       tabKey: 'contest-payments',
       name: 'Revenue Report',
       desc: 'Entry fee gross inflows, platform commission margins, and prize pool outflows.',
-      range: 'Per-Tournament Statement',
+      range: 'Per-Contest Statement',
       type: 'Financial & Margins',
       format: 'CSV, Excel',
       icon: CreditCard,
@@ -572,7 +572,7 @@ const ViewReports = () => {
     },
     {
       key: 'contestsJoined',
-      label: 'Tournaments Joined',
+      label: 'Contests Joined',
       cellClassName: 'text-center text-xs font-semibold text-gray-200',
       headerClassName: 'text-center',
       render: (val, row) => (
@@ -1138,7 +1138,7 @@ const ViewReports = () => {
 
             <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold text-gray-400">Total Tournaments</p>
+                <p className="text-xs font-semibold text-gray-400">Total Contests</p>
                 <h3 className="text-xl font-bold text-white mt-1">{contestReportData.length || 5}</h3>
                 <p className="text-[10px] text-gray-400 mt-0.5">Live & Scheduled</p>
               </div>
@@ -1221,7 +1221,7 @@ const ViewReports = () => {
               </p>
             </div>
             <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10">
-              <p className="text-xs text-gray-400">Total Tournament Attempts</p>
+              <p className="text-xs text-gray-400">Total Contest Attempts</p>
               <h3 className="text-xl font-bold text-amber-400 mt-1">
                 {userParticipationData.reduce((s, u) => s + (u.contestsJoined || 0), 0)}
               </h3>
@@ -1289,7 +1289,7 @@ const ViewReports = () => {
           {/* Summary KPIs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10">
-              <p className="text-xs text-gray-400">Total Tournaments</p>
+              <p className="text-xs text-gray-400">Total Contests</p>
               <h3 className="text-xl font-bold text-white mt-1">{contestReportData.length}</h3>
               <p className="text-[10px] text-amber-400 mt-1">
                 {contestReportData.filter(c => c.status === 'live').length} Currently Live
@@ -1670,7 +1670,7 @@ const ViewReports = () => {
                     <span className="font-mono text-gray-300">{modalData.email}</span>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-white/5">
-                    <span className="text-gray-400">Tournaments Participated</span>
+                    <span className="text-gray-400">Contests Participated</span>
                     <span className="font-bold text-white font-mono">{modalData.contestsJoined} Contests</span>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-white/5">

@@ -258,7 +258,7 @@ const Settings = () => {
         <div>
           <h1 className="text-xl font-bold">Settings</h1>
           <p className="text-xs text-gray-400 mt-1">
-            Configure deposit limits, withdrawal parameters, tournament gameplay rules, and platform preferences.
+            Configure deposit limits, withdrawal parameters, Contest gameplay rules, and platform preferences.
           </p>
         </div>
 

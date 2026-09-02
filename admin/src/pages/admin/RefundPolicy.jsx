@@ -48,7 +48,7 @@ const DEFAULT_CUSTOMER_POLICY = `<h2>1. Refund &amp; Cancellation Overview</h2>
 <p>For refund disputes or transaction escalations, contact our finance team at <strong>refunds@knowchamp.com</strong> with your Transaction ID and registered User ID.</p>`;
 
 const DEFAULT_DRIVER_POLICY = `<h2>1. Contest Host Settlement &amp; Cancellation Terms</h2>
-<p>This policy details the refund, cancellation, and fee adjustment guidelines applicable to verified Quiz Creators, Tournament Organizers, and Subject Experts hosting contests on <strong>KnowChamp</strong>.</p>
+<p>This policy details the refund, cancellation, and fee adjustment guidelines applicable to verified Quiz Creators, Contest Organizers, and Subject Experts hosting contests on <strong>KnowChamp</strong>.</p>
 
 <h2>2. Host Contest Cancellation &amp; Penalties</h2>
 <ul>
@@ -58,7 +58,7 @@ const DEFAULT_DRIVER_POLICY = `<h2>1. Contest Host Settlement &amp; Cancellation
 
 <h2>3. Platform Fee Reversals</h2>
 <ul>
-  <li>Platform commission fees charged to hosts for aborted or server-cancelled tournaments are fully waived and credited back to host accounts.</li>
+  <li>Platform commission fees charged to hosts for aborted or server-cancelled Contests are fully waived and credited back to host accounts.</li>
 </ul>
 
 <h2>4. Dispute Resolution &amp; Host Support</h2>

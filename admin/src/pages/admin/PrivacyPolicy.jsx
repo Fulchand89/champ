@@ -33,14 +33,14 @@ const DEFAULT_CUSTOMER_POLICY = `<h2>1. Introduction</h2>
 <p>To provide a fair, competitive, and secure quiz gaming experience, we collect the following categories of information:</p>
 <ul>
   <li><strong>Account &amp; Profile Details:</strong> Full name, username, mobile phone number, email address, date of birth, and avatar selection.</li>
-  <li><strong>Gameplay &amp; Tournament Analytics:</strong> Contest participation history, response speed, accuracy rates, leaderboard rankings, and tournament achievements.</li>
+  <li><strong>Gameplay &amp; Contest Analytics:</strong> Contest participation history, response speed, accuracy rates, leaderboard rankings, and Contest achievements.</li>
   <li><strong>Wallet &amp; Financial Transactions:</strong> Entry fee transactions, prize pool winnings, withdrawal records, and payout identifiers (e.g., UPI ID, Bank Account details) for prize distributions.</li>
   <li><strong>Device &amp; Security Data:</strong> IP address, device model, operating system, and geolocation data (used strictly to enforce regional contest eligibility and anti-cheat policies).</li>
 </ul>
 
 <h2>3. How We Use Your Information</h2>
 <ul>
-  <li>Facilitating real-time quiz matchmaking and live tournament score computation.</li>
+  <li>Facilitating real-time quiz matchmaking and live Contest score computation.</li>
   <li>Crediting prize pool winnings, bonuses, and processing instant wallet withdrawals.</li>
   <li>Ensuring fair-play compliance and detecting unauthorized bots, emulators, or multi-accounting.</li>
   <li>Delivering personalized contest recommendations, push notifications, and customer support.</li>
@@ -56,7 +56,7 @@ const DEFAULT_CUSTOMER_POLICY = `<h2>1. Introduction</h2>
 <p>For inquiries regarding data protection, consent withdrawal, or account deletion, contact our privacy team at <strong>privacy@knowchamp.com</strong> or through the in-app Support Center.</p>`;
 
 const DEFAULT_DRIVER_POLICY = `<h2>1. Contest Organizers &amp; Quiz Hosts Overview</h2>
-<p>This Privacy Policy outlines how <strong>KnowChamp</strong> collects, uses, and safeguards information provided by verified quiz creators, tournament hosts, and content moderators on our platform.</p>
+<p>This Privacy Policy outlines how <strong>KnowChamp</strong> collects, uses, and safeguards information provided by verified quiz creators, Contest hosts, and content moderators on our platform.</p>
 
 <h2>2. Host Verification &amp; Payout Data</h2>
 <p>To ensure content integrity and facilitate host revenue-sharing, we collect:</p>

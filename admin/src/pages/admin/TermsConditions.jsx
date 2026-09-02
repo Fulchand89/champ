@@ -30,7 +30,7 @@ const DEFAULT_CUSTOMER_TERMS = `<h2>1. Acceptance of Terms</h2>
 
 <h2>2. Eligibility &amp; Account Registration</h2>
 <ul>
-  <li>Users must be at least 18 years of age (or have verified parental/guardian consent) to participate in cash prize tournaments.</li>
+  <li>Users must be at least 18 years of age (or have verified parental/guardian consent) to participate in cash prize Contests.</li>
   <li>Each player is entitled to maintain only one active KnowChamp account. Multi-accounting, emulator usage, or profile sharing is strictly prohibited.</li>
   <li>Players from restricted jurisdictions where skill-based gaming is legally prohibited are not eligible to enter paid contests.</li>
 </ul>
@@ -57,7 +57,7 @@ const DEFAULT_CUSTOMER_TERMS = `<h2>1. Acceptance of Terms</h2>
 <p>KnowChamp is a game of knowledge, skill, and cognitive speed. We are not liable for gameplay disruptions arising from user connectivity issues, device failures, or third-party telecommunication interruptions.</p>`;
 
 const DEFAULT_DRIVER_TERMS = `<h2>1. Quiz Host &amp; Partner Agreement</h2>
-<p>This Agreement governs your onboarding and engagement as an approved Quiz Creator, Tournament Host, or Subject Expert on the <strong>KnowChamp</strong> platform.</p>
+<p>This Agreement governs your onboarding and engagement as an approved Quiz Creator, Contest Host, or Subject Expert on the <strong>KnowChamp</strong> platform.</p>
 
 <h2>2. Question Quality &amp; Confidentiality</h2>
 <ul>

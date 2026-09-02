@@ -65,7 +65,7 @@ const PublicSupportContact = () => {
           Contact <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">Support</span>
         </h1>
         <p className="text-gray-400 max-w-xl mx-auto text-sm sm:text-base">
-          Have questions about tournaments, scoring, wallet deposits, or withdrawals? We are here to help.
+          Have questions about Contests, scoring, wallet deposits, or withdrawals? We are here to help.
         </p>
       </div>
 
