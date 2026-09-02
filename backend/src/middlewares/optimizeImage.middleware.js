@@ -34,7 +34,8 @@ const optimizeImage = async (req, res, next) => {
       const ext = path.extname(file.originalname || '').toLowerCase();
       if (
         file.mimetype === 'image/svg+xml' ||
-        (!file.mimetype?.startsWith('image/') && !['.jpg', '.jpeg', '.png', '.webp'].includes(ext))
+        ext === '.svg' ||
+        (!file.mimetype?.startsWith('image/') && !['.jpg', '.jpeg', '.png', '.webp', '.svg'].includes(ext))
       ) {
         return;
       }

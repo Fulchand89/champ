@@ -116,8 +116,10 @@ const ScheduleContest = () => {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)) {
-        toast.error('Only JPG, JPEG, PNG, or WEBP images are allowed');
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/svg+xml'];
+      const isSvg = file.name.toLowerCase().endsWith('.svg');
+      if (!validTypes.includes(file.type) && !isSvg) {
+        toast.error('Only JPG, JPEG, PNG, WEBP, or SVG images are allowed');
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
@@ -271,7 +273,11 @@ const ScheduleContest = () => {
         else if (catName.includes('math') || catName.includes('logic')) fallbackImg = '/Knowledge.png';
         else if (catName.includes('general') || catName.includes('gk') || catName.includes('knowledge')) fallbackImg = '/cat-general.png';
 
-        const imgPath = row.image || row.category?.image || row.category?.icon || fallbackImg;
+        const isUrlPath = (pathStr) => pathStr && typeof pathStr === 'string' && (
+          pathStr.startsWith('/') || pathStr.startsWith('http') || pathStr.startsWith('uploads/') || pathStr.startsWith('data:')
+        );
+
+        const imgPath = isUrlPath(row.image) ? row.image : (isUrlPath(row.category?.image) ? row.category.image : (isUrlPath(row.category?.icon) ? row.category.icon : fallbackImg));
         return (
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
@@ -444,11 +450,11 @@ const ScheduleContest = () => {
                     >
                       <Upload size={16} className="text-[#E94B4B]" />
                       <p className="text-xs text-gray-300 font-medium">{imageFile ? imageFile.name : 'Click to select contest image'}</p>
-                      <p className="text-[10px] text-gray-500">JPG, PNG, WEBP (Max 5MB)</p>
+                      <p className="text-[10px] text-gray-500">JPG, PNG, WEBP, SVG (Max 5MB)</p>
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept="image/jpeg,image/png,image/jpg,image/webp"
+                        accept="image/jpeg,image/png,image/jpg,image/webp,image/svg+xml,.svg"
                         className="hidden"
                         onChange={handleFileChange}
                       />

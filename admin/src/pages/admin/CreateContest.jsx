@@ -79,8 +79,10 @@ const CreateContest = () => {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)) {
-        toast.error('Only JPG, JPEG, PNG, or WEBP images are allowed');
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/svg+xml'];
+      const isSvg = file.name.toLowerCase().endsWith('.svg');
+      if (!validTypes.includes(file.type) && !isSvg) {
+        toast.error('Only JPG, JPEG, PNG, WEBP, or SVG images are allowed');
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
@@ -297,11 +299,11 @@ const CreateContest = () => {
               >
                 <Upload size={18} className="text-[#E94B4B]" />
                 <p className="text-xs text-gray-300 font-medium">{imageFile ? imageFile.name : 'Click to select contest image'}</p>
-                <p className="text-[10px] text-gray-500">JPG, PNG, WEBP (Max 5MB)</p>
+                <p className="text-[10px] text-gray-500">JPG, PNG, WEBP, SVG (Max 5MB)</p>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/jpeg,image/png,image/jpg,image/webp"
+                  accept="image/jpeg,image/png,image/jpg,image/webp,image/svg+xml,.svg"
                   className="hidden"
                   onChange={handleFileChange}
                 />

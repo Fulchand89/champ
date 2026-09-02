@@ -136,6 +136,7 @@ const fileFilter = (req, file, cb) => {
     'image/jpg',
     'image/png',
     'image/webp',
+    'image/svg+xml',
   ];
 
   const allowedDocMimes = [
@@ -185,6 +186,7 @@ const fileFilter = (req, file, cb) => {
       '.jpeg',
       '.png',
       '.webp',
+      '.svg',
     ].includes(ext)
   ) {
 
@@ -194,7 +196,7 @@ const fileFilter = (req, file, cb) => {
 
   return cb(
     new Error(
-      'Only JPG, JPEG, PNG, and WEBP image files are allowed'
+      'Only JPG, JPEG, PNG, WEBP, and SVG image files are allowed'
     ),
     false
   );

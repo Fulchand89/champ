@@ -66,7 +66,14 @@ const ContestCard = ({
     );
   }
 
-  const effectiveImage = image || contest?.image || contest?.category?.image || contest?.category?.icon;
+  const isUrlPath = (pathStr) => pathStr && typeof pathStr === 'string' && (
+    pathStr.startsWith('/') || pathStr.startsWith('http') || pathStr.startsWith('uploads/') || pathStr.startsWith('data:')
+  );
+
+  const effectiveImage = isUrlPath(image) ? image :
+    (isUrlPath(contest?.image) ? contest.image :
+    (isUrlPath(contest?.category?.image) ? contest.category.image :
+    (isUrlPath(contest?.category?.icon) ? contest.category.icon : '/cat-general.png')));
 
   const headerBgColor = (() => {
     const cat = (category || '').toLowerCase();

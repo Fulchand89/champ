@@ -127,8 +127,10 @@ const ManageQuizCategories = () => {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(file.type)) {
-        toast.error('Only JPG, JPEG, PNG, or WEBP images are allowed');
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'image/svg+xml'];
+      const isSvg = file.name.toLowerCase().endsWith('.svg');
+      if (!validTypes.includes(file.type) && !isSvg) {
+        toast.error('Only JPG, JPEG, PNG, WEBP, or SVG images are allowed');
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
@@ -282,7 +284,11 @@ const ManageQuizCategories = () => {
         else if (catName.includes('math') || catName.includes('logic')) fallbackImg = '/Knowledge.png';
         else if (catName.includes('general') || catName.includes('gk') || catName.includes('knowledge')) fallbackImg = '/cat-general.png';
 
-        const imgPath = row.image || row.icon || fallbackImg;
+        const isUrlPath = (pathStr) => pathStr && typeof pathStr === 'string' && (
+          pathStr.startsWith('/') || pathStr.startsWith('http') || pathStr.startsWith('uploads/') || pathStr.startsWith('data:')
+        );
+
+        const imgPath = isUrlPath(row.image) ? row.image : (isUrlPath(row.icon) ? row.icon : fallbackImg);
         return (
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
@@ -474,12 +480,12 @@ const ManageQuizCategories = () => {
                     <p className="text-xs text-gray-200 font-semibold">
                       {imageFile ? `Selected: ${imageFile.name}` : 'Click or drop image here to upload'}
                     </p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">Supports JPG, PNG, WEBP</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">Supports JPG, PNG, WEBP, SVG</p>
                   </div>
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/jpeg,image/png,image/jpg,image/webp"
+                    accept="image/jpeg,image/png,image/jpg,image/webp,image/svg+xml,.svg"
                     className="hidden"
                     onChange={handleFileChange}
                   />
