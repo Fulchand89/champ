@@ -7,6 +7,7 @@ import ContestCard from '../../components/know-champ/ContestCard';
 import QuizPlayModal from '../../components/know-champ/QuizPlayModal';
 import { categoryService } from '../../api/services/categoryService';
 import { contestService } from '../../api/services/contestService';
+import { getImageUrl } from '../../api/services/api';
 import { Search, Filter } from 'lucide-react';
 
 const Contest = () => {
@@ -79,7 +80,8 @@ const Contest = () => {
   const getCategoryTheme = (catName = '', catData = {}) => {
     const nameLower = (catName || '').toLowerCase();
     const iconVal = catData?.icon || '';
-    const imgVal = catData?.image || '';
+    // Apply MIME correction before truthy check
+    const imgVal = catData?.image ? getImageUrl(catData.image) : '';
 
     let img = null;
     let icon = iconVal || '📚';
@@ -227,7 +229,7 @@ const Contest = () => {
               const prize = contest.prizePool !== undefined ? parseFloat(contest.prizePool) : (contest.prize || 0);
               const entry = contest.entryFee !== undefined ? parseFloat(contest.entryFee) : (contest.entry || 0);
               const joined = contest.joined !== undefined ? contest.joined : 0;
-              const image = contest.image || catTheme.image || catTheme.icon;
+              const image = getImageUrl(contest.image) || catTheme.image || catTheme.icon;
               const date = contest?.startTime
                 ? new Date(contest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 Am'
                 : (contest?.date || '');

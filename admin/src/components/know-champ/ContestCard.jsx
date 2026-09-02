@@ -67,21 +67,24 @@ const ContestCard = ({
   }
 
   const resolveContestImage = () => {
+    // Apply MIME correction up-front so the truthy check works on valid, renderable URLs
+    const rawImg       = image;
+    const rawContestImg  = contest?.image;
+    const rawCatImg    = contest?.category?.image;
+    const rawCatIcon   = contest?.category?.icon;
+
+    const img1 = rawImg       ? getImageUrl(rawImg)       : '';
+    const img2 = rawContestImg  ? getImageUrl(rawContestImg)  : '';
+    const img3 = rawCatImg    ? getImageUrl(rawCatImg)    : '';
+    const img4 = rawCatIcon   ? getImageUrl(rawCatIcon)   : '';
+
     // 1. Contest's own custom uploaded image
-    if (image && typeof image === 'string' && image.trim() !== '' && image !== '/cat-general.png' && image !== 'cat-general.png') {
-      return image;
-    }
-    if (contest?.image && typeof contest.image === 'string' && contest.image.trim() !== '' && contest.image !== '/cat-general.png' && contest.image !== 'cat-general.png') {
-      return contest.image;
-    }
+    if (img1 && img1 !== '/cat-general.png' && img1 !== 'cat-general.png') return img1;
+    if (img2 && img2 !== '/cat-general.png' && img2 !== 'cat-general.png') return img2;
 
     // 2. Category's custom uploaded image
-    if (contest?.category?.image && typeof contest.category.image === 'string' && contest.category.image.trim() !== '' && contest.category.image !== '/cat-general.png' && contest.category.image !== 'cat-general.png') {
-      return contest.category.image;
-    }
-    if (contest?.category?.icon && typeof contest.category.icon === 'string' && (contest.category.icon.startsWith('data:') || contest.category.icon.startsWith('/') || contest.category.icon.startsWith('http') || contest.category.icon.startsWith('uploads/'))) {
-      return contest.category.icon;
-    }
+    if (img3 && img3 !== '/cat-general.png' && img3 !== 'cat-general.png') return img3;
+    if (img4 && (img4.startsWith('data:') || img4.startsWith('/') || img4.startsWith('http') || img4.startsWith('blob:') || img4.startsWith('uploads/'))) return img4;
 
     // 3. Preset image matching based on Category / Contest Name
     const cat = (category || contest?.category?.name || title || '').toLowerCase();
@@ -141,7 +144,7 @@ const ContestCard = ({
           {category}
         </h3>
         <img
-          src={getImageUrl(effectiveImage || '/cat-general.png')}
+          src={effectiveImage || '/cat-general.png'}
           alt={category}
           className="w-12 h-12 sm:w-14 sm:h-14 object-contain shrink-0 select-none group-hover:scale-105 transition-transform duration-300"
           draggable="false"

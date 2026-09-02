@@ -6,35 +6,34 @@ const CategoryCard = ({ name = '', image, icon, colorClass, borderGlowClass, isL
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-between bg-[#0e1121] border border-gray-800 rounded-2xl p-3 sm:p-4 aspect-square animate-pulse w-full">
-        {/* Image placeholder */}
         <div className="flex-1 flex items-center justify-center">
           <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gray-800/60 rounded-full"></div>
         </div>
-
-        {/* Category name placeholder */}
         <div className="h-3 bg-gray-800/60 rounded w-16 mt-1 sm:mt-2"></div>
       </div>
     );
   }
 
   const resolveImage = () => {
+    // Apply MIME correction up-front so truthy checks work on valid URLs only
+    const resolvedImage = image ? getImageUrl(image) : '';
+    const resolvedIcon  = icon  ? getImageUrl(icon)  : '';
+
     // 1. Custom uploaded image (Data URI, /uploads/, blob, or http URL)
     if (
-      image &&
-      typeof image === 'string' &&
-      image.trim() !== '' &&
-      image !== '/cat-general.png' &&
-      image !== 'cat-general.png'
+      resolvedImage &&
+      resolvedImage.trim() !== '' &&
+      resolvedImage !== '/cat-general.png' &&
+      resolvedImage !== 'cat-general.png'
     ) {
-      return image;
+      return resolvedImage;
     }
     if (
-      icon &&
-      typeof icon === 'string' &&
-      icon.trim() !== '' &&
-      (icon.startsWith('data:') || icon.startsWith('/') || icon.startsWith('http') || icon.startsWith('uploads/'))
+      resolvedIcon &&
+      resolvedIcon.trim() !== '' &&
+      (resolvedIcon.startsWith('data:') || resolvedIcon.startsWith('/') || resolvedIcon.startsWith('http') || resolvedIcon.startsWith('blob:') || resolvedIcon.startsWith('uploads/'))
     ) {
-      return icon;
+      return resolvedIcon;
     }
 
     // 2. Preset image matching based on category name when no custom image was uploaded
@@ -78,7 +77,7 @@ const CategoryCard = ({ name = '', image, icon, colorClass, borderGlowClass, isL
       {/* Category Image */}
       <div className="flex-1 flex items-center justify-center">
         <img
-          src={getImageUrl(finalImg)}
+          src={finalImg}
           alt={name}
           className="w-8 h-8 sm:w-12 sm:h-12 object-contain select-none"
           draggable="false"

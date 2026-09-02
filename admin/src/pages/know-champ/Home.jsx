@@ -23,6 +23,7 @@ import {
 import { featureService } from '../../api/services/featureService';
 import { categoryService } from '../../api/services/categoryService';
 import { contestService } from '../../api/services/contestService';
+import { getImageUrl } from '../../api/services/api';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -113,7 +114,8 @@ const Home = () => {
   const getCategoryTheme = (catName = '', catData = {}) => {
     const nameLower = (catName || '').toLowerCase();
     const iconVal = catData?.icon || '';
-    const imgVal = catData?.image || '';
+    // Apply MIME correction before truthy check
+    const imgVal = catData?.image ? getImageUrl(catData.image) : '';
 
     let img = null;
     let icon = iconVal || '📚';
@@ -333,7 +335,7 @@ const Home = () => {
                   <div key={category.id || index} className="w-[calc((100%-2*0.75rem)/3)] xs:w-[calc((100%-2*0.75rem)/3)] sm:w-[calc((100%-3*1rem)/4)] md:w-[calc((100%-4*1rem)/5)] lg:w-[calc((100%-6*1.25rem)/7)] flex-shrink-0">
                     <CategoryCard
                       name={category.name}
-                      image={category.image || catTheme.image}
+                      image={getImageUrl(category.image) || catTheme.image}
                       colorClass={catTheme.colorClass}
                       borderGlowClass={catTheme.borderGlowClass}
                       onClick={() => navigate(`/contests?category=${encodeURIComponent(category.name.toLowerCase())}`)}
