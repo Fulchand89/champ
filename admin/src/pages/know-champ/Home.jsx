@@ -118,7 +118,7 @@ const Home = () => {
     let img = null;
     let icon = iconVal || '📚';
 
-    // 1. Direct image paths/URLs (custom uploaded image takes top priority)
+    // 1. Direct custom image paths/URLs (custom uploaded image takes top priority)
     const isCustomUpload = imgVal && typeof imgVal === 'string' && imgVal !== '/cat-general.png' && imgVal !== 'cat-general.png' && (
       imgVal.startsWith('/uploads/') ||
       imgVal.startsWith('uploads/') ||
@@ -147,23 +147,29 @@ const Home = () => {
     } else if (iconVal === '💻' || iconVal === '🤖' || nameLower.includes('tech') || nameLower.includes('robot') || nameLower.includes('code') || nameLower.includes('computer')) {
       img = '/cat-technology.png';
       icon = iconVal || '💻';
-    } else if (iconVal === '⚽' || nameLower.includes('sport') || nameLower.includes('cricket') || nameLower.includes('football')) {
+    } else if (iconVal === '⚽' || nameLower.includes('sport') || nameLower.includes('cricket') || nameLower.includes('football') || nameLower.includes('game')) {
       img = '/cat-sports.png';
       icon = '⚽';
-    } else if (iconVal === '🎬' || nameLower.includes('entertain') || nameLower.includes('movie') || nameLower.includes('music') || nameLower.includes('cinema')) {
+    } else if (iconVal === '🎬' || nameLower.includes('entertain') || nameLower.includes('movie') || nameLower.includes('music') || nameLower.includes('cinema') || nameLower.includes('song')) {
       img = '/cat-entertainment.png';
       icon = '🎬';
-    } else if (iconVal === '📜' || nameLower.includes('history')) {
+    } else if (iconVal === '📜' || nameLower.includes('history') || nameLower.includes('culture') || nameLower.includes('geo') || nameLower.includes('earth')) {
       img = '/cat-history.png';
       icon = '📜';
-    } else if (iconVal === '📰' || nameLower.includes('current') || nameLower.includes('news') || nameLower.includes('affair')) {
+    } else if (iconVal === '📰' || nameLower.includes('current') || nameLower.includes('news') || nameLower.includes('affair') || nameLower.includes('today')) {
       img = '/cat-current.png';
       icon = '📰';
-    } else if (nameLower.includes('health') || nameLower.includes('medic')) {
+    } else if (nameLower.includes('health') || nameLower.includes('medic') || nameLower.includes('environ') || nameLower.includes('nature')) {
       img = '/cat-science.png';
       icon = '🩺';
+    } else if (nameLower.includes('brain') || nameLower.includes('math') || nameLower.includes('logic') || nameLower.includes('iq')) {
+      img = '/Knowledge.png';
+      icon = '🧠';
     } else {
-      img = '/cat-general.png';
+      // Deterministic distinct preset image for unknown custom categories so no two categories show the same icon by default
+      const presets = ['/cat-science.png', '/cat-technology.png', '/cat-sports.png', '/cat-entertainment.png', '/cat-history.png', '/cat-current.png', '/Knowledge.png'];
+      const charSum = nameLower.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+      img = presets[charSum % presets.length];
       icon = iconVal || '📚';
     }
 
