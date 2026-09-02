@@ -82,17 +82,23 @@ export const getImageUrl = (imgPath) => {
   // ── Data URI ────────────────────────────────────────────────────────────────
   if (cleanStr.startsWith('data:')) {
     const commaIdx = cleanStr.indexOf(',');
-    if (commaIdx === -1) return ''; // malformed
+    if (commaIdx === -1) return ''; // malformed — no comma separator
 
     const header = cleanStr.slice(5, commaIdx);       // e.g. "image/png;base64"
     const base64Data = cleanStr.slice(commaIdx + 1);
 
-    if (!base64Data || base64Data.length < 16) return ''; // too short to be a real image
+    // Must have enough bytes to decode a real image header (at least 48 base64 chars = 36 bytes)
+    if (!base64Data || base64Data.length < 48) return '';
 
     if (header.includes(';base64')) {
+      // Detect truncation: valid base64 length must be a multiple of 4 (after stripping padding).
+      // A truncated string (e.g. cut at VARCHAR(255)) will almost never align to 4.
+      // We check the raw length after removing any trailing '=' padding chars.
+      const stripped = base64Data.replace(/=+$/, '');
+      if (stripped.length % 4 !== 0) return ''; // truncated — drop it, use fallback image
+
       const declaredMime = header.split(';')[0].trim();
       const realMime = detectMimeFromBase64(base64Data, declaredMime);
-      // Return corrected URI (no-op if MIME was already correct)
       return `data:${realMime};base64,${base64Data}`;
     }
     return cleanStr;

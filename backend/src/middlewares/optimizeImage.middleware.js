@@ -43,8 +43,8 @@ const optimizeImage = async (req, res, next) => {
       try {
         if (file.buffer) {
           const optBuf = await sharp(file.buffer)
-            .resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true })
-            .webp({ quality: 85, effort: 4 })
+            .resize({ width: 256, height: 256, fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 60, effort: 4 })
             .toBuffer();
           file.buffer = optBuf;
           file.mimetype = 'image/webp';
@@ -56,8 +56,8 @@ const optimizeImage = async (req, res, next) => {
           const newPath = path.join(parsedPath.dir, newFilename);
 
           await sharp(originalPath)
-            .resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true })
-            .webp({ quality: 85, effort: 4 })
+            .resize({ width: 256, height: 256, fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 60, effort: 4 })
             .toFile(newPath);
 
           if (fs.existsSync(originalPath) && originalPath !== newPath) {

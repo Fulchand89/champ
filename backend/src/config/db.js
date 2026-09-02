@@ -147,12 +147,11 @@ const connectDB = async (retries = 5, delay = 2000) => {
               await sequelize.query("ALTER TABLE `contests` ADD COLUMN `numQuestions` INT DEFAULT 10");
             }
             if (!colNames.includes('image')) {
-              await sequelize.query("ALTER TABLE `contests` ADD COLUMN `image` LONGTEXT NULL");
+              await sequelize.query("ALTER TABLE `contests` ADD COLUMN `image` MEDIUMTEXT NULL");
+            } else {
+              // Always attempt to widen in case it was created as VARCHAR(255) or TEXT
+              await sequelize.query("ALTER TABLE `contests` MODIFY COLUMN `image` MEDIUMTEXT NULL");
             }
-            try {
-              await sequelize.query("ALTER TABLE `contests` MODIFY COLUMN `image` LONGTEXT NULL");
-              await sequelize.query("UPDATE `contests` SET `image` = NULL WHERE `image` LIKE 'data:%' AND CHAR_LENGTH(`image`) < 1000");
-            } catch (mErr) {}
             if (!colNames.includes('durationPerQuestion')) {
               await sequelize.query("ALTER TABLE `contests` ADD COLUMN `durationPerQuestion` INT DEFAULT 15");
             }
@@ -165,12 +164,19 @@ const connectDB = async (retries = 5, delay = 2000) => {
               const [catCols] = await sequelize.query("SHOW COLUMNS FROM `categories`");
               const catColNames = catCols.map(c => c.Field);
               if (!catColNames.includes('image')) {
-                await sequelize.query("ALTER TABLE `categories` ADD COLUMN `image` LONGTEXT NULL");
+                await sequelize.query("ALTER TABLE `categories` ADD COLUMN `image` MEDIUMTEXT NULL");
+              } else {
+                // Always attempt to widen the column in case it was created as VARCHAR(255) or TEXT
+                await sequelize.query("ALTER TABLE `categories` MODIFY COLUMN `image` MEDIUMTEXT NULL");
               }
-              await sequelize.query("ALTER TABLE `categories` MODIFY COLUMN `image` LONGTEXT NULL");
-              await sequelize.query("UPDATE `categories` SET `image` = NULL WHERE `image` LIKE 'data:%' AND CHAR_LENGTH(`image`) < 1000");
+              if (!catColNames.includes('icon')) {
+                await sequelize.query("ALTER TABLE `categories` ADD COLUMN `icon` VARCHAR(255) NULL DEFAULT '📚'");
+              }
+              if (!catColNames.includes('colorClass')) {
+                await sequelize.query("ALTER TABLE `categories` ADD COLUMN `colorClass` VARCHAR(255) NULL");
+              }
             } catch (catErr) {
-              logger.warn('Category image column check notice:', catErr.message);
+              logger.warn('Category column auto-migration notice:', catErr.message);
             }
 
             // Ensure missing columns exist in users table
