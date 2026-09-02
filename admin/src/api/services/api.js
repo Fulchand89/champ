@@ -34,22 +34,24 @@ const api = axios.create({
  * Resolves uploaded backend image paths (/uploads/...) and public local assets safely
  */
 export const getImageUrl = (imgPath) => {
-  if (!imgPath) return '';
-  if (typeof imgPath !== 'string') return '';
-  if (
-    imgPath.startsWith('data:') ||
-    imgPath.startsWith('http://') ||
-    imgPath.startsWith('https://') ||
-    imgPath.startsWith('blob:')
-  ) {
-    return imgPath;
+  if (!imgPath || typeof imgPath !== 'string') return '';
+  const cleanStr = imgPath.trim();
+  if (cleanStr.startsWith('data:')) {
+    return cleanStr.replace(/[\r\n\s]+/g, '');
   }
-  if (imgPath.startsWith('/uploads/') || imgPath.startsWith('uploads/')) {
-    const cleanPath = imgPath.startsWith('/') ? imgPath : `/${imgPath}`;
+  if (
+    cleanStr.startsWith('http://') ||
+    cleanStr.startsWith('https://') ||
+    cleanStr.startsWith('blob:')
+  ) {
+    return cleanStr;
+  }
+  if (cleanStr.startsWith('/uploads/') || cleanStr.startsWith('uploads/')) {
+    const cleanPath = cleanStr.startsWith('/') ? cleanStr : `/${cleanStr}`;
     const backendOrigin = RAW_BASE_URL.replace(/\/api\/v1\/?$/, '');
     return `${backendOrigin}${cleanPath}`;
   }
-  return imgPath;
+  return cleanStr;
 };
 
 // Request interceptor to inject JWT bearer token & adjust FormData headers

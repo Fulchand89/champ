@@ -61,7 +61,8 @@ const processUploadedFile = (file, fallbackDir = 'others') => {
       else if (ext === '.jpg' || ext === '.jpeg') mimeType = 'image/jpeg';
       else if (ext === '.png') mimeType = 'image/png';
       else if (ext === '.webp') mimeType = 'image/webp';
-      return `data:${mimeType};base64,${fileBuf.toString('base64')}`;
+      const cleanB64 = fileBuf.toString('base64').replace(/[\r\n\s]+/g, '');
+      return `data:${mimeType};base64,${cleanB64}`;
     }
   } catch (err) {
     console.warn('Error converting file to Data URI:', err.message);

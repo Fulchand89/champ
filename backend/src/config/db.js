@@ -147,8 +147,12 @@ const connectDB = async (retries = 5, delay = 2000) => {
               await sequelize.query("ALTER TABLE `contests` ADD COLUMN `numQuestions` INT DEFAULT 10");
             }
             if (!colNames.includes('image')) {
-              await sequelize.query("ALTER TABLE `contests` ADD COLUMN `image` VARCHAR(255) NULL");
+              await sequelize.query("ALTER TABLE `contests` ADD COLUMN `image` LONGTEXT NULL");
             }
+            try {
+              await sequelize.query("ALTER TABLE `contests` MODIFY COLUMN `image` LONGTEXT NULL");
+              await sequelize.query("UPDATE `contests` SET `image` = NULL WHERE `image` LIKE 'data:%' AND CHAR_LENGTH(`image`) < 1000");
+            } catch (mErr) {}
             if (!colNames.includes('durationPerQuestion')) {
               await sequelize.query("ALTER TABLE `contests` ADD COLUMN `durationPerQuestion` INT DEFAULT 15");
             }
@@ -161,8 +165,10 @@ const connectDB = async (retries = 5, delay = 2000) => {
               const [catCols] = await sequelize.query("SHOW COLUMNS FROM `categories`");
               const catColNames = catCols.map(c => c.Field);
               if (!catColNames.includes('image')) {
-                await sequelize.query("ALTER TABLE `categories` ADD COLUMN `image` VARCHAR(255) NULL");
+                await sequelize.query("ALTER TABLE `categories` ADD COLUMN `image` LONGTEXT NULL");
               }
+              await sequelize.query("ALTER TABLE `categories` MODIFY COLUMN `image` LONGTEXT NULL");
+              await sequelize.query("UPDATE `categories` SET `image` = NULL WHERE `image` LIKE 'data:%' AND CHAR_LENGTH(`image`) < 1000");
             } catch (catErr) {
               logger.warn('Category image column check notice:', catErr.message);
             }
