@@ -173,7 +173,7 @@ const ManageUsers = () => {
         toast.error(res?.message || 'Failed to create user');
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Error creating user');
+      toast.error(err.response?.data?.message || err.response?.data?.error || err.message || 'Error creating user');
     } finally {
       setIsSaving(false);
     }

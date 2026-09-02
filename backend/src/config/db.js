@@ -147,6 +147,14 @@ const connectDB = async (retries = 5, delay = 2000) => {
             // Ensure missing columns exist in categories table
             try {
               const [catCols] = await sequelize.query("SHOW COLUMNS FROM `categories`");
+              const catColNames = catCols.map(c => c.Field);
+              if (!catColNames.includes('image')) {
+                await sequelize.query("ALTER TABLE `categories` ADD COLUMN `image` VARCHAR(255) NULL");
+              }
+            } catch (catErr) {
+              logger.warn('Category image column check notice:', catErr.message);
+            }
+
             // Ensure missing columns exist in users table
             try {
               const [userCols] = await sequelize.query("SHOW COLUMNS FROM `users`");

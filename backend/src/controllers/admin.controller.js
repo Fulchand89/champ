@@ -1415,26 +1415,41 @@ const createUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: 'Name and email are required' });
   }
 
-  const existingEmail = await authRepository.findByEmail(email);
+  const existingEmail = await authRepository.findByEmail(email.trim());
   if (existingEmail) {
     return res.status(400).json({ success: false, message: 'User with this email already exists' });
   }
 
-  const newUser = await authRepository.create({
-    name,
-    email,
-    dob: dob || null,
-    panNumber: panNumber ? panNumber.toUpperCase() : null,
-    adharNumber: aadhaarNumber || adharNumber || null,
-    address: address || null,
-    mobile: mobile || null,
-    password: password || 'KnowChamp@123',
-    city: city || 'New Delhi',
-    role: role || 'user',
-    isActive: isActive !== undefined ? isActive : true,
-    isVerified: 'approved',
-    isTermAccpeted: true,
-  });
+  const cleanMobile = (mobile && String(mobile).trim()) ? String(mobile).trim() : null;
+  if (cleanMobile) {
+    const existingMobile = await authRepository.findByMobile(cleanMobile);
+    if (existingMobile) {
+      return res.status(400).json({ success: false, message: 'User with this mobile number already exists' });
+    }
+  }
+
+  let newUser;
+  try {
+    newUser = await authRepository.create({
+      name: name.trim(),
+      email: email.trim(),
+      dob: dob || null,
+      panNumber: panNumber ? panNumber.trim().toUpperCase() : null,
+      adharNumber: (aadhaarNumber || adharNumber) ? String(aadhaarNumber || adharNumber).trim() : null,
+      address: address ? address.trim() : null,
+      mobile: cleanMobile,
+      password: password || 'KnowChamp@123',
+      city: (city && String(city).trim()) ? String(city).trim() : 'New Delhi',
+      role: role || 'user',
+      isActive: isActive !== undefined ? parseBool(isActive) : true,
+      isVerified: 'approved',
+      isTermAccpeted: true,
+    });
+  } catch (createErr) {
+    console.error('Error creating user record:', createErr);
+    const msg = createErr.original?.sqlMessage || createErr.errors?.[0]?.message || createErr.message || 'Failed to create user record';
+    return res.status(400).json({ success: false, message: msg });
+  }
 
   try {
     notificationService.createNotification({
