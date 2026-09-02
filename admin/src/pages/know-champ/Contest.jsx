@@ -84,17 +84,33 @@ const Contest = () => {
     let img = null;
     let icon = iconVal || '📚';
 
-    // 1. Direct image paths/URLs (uploaded image takes top priority)
-    if (imgVal && typeof imgVal === 'string') {
+    // 1. Direct image paths/URLs (custom uploaded image takes top priority)
+    const isCustomUpload = imgVal && typeof imgVal === 'string' && imgVal !== '/cat-general.png' && imgVal !== 'cat-general.png' && (
+      imgVal.startsWith('/uploads/') ||
+      imgVal.startsWith('uploads/') ||
+      imgVal.startsWith('data:') ||
+      imgVal.startsWith('http://') ||
+      imgVal.startsWith('https://')
+    );
+
+    const isCustomIcon = iconVal && typeof iconVal === 'string' && (
+      iconVal.startsWith('/uploads/') ||
+      iconVal.startsWith('uploads/') ||
+      iconVal.startsWith('data:') ||
+      iconVal.startsWith('http://') ||
+      iconVal.startsWith('https://')
+    );
+
+    if (isCustomUpload) {
       img = imgVal;
-    } else if (iconVal && typeof iconVal === 'string' && (iconVal.startsWith('/') || iconVal.startsWith('http') || iconVal.startsWith('data:') || iconVal.startsWith('uploads/'))) {
+    } else if (isCustomIcon) {
       img = iconVal;
     } 
     // 2. Preset image mappings based on icon emoji or keyword
     else if (iconVal === '🔬' || nameLower.includes('science')) {
       img = '/cat-science.png';
       icon = '🔬';
-    } else if (iconVal === '💻' || iconVal === '🤖' || nameLower.includes('tech') || nameLower.includes('robot') || nameLower.includes('code')) {
+    } else if (iconVal === '💻' || iconVal === '🤖' || nameLower.includes('tech') || nameLower.includes('robot') || nameLower.includes('code') || nameLower.includes('computer')) {
       img = '/cat-technology.png';
       icon = iconVal || '💻';
     } else if (iconVal === '⚽' || nameLower.includes('sport') || nameLower.includes('cricket') || nameLower.includes('football')) {
@@ -109,9 +125,9 @@ const Contest = () => {
     } else if (iconVal === '📰' || nameLower.includes('current') || nameLower.includes('news') || nameLower.includes('affair')) {
       img = '/cat-current.png';
       icon = '📰';
-    } else if (iconVal === '📚' || nameLower.includes('general') || nameLower.includes('gk') || nameLower.includes('knowledge')) {
-      img = '/cat-general.png';
-      icon = '📚';
+    } else if (nameLower.includes('health') || nameLower.includes('medic')) {
+      img = '/cat-science.png';
+      icon = '🩺';
     } else {
       img = '/cat-general.png';
       icon = iconVal || '📚';

@@ -779,9 +779,9 @@ const createCategory = asyncHandler(async (req, res) => {
     imageUrl = req.body.image.trim();
   }
 
-  // Fallback to default placeholder if not uploaded
+  // Set imageUrl = null if no custom image was uploaded (preset theme matcher handles default image)
   if (!imageUrl) {
-    imageUrl = '/cat-general.png';
+    imageUrl = null;
   }
 
   const category = await Category.create({
