@@ -180,19 +180,10 @@ const ManageQuizCategories = () => {
         formData.append('colorClass', jsonPayload.colorClass);
         formData.append('isActive', String(jsonPayload.isActive));
         formData.append('image', imageFile);
-        try {
-          if (modalType === 'add') {
-            res = await categoryService.createCategory(formData);
-          } else {
-            res = await categoryService.updateCategory(currentCategory.id, formData);
-          }
-        } catch (formErr) {
-          console.warn('FormData category save failed, retrying with JSON:', formErr);
-          if (modalType === 'add') {
-            res = await categoryService.createCategory(jsonPayload);
-          } else {
-            res = await categoryService.updateCategory(currentCategory.id, jsonPayload);
-          }
+        if (modalType === 'add') {
+          res = await categoryService.createCategory(formData);
+        } else {
+          res = await categoryService.updateCategory(currentCategory.id, formData);
         }
       } else {
         if (modalType === 'add') {

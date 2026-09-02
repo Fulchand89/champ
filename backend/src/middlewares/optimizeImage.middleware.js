@@ -29,7 +29,7 @@ const optimizeImage = async (req, res, next) => {
 
   try {
     await Promise.all(filesToProcess.map(async (file) => {
-      if (!file || !file.path || !fs.existsSync(file.path)) return;
+      if (!file || (!file.buffer && (!file.path || !fs.existsSync(file.path)))) return;
 
       const ext = path.extname(file.originalname || '').toLowerCase();
       if (
@@ -40,29 +40,35 @@ const optimizeImage = async (req, res, next) => {
         return;
       }
 
-      const originalPath = file.path;
-      const parsedPath = path.parse(originalPath);
-      
-      const newFilename = `${parsedPath.name}-opt.webp`;
-      const newPath = path.join(parsedPath.dir, newFilename);
-
       try {
-        await sharp(originalPath)
-          .resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true }) 
-          .webp({ quality: 85, effort: 4 })
-          .toFile(newPath);
+        if (file.buffer) {
+          const optBuf = await sharp(file.buffer)
+            .resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 85, effort: 4 })
+            .toBuffer();
+          file.buffer = optBuf;
+          file.mimetype = 'image/webp';
+          file.size = optBuf.length;
+        } else {
+          const originalPath = file.path;
+          const parsedPath = path.parse(originalPath);
+          const newFilename = `${parsedPath.name}-opt.webp`;
+          const newPath = path.join(parsedPath.dir, newFilename);
 
-        if (fs.existsSync(originalPath) && originalPath !== newPath) {
-          try { fs.unlinkSync(originalPath); } catch (err) {}
+          await sharp(originalPath)
+            .resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 85, effort: 4 })
+            .toFile(newPath);
+
+          if (fs.existsSync(originalPath) && originalPath !== newPath) {
+            try { fs.unlinkSync(originalPath); } catch (err) {}
+          }
+
+          file.path = newPath;
+          file.filename = newFilename;
+          file.mimetype = 'image/webp';
+          try { file.size = fs.statSync(newPath).size; } catch (statErr) {}
         }
-
-        file.path = newPath;
-        file.filename = newFilename;
-        file.mimetype = 'image/webp';
-        
-        try {
-          file.size = fs.statSync(newPath).size;
-        } catch (statErr) {}
       } catch (sharpErr) {
         console.warn(`Sharp processing skipped for ${file.originalname}:`, sharpErr.message);
       }

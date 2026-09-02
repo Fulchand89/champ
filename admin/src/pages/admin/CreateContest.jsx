@@ -167,13 +167,7 @@ const CreateContest = () => {
           formData.append(key, val);
         });
         formData.append('image', imageFile);
-        try {
-          res = await contestService.createContest(formData);
-        } catch (formDataErr) {
-          // If multer/multipart fails on backend, fallback to json
-          console.warn('FormData submission failed, retrying with JSON payload:', formDataErr);
-          res = await contestService.createContest(jsonPayload);
-        }
+        res = await contestService.createContest(formData);
       } else {
         res = await contestService.createContest(jsonPayload);
       }

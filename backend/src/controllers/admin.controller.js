@@ -47,8 +47,14 @@ const writeJsonFile = (filePath, data) => {
 const processUploadedFile = (file, fallbackDir = 'others') => {
   if (!file) return null;
   try {
-    if (file.path && fs.existsSync(file.path)) {
-      const fileBuf = fs.readFileSync(file.path);
+    let fileBuf = null;
+    if (file.buffer) {
+      fileBuf = file.buffer;
+    } else if (file.path && fs.existsSync(file.path)) {
+      fileBuf = fs.readFileSync(file.path);
+    }
+
+    if (fileBuf) {
       const ext = path.extname(file.originalname || file.filename || '').toLowerCase();
       let mimeType = file.mimetype || 'image/png';
       if (ext === '.svg') mimeType = 'image/svg+xml';
@@ -60,7 +66,7 @@ const processUploadedFile = (file, fallbackDir = 'others') => {
   } catch (err) {
     console.warn('Error converting file to Data URI:', err.message);
   }
-  return `/uploads/${fallbackDir}/${file.filename}`;
+  return file.filename ? `/uploads/${fallbackDir}/${file.filename}` : null;
 };
 
 // Helper to parse booleans

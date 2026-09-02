@@ -167,19 +167,10 @@ const ScheduleContest = () => {
         if (!imagePreview && currentContest?.image) {
           formData.append('removeImage', 'true');
         }
-        try {
-          if (modalType === 'add') {
-            res = await contestService.createContest(formData);
-          } else {
-            res = await contestService.updateContest(currentContest.id, formData);
-          }
-        } catch (formErr) {
-          console.warn('FormData submission failed, retrying with JSON payload:', formErr);
-          if (modalType === 'add') {
-            res = await contestService.createContest(jsonPayload);
-          } else {
-            res = await contestService.updateContest(currentContest.id, jsonPayload);
-          }
+        if (modalType === 'add') {
+          res = await contestService.createContest(formData);
+        } else {
+          res = await contestService.updateContest(currentContest.id, formData);
         }
       } else {
         if (modalType === 'add') {
