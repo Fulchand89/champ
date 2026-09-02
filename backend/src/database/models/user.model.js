@@ -64,6 +64,21 @@ const User = sequelize.define('User', {
     allowNull: true,
     comment: 'City of residence/operation of the user',
   },
+  dob: {
+    type: DataTypes.DATEONLY,
+    allowNull: true,
+    comment: 'Date of Birth of the user',
+  },
+  panNumber: {
+    type: DataTypes.STRING(20),
+    allowNull: true,
+    comment: '10-character PAN Card number',
+  },
+  address: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: 'Complete residential address of the user',
+  },
   adharNumber: {
     type: DataTypes.STRING(20),
     allowNull: true,

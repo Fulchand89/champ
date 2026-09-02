@@ -147,12 +147,21 @@ const connectDB = async (retries = 5, delay = 2000) => {
             // Ensure missing columns exist in categories table
             try {
               const [catCols] = await sequelize.query("SHOW COLUMNS FROM `categories`");
-              const catColNames = catCols.map(c => c.Field);
-              if (!catColNames.includes('image')) {
-                await sequelize.query("ALTER TABLE `categories` ADD COLUMN `image` VARCHAR(255) NULL");
+            // Ensure missing columns exist in users table
+            try {
+              const [userCols] = await sequelize.query("SHOW COLUMNS FROM `users`");
+              const userColNames = userCols.map(c => c.Field);
+              if (!userColNames.includes('dob')) {
+                await sequelize.query("ALTER TABLE `users` ADD COLUMN `dob` DATE NULL");
               }
-            } catch (catErr) {
-              logger.warn('Category image column check notice:', catErr.message);
+              if (!userColNames.includes('panNumber')) {
+                await sequelize.query("ALTER TABLE `users` ADD COLUMN `panNumber` VARCHAR(20) NULL");
+              }
+              if (!userColNames.includes('address')) {
+                await sequelize.query("ALTER TABLE `users` ADD COLUMN `address` TEXT NULL");
+              }
+            } catch (uErr) {
+              logger.warn('User columns check notice:', uErr.message);
             }
 
             // Ensure missing columns exist in contest_participants table

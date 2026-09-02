@@ -71,16 +71,17 @@ const ManageUsers = () => {
           rawId: u.id,
           name: u.name,
           email: u.email,
-          mobile: u.mobile || '-',
-          city: u.city || '-',
+          dob: u.dob ? (u.dob.includes('T') ? u.dob.split('T')[0] : u.dob) : '-',
+          rawDob: u.dob || '',
+          panNumber: u.panNumber || u.pan_number || '-',
+          aadhaarNumber: u.aadhaarNumber || u.adharNumber || u.aadhaar_number || u.adhar_number || '-',
+          address: u.address || '-',
           role: u.role || 'user',
           joined: new Date(u.createdAt).toLocaleDateString('en-GB', {
             day: 'numeric',
             month: 'short',
             year: 'numeric'
           }),
-          quizzesPlayed: u.quizzesPlayed || 0,
-          coinsEarned: u.coinsEarned || 0,
           isActive: !!u.isActive,
           status: u.isActive ? 'Active' : 'Blocked',
           raw: u,
@@ -191,8 +192,10 @@ const ManageUsers = () => {
     try {
       const res = await userService.updateUser(selectedUser.rawId, {
         name: formData.name,
-        mobile: formData.mobile,
-        city: formData.city,
+        dob: formData.dob,
+        panNumber: formData.panNumber,
+        aadhaarNumber: formData.aadhaarNumber,
+        address: formData.address,
         role: formData.role,
         isActive: isTargetAdmin ? true : formData.isActive,
       });
@@ -273,8 +276,10 @@ const ManageUsers = () => {
     setFormData({
       name: user.name || '',
       email: user.email || '',
-      mobile: user.mobile === '-' ? '' : user.mobile,
-      city: user.city === '-' ? '' : user.city,
+      dob: user.rawDob || (user.dob !== '-' ? user.dob : ''),
+      panNumber: user.panNumber === '-' ? '' : user.panNumber,
+      aadhaarNumber: user.aadhaarNumber === '-' ? '' : user.aadhaarNumber,
+      address: user.address === '-' ? '' : user.address,
       role: user.role || 'user',
       isActive: user.isActive,
     });
@@ -308,7 +313,7 @@ const ManageUsers = () => {
     { key: 'id', label: 'User ID', cellClassName: 'font-mono text-[#E94B4B] font-bold' },
     { 
       key: 'name', 
-      label: 'Name', 
+      label: 'Full Name', 
       render: (_, row) => {
         const isAdmin = row.role === 'admin' || row.role === 'super_admin';
         return (
@@ -331,11 +336,10 @@ const ManageUsers = () => {
         );
       }
     },
-    { key: 'mobile', label: 'Mobile' },
-    { key: 'city', label: 'City' },
-    { key: 'joined', label: 'Date Joined' },
-    { key: 'quizzesPlayed', label: 'Quizzes', headerClassName: 'text-center', cellClassName: 'text-center font-semibold' },
-    { key: 'coinsEarned', label: 'Coins', headerClassName: 'text-center', cellClassName: 'text-center text-amber-400 font-bold' },
+    { key: 'dob', label: 'DOB', cellClassName: 'text-xs text-white/80' },
+    { key: 'panNumber', label: 'PAN Card Number', cellClassName: 'font-mono text-xs text-amber-300 uppercase' },
+    { key: 'aadhaarNumber', label: 'Aadhaar Card Number', cellClassName: 'font-mono text-xs text-blue-300' },
+    { key: 'address', label: 'Complete Address', cellClassName: 'text-xs text-white/70 max-w-[200px] truncate' },
     {
       key: 'status',
       label: 'Status',
@@ -805,13 +809,13 @@ const ManageUsers = () => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                    Mobile Number
+                    Date of Birth (DOB)
                   </label>
                   <input
-                    type="text"
-                    value={formData.mobile}
-                    onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
-                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
+                    type="date"
+                    value={formData.dob}
+                    onChange={(e) => setFormData(prev => ({ ...prev, dob: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B] [color-scheme:dark]"
                   />
                 </div>
               </div>
@@ -819,15 +823,43 @@ const ManageUsers = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                    City
+                    PAN Card Number
                   </label>
                   <input
                     type="text"
-                    value={formData.city}
-                    onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                    maxLength={10}
+                    value={formData.panNumber}
+                    onChange={(e) => setFormData(prev => ({ ...prev, panNumber: e.target.value.toUpperCase() }))}
+                    className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B] uppercase"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    Aadhaar Card Number
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={12}
+                    value={formData.aadhaarNumber}
+                    onChange={(e) => setFormData(prev => ({ ...prev, aadhaarNumber: e.target.value.replace(/\D/g, '') }))}
                     className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B]"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                  Complete Address
+                </label>
+                <textarea
+                  rows={2}
+                  value={formData.address}
+                  onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 text-sm bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#E94B4B] resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
                     System Role
@@ -841,32 +873,30 @@ const ManageUsers = () => {
                     <option value="admin">Administrator</option>
                   </select>
                 </div>
-              </div>
-
-              <div className="pt-1">
-                <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                  Account Status
-                </label>
-                {(selectedUser?.role === 'admin' || selectedUser?.role === 'super_admin') ? (
-                  <div>
-                    <input
-                      type="text"
-                      disabled
-                      value="Active (Protected Admin)"
-                      className="w-full px-3.5 py-2.5 text-sm bg-blue-500/10 border border-blue-500/30 rounded-xl text-blue-400 font-bold cursor-not-allowed"
-                    />
-                    <p className="text-[11px] text-amber-400/80 mt-1">Admin accounts are protected and cannot be deactivated.</p>
-                  </div>
-                ) : (
-                  <select
-                    value={formData.isActive ? 'active' : 'blocked'}
-                    onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.value === 'active' }))}
-                    className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
-                  >
-                    <option value="active">Active</option>
-                    <option value="blocked">Blocked</option>
-                  </select>
-                )}
+                <div>
+                  <label className="block text-xs font-bold text-white/70 uppercase tracking-wider mb-1.5">
+                    Account Status
+                  </label>
+                  {(selectedUser?.role === 'admin' || selectedUser?.role === 'super_admin') ? (
+                    <div>
+                      <input
+                        type="text"
+                        disabled
+                        value="Active (Protected Admin)"
+                        className="w-full px-3.5 py-2.5 text-sm bg-blue-500/10 border border-blue-500/30 rounded-xl text-blue-400 font-bold cursor-not-allowed"
+                      />
+                    </div>
+                  ) : (
+                    <select
+                      value={formData.isActive ? 'active' : 'blocked'}
+                      onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.value === 'active' }))}
+                      className="w-full px-3.5 py-2.5 text-sm bg-[#161922] border border-white/10 rounded-xl text-white focus:outline-none focus:border-[#E94B4B]"
+                    >
+                      <option value="active">Active</option>
+                      <option value="blocked">Blocked</option>
+                    </select>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
@@ -924,32 +954,40 @@ const ManageUsers = () => {
 
               <div className="space-y-3 text-xs">
                 <div className="flex justify-between py-1.5 border-b border-white/5">
-                  <span className="text-white/50">Email</span>
+                  <span className="text-white/50">Full Name</span>
+                  <span className="font-semibold text-white">{selectedUser.name}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-white/5">
+                  <span className="text-white/50">Email Address</span>
                   <span className="font-semibold text-white">{selectedUser.email}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-white/5">
-                  <span className="text-white/50">Mobile</span>
-                  <span className="font-semibold text-white">{selectedUser.mobile}</span>
+                  <span className="text-white/50">Date of Birth (DOB)</span>
+                  <span className="font-semibold text-white">{selectedUser.dob}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-white/5">
-                  <span className="text-white/50">City</span>
-                  <span className="font-semibold text-white">{selectedUser.city}</span>
+                  <span className="text-white/50">PAN Card Number</span>
+                  <span className="font-mono font-semibold text-amber-300 uppercase">{selectedUser.panNumber}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-white/5">
-                  <span className="text-white/50">Role</span>
+                  <span className="text-white/50">Aadhaar Card Number</span>
+                  <span className="font-mono font-semibold text-blue-300">{selectedUser.aadhaarNumber}</span>
+                </div>
+                <div className="flex flex-col gap-1 py-1.5 border-b border-white/5">
+                  <span className="text-white/50">Complete Address</span>
+                  <span className="font-semibold text-white leading-relaxed">{selectedUser.address}</span>
+                </div>
+                <div className="flex justify-between py-1.5 border-b border-white/5">
+                  <span className="text-white/50">System Role</span>
                   <span className="font-semibold text-white capitalize">{selectedUser.role}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-white/5">
-                  <span className="text-white/50">Date Joined</span>
-                  <span className="font-semibold text-white">{selectedUser.joined}</span>
-                </div>
-                <div className="flex justify-between py-1.5 border-b border-white/5">
-                  <span className="text-white/50">Quizzes Played</span>
-                  <span className="font-bold text-white">{selectedUser.quizzesPlayed}</span>
+                  <span className="text-white/50">Account Status</span>
+                  <span className={`font-bold ${selectedUser.isActive ? 'text-green-400' : 'text-red-400'}`}>{selectedUser.status}</span>
                 </div>
                 <div className="flex justify-between py-1.5">
-                  <span className="text-white/50">Coins Earned</span>
-                  <span className="font-bold text-amber-400">{selectedUser.coinsEarned}</span>
+                  <span className="text-white/50">Date Joined</span>
+                  <span className="font-semibold text-white">{selectedUser.joined}</span>
                 </div>
               </div>
 

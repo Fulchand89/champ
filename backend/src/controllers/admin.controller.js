@@ -1410,7 +1410,7 @@ const getUserById = asyncHandler(async (req, res) => {
 });
 
 const createUser = asyncHandler(async (req, res) => {
-  const { name, email, mobile, password, city, role = 'user', isActive = true } = req.body;
+  const { name, email, dob, panNumber, aadhaarNumber, adharNumber, address, mobile, password, city, role = 'user', isActive = true } = req.body;
   if (!name || !email) {
     return res.status(400).json({ success: false, message: 'Name and email are required' });
   }
@@ -1423,6 +1423,10 @@ const createUser = asyncHandler(async (req, res) => {
   const newUser = await authRepository.create({
     name,
     email,
+    dob: dob || null,
+    panNumber: panNumber ? panNumber.toUpperCase() : null,
+    adharNumber: aadhaarNumber || adharNumber || null,
+    address: address || null,
     mobile: mobile || null,
     password: password || 'KnowChamp@123',
     city: city || 'New Delhi',
@@ -1456,7 +1460,7 @@ const updateUser = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: 'User not found' });
   }
 
-  const { name, mobile, city, role, isActive } = req.body;
+  const { name, dob, panNumber, aadhaarNumber, adharNumber, address, mobile, city, role, isActive } = req.body;
 
   // Protect Admin / Super Admin users from being deactivated
   const isTargetAdmin = user.role === 'admin' || user.role === 'super_admin';
@@ -1469,8 +1473,12 @@ const updateUser = asyncHandler(async (req, res) => {
 
   const updates = {};
   if (name !== undefined) updates.name = name.trim();
-  if (mobile !== undefined) updates.mobile = mobile.trim();
-  if (city !== undefined) updates.city = city.trim();
+  if (dob !== undefined) updates.dob = dob ? dob : null;
+  if (panNumber !== undefined) updates.panNumber = panNumber ? panNumber.trim().toUpperCase() : null;
+  if (aadhaarNumber !== undefined || adharNumber !== undefined) updates.adharNumber = (aadhaarNumber || adharNumber) ? (aadhaarNumber || adharNumber).trim() : null;
+  if (address !== undefined) updates.address = address ? address.trim() : null;
+  if (mobile !== undefined) updates.mobile = mobile ? mobile.trim() : null;
+  if (city !== undefined) updates.city = city ? city.trim() : null;
   if (role !== undefined) updates.role = role;
   if (isActive !== undefined) updates.isActive = isTargetAdmin ? true : isActive;
 
