@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, RotateCw, Plus, Edit, Trash2, X, Upload, Image as ImageIcon } from 'lucide-react';
 import Table from '../../components/common/Table';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import { categoryService } from '../../api/services/categoryService';
 import { getImageUrl } from '../../api/services/api';
 import toast from 'react-hot-toast';
@@ -14,6 +15,11 @@ const ManageQuizCategories = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add'); // 'add' | 'edit'
   const [currentCategory, setCurrentCategory] = useState(null);
+
+  // Delete modal states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Form states
   const [name, setName] = useState('');
@@ -212,18 +218,27 @@ const ManageQuizCategories = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      try {
-        const res = await categoryService.deleteCategory(id);
-        if (res?.success) {
-          toast.success('Category deleted successfully');
-          fetchCategories();
-        }
-      } catch (err) {
-        console.error('Error deleting category:', err);
-        toast.error('Failed to delete category');
+  const handleOpenDeleteModal = (catId) => {
+    setCategoryToDelete(catId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!categoryToDelete) return;
+    setDeleting(true);
+    try {
+      const res = await categoryService.deleteCategory(categoryToDelete);
+      if (res?.success) {
+        toast.success('Category deleted successfully');
+        fetchCategories();
+        setDeleteModalOpen(false);
+        setCategoryToDelete(null);
       }
+    } catch (err) {
+      console.error('Error deleting category:', err);
+      toast.error('Failed to delete category');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -315,7 +330,7 @@ const ManageQuizCategories = () => {
             <Edit size={16} />
           </button>
           <button
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleOpenDeleteModal(row.id)}
             className="p-1 text-red-500/70 hover:text-red-500 rounded transition-colors cursor-pointer"
           >
             <Trash2 size={16} />
@@ -556,6 +571,24 @@ const ManageQuizCategories = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Category Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          if (!deleting) {
+            setDeleteModalOpen(false);
+            setCategoryToDelete(null);
+          }
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Category?"
+        message={"Are you sure you want to delete this category?\nThis action cannot be undone."}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={deleting}
+      />
     </div>
   );
 };

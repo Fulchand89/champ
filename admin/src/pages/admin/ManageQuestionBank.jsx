@@ -15,6 +15,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import Table from '../../components/common/Table';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import { questionService } from '../../api/services/questionService';
 import { categoryService } from '../../api/services/categoryService';
 import { subjectService } from '../../api/services/subjectService';
@@ -50,6 +51,11 @@ const ManageQuestionBank = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add'); // 'add' | 'edit'
   const [currentQuestion, setCurrentQuestion] = useState(null);
+
+  // Delete modal states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Form states for Add / Edit Screen
   const [formCategoryId, setFormCategoryId] = useState('');
@@ -314,20 +320,30 @@ const ManageQuestionBank = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this question?')) {
-      try {
-        const res = await questionService.deleteQuestion(id);
-        if (res?.success) {
-          toast.success('Question deleted successfully');
-          fetchQuestions();
-        } else {
-          toast.error(res?.message || 'Failed to delete question');
-        }
-      } catch (err) {
-        console.error('Error deleting question:', err);
-        toast.error('Failed to delete question');
+  const handleOpenDeleteModal = (q) => {
+    setQuestionToDelete(q);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!questionToDelete) return;
+    const id = typeof questionToDelete === 'object' ? questionToDelete.id : questionToDelete;
+    setDeleting(true);
+    try {
+      const res = await questionService.deleteQuestion(id);
+      if (res?.success) {
+        toast.success('Question deleted successfully');
+        fetchQuestions();
+        setDeleteModalOpen(false);
+        setQuestionToDelete(null);
+      } else {
+        toast.error(res?.message || 'Failed to delete question');
       }
+    } catch (err) {
+      console.error('Error deleting question:', err);
+      toast.error('Failed to delete question');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -417,7 +433,7 @@ const ManageQuestionBank = () => {
             <Edit size={14} />
           </button>
           <button
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleOpenDeleteModal(row)}
             className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-red-500/15 text-white/40 hover:text-red-400 transition-colors cursor-pointer"
             title="Delete Question"
           >
@@ -957,6 +973,24 @@ const ManageQuestionBank = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Question Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          if (!deleting) {
+            setDeleteModalOpen(false);
+            setQuestionToDelete(null);
+          }
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Question?"
+        message={"Are you sure you want to delete this question?\nThis action cannot be undone."}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={deleting}
+      />
     </div>
   );
 };
