@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, RotateCw, Plus, Edit, Trash2, Award, X } from 'lucide-react';
 import Table from '../../components/common/Table';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import { contestService } from '../../api/services/contestService';
 import toast from 'react-hot-toast';
 
@@ -13,6 +14,11 @@ const ConfigurePrizePool = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add'); // 'add' | 'edit'
   const [currentPool, setCurrentPool] = useState(null);
+
+  // Delete modal states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [poolToDelete, setPoolToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Form states
   const [name, setName] = useState('');
@@ -102,18 +108,27 @@ const ConfigurePrizePool = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this prize template?')) {
-      try {
-        const res = await contestService.deletePrizeTemplate(id);
-        if (res?.success) {
-          toast.success('Prize template deleted successfully');
-          fetchPools();
-        }
-      } catch (err) {
-        console.error('Error deleting prize template:', err);
-        toast.error('Failed to delete prize template');
+  const handleOpenDeleteModal = (id) => {
+    setPoolToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!poolToDelete) return;
+    setDeleting(true);
+    try {
+      const res = await contestService.deletePrizeTemplate(poolToDelete);
+      if (res?.success) {
+        toast.success('Prize template deleted successfully');
+        fetchPools();
+        setDeleteModalOpen(false);
+        setPoolToDelete(null);
       }
+    } catch (err) {
+      console.error('Error deleting prize template:', err);
+      toast.error('Failed to delete prize template');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -153,10 +168,10 @@ const ConfigurePrizePool = () => {
             <Edit size={14} />
           </button>
           <button 
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleOpenDeleteModal(row.id)}
             className="p-1 text-red-500/70 hover:text-red-500 rounded transition-colors cursor-pointer"
           >
-            <Trash2 size={14} />
+            <Trash2 size={16} />
           </button>
         </div>
       )
@@ -302,6 +317,24 @@ const ConfigurePrizePool = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Prize Template Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          if (!deleting) {
+            setDeleteModalOpen(false);
+            setPoolToDelete(null);
+          }
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Prize Template?"
+        message={"Are you sure you want to delete this prize template?\nThis action cannot be undone."}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={deleting}
+      />
     </div>
   );
 };

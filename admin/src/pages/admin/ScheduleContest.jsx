@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, RotateCw, Plus, Edit, Trash2, X, Upload, Image as ImageIcon } from 'lucide-react';
 import Table from '../../components/common/Table';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import { contestService } from '../../api/services/contestService';
 import { categoryService } from '../../api/services/categoryService';
 import { getImageUrl } from '../../api/services/api';
@@ -16,6 +17,11 @@ const ScheduleContest = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add'); // 'add' | 'edit'
   const [currentContest, setCurrentContest] = useState(null);
+
+  // Delete modal states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [contestToDelete, setContestToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Form states
   const [title, setTitle] = useState('');
@@ -209,18 +215,27 @@ const ScheduleContest = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this contest?')) {
-      try {
-        const res = await contestService.deleteContest(id);
-        if (res?.success) {
-          toast.success('Contest deleted successfully');
-          fetchContestsAndCategories();
-        }
-      } catch (err) {
-        console.error('Error deleting contest:', err);
-        toast.error('Failed to delete contest');
+  const handleOpenDeleteModal = (id) => {
+    setContestToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!contestToDelete) return;
+    setDeleting(true);
+    try {
+      const res = await contestService.deleteContest(contestToDelete);
+      if (res?.success) {
+        toast.success('Contest deleted successfully');
+        fetchContestsAndCategories();
+        setDeleteModalOpen(false);
+        setContestToDelete(null);
       }
+    } catch (err) {
+      console.error('Error deleting contest:', err);
+      toast.error('Failed to delete contest');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -336,7 +351,7 @@ const ScheduleContest = () => {
             <Edit size={16} />
           </button>
           <button
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleOpenDeleteModal(row.id)}
             className="p-1 text-red-500/70 hover:text-red-500 rounded transition-colors cursor-pointer"
           >
             <Trash2 size={16} />
@@ -605,6 +620,24 @@ const ScheduleContest = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Contest Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          if (!deleting) {
+            setDeleteModalOpen(false);
+            setContestToDelete(null);
+          }
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Contest?"
+        message={"Are you sure you want to delete this contest?\nThis action cannot be undone."}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={deleting}
+      />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, RotateCw, Plus, Edit, Trash2, X } from 'lucide-react';
 import Table from '../../components/common/Table';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import { contestService } from '../../api/services/contestService';
 import toast from 'react-hot-toast';
 
@@ -13,6 +14,11 @@ const ConfigureEntryFee = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add'); // 'add' | 'edit'
   const [currentTier, setCurrentTier] = useState(null);
+
+  // Delete modal states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [tierToDelete, setTierToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Form states
   const [tierName, setTierName] = useState('');
@@ -98,18 +104,27 @@ const ConfigureEntryFee = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this fee tier?')) {
-      try {
-        const res = await contestService.deleteEntryFeeTier(id);
-        if (res?.success) {
-          toast.success('Fee tier deleted successfully');
-          fetchTiers();
-        }
-      } catch (err) {
-        console.error('Error deleting fee tier:', err);
-        toast.error('Failed to delete fee tier');
+  const handleOpenDeleteModal = (id) => {
+    setTierToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!tierToDelete) return;
+    setDeleting(true);
+    try {
+      const res = await contestService.deleteEntryFeeTier(tierToDelete);
+      if (res?.success) {
+        toast.success('Fee tier deleted successfully');
+        fetchTiers();
+        setDeleteModalOpen(false);
+        setTierToDelete(null);
       }
+    } catch (err) {
+      console.error('Error deleting fee tier:', err);
+      toast.error('Failed to delete fee tier');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -168,11 +183,11 @@ const ConfigureEntryFee = () => {
           >
             <Edit size={14} />
           </button>
-          <button 
-            onClick={() => handleDelete(row.id)}
+          <button
+            onClick={() => handleOpenDeleteModal(row.id)}
             className="p-1 text-red-500/70 hover:text-red-500 rounded transition-colors cursor-pointer"
           >
-            <Trash2 size={14} />
+            <Trash2 size={16} />
           </button>
         </div>
       )
@@ -322,6 +337,24 @@ const ConfigureEntryFee = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Fee Tier Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          if (!deleting) {
+            setDeleteModalOpen(false);
+            setTierToDelete(null);
+          }
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Fee Tier?"
+        message={"Are you sure you want to delete this fee tier?\nThis action cannot be undone."}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={deleting}
+      />
     </div>
   );
 };

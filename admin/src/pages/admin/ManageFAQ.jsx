@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, RotateCw, Plus, Edit, Trash2, X, HelpCircle, ChevronDown, ChevronUp, ChevronsUpDown, Check } from 'lucide-react';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import { faqService } from '../../api/services/faqService';
 import { contestService } from '../../api/services/contestService';
 import toast from 'react-hot-toast';
@@ -19,6 +20,11 @@ const ManageFAQ = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('add'); // 'add' | 'edit'
   const [currentFAQ, setCurrentFAQ] = useState(null);
+
+  // Delete modal states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [faqToDelete, setFaqToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Form states
   const [question, setQuestion] = useState('');
@@ -140,18 +146,27 @@ const ManageFAQ = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this FAQ?')) {
-      try {
-        const res = await faqService.deleteFAQ(id);
-        if (res?.success) {
-          toast.success('FAQ deleted successfully');
-          fetchFAQs();
-        }
-      } catch (err) {
-        console.error('Error deleting FAQ:', err);
-        toast.error('Failed to delete FAQ');
+  const handleOpenDeleteModal = (id) => {
+    setFaqToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!faqToDelete) return;
+    setDeleting(true);
+    try {
+      const res = await faqService.deleteFAQ(faqToDelete);
+      if (res?.success) {
+        toast.success('FAQ deleted successfully');
+        fetchFAQs();
+        setDeleteModalOpen(false);
+        setFaqToDelete(null);
       }
+    } catch (err) {
+      console.error('Error deleting FAQ:', err);
+      toast.error('Failed to delete FAQ');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -434,11 +449,11 @@ const ManageFAQ = () => {
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleDelete(faq.id)}
-                            className="p-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-white/10 transition-colors cursor-pointer"
+                            onClick={() => handleOpenDeleteModal(faq.id)}
+                            className="p-1.5 rounded-lg border border-white/10 bg-[#161822] text-gray-400 hover:text-red-400 hover:border-red-500/30 transition-all cursor-pointer"
                             title="Delete FAQ"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 size={13} />
                           </button>
                         </div>
                       </td>
@@ -578,6 +593,24 @@ const ManageFAQ = () => {
           </div>
         </div>
       )}
+
+      {/* Delete FAQ Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          if (!deleting) {
+            setDeleteModalOpen(false);
+            setFaqToDelete(null);
+          }
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete FAQ?"
+        message={"Are you sure you want to delete this FAQ?\nThis action cannot be undone."}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={deleting}
+      />
     </div>
   );
 };

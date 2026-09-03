@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, RotateCw, Plus, Edit, Trash2, X } from 'lucide-react';
 import Table from '../../components/common/Table';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import { topicService } from '../../api/services/topicService';
 import { subjectService } from '../../api/services/subjectService';
 import toast from 'react-hot-toast';
@@ -13,8 +14,13 @@ const ManageTopics = () => {
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState('add');
+  const [modalType, setModalType] = useState('add'); // 'add' | 'edit'
   const [currentTopic, setCurrentTopic] = useState(null);
+
+  // Delete modal states
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [topicToDelete, setTopicToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Form states
   const [name, setName] = useState('');
@@ -107,18 +113,27 @@ const ManageTopics = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this topic?')) {
-      try {
-        const res = await topicService.deleteTopic(id);
-        if (res?.success) {
-          toast.success('Topic deleted successfully');
-          fetchData();
-        }
-      } catch (err) {
-        console.error('Error deleting topic:', err);
-        toast.error('Failed to delete topic');
+  const handleOpenDeleteModal = (id) => {
+    setTopicToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!topicToDelete) return;
+    setDeleting(true);
+    try {
+      const res = await topicService.deleteTopic(topicToDelete);
+      if (res?.success) {
+        toast.success('Topic deleted successfully');
+        fetchData();
+        setDeleteModalOpen(false);
+        setTopicToDelete(null);
       }
+    } catch (err) {
+      console.error('Error deleting topic:', err);
+      toast.error('Failed to delete topic');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -185,10 +200,10 @@ const ManageTopics = () => {
             <Edit size={14} />
           </button>
           <button 
-            onClick={() => handleDelete(row.id)}
+            onClick={() => handleOpenDeleteModal(row.id)}
             className="p-1 text-red-500/70 hover:text-red-500 rounded transition-colors cursor-pointer"
           >
-            <Trash2 size={14} />
+            <Trash2 size={16} />
           </button>
         </div>
       )
@@ -323,6 +338,24 @@ const ManageTopics = () => {
           </div>
         </div>
       )}
+
+      {/* Delete Topic Confirmation Modal */}
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          if (!deleting) {
+            setDeleteModalOpen(false);
+            setTopicToDelete(null);
+          }
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Topic?"
+        message={"Are you sure you want to delete this topic?\nThis action cannot be undone."}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={deleting}
+      />
     </div>
   );
 };
