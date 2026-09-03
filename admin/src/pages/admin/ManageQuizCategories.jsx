@@ -104,7 +104,7 @@ const ManageQuizCategories = () => {
     setColorClass(cat.colorClass || 'hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.25)]');
     setIsActive(cat.isActive);
     setImageFile(null);
-    const existingImg = cat.image || '/cat-general.png';
+    const existingImg = cat.image || '';
     setImagePreview(existingImg);
     setIsModalOpen(true);
   };

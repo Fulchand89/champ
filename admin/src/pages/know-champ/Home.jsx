@@ -233,7 +233,7 @@ const Home = () => {
                 const prize = contest.prizePool !== undefined ? parseFloat(contest.prizePool) : (contest.prize || 0);
                 const entry = contest.entryFee !== undefined ? parseFloat(contest.entryFee) : (contest.entry || 0);
                 const joined = contest.joined !== undefined ? contest.joined : 0;
-                const image = contest.image || catTheme.image || catTheme.icon;
+                const image = getImageUrl(contest.image) || catTheme.image || catTheme.icon;
                 const date = contest?.startTime
                   ? new Date(contest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 Am'
                   : (contest?.date || '');

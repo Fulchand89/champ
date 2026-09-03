@@ -43,7 +43,12 @@ const writeJsonFile = (filePath, data) => {
   }
 };
 
-// Helper to process uploaded file into persistent Data URI or relative path
+const isVercel = !!process.env.VERCEL;
+const uploadBaseDir = isVercel
+  ? path.join('/tmp', 'uploads')
+  : path.join(__dirname, '../uploads');
+
+// Helper to process uploaded file into persistent relative path or Data URI fallback
 const processUploadedFile = (file, fallbackDir = 'others') => {
   if (!file) return null;
   try {
@@ -98,11 +103,33 @@ const processUploadedFile = (file, fallbackDir = 'others') => {
         if (isSvg) mimeType = 'image/svg+xml';
       }
 
-      const cleanB64 = fileBuf.toString('base64').replace(/[\r\n\s]+/g, '');
-      return `data:${mimeType};base64,${cleanB64}`;
+      let ext = '.png';
+      if (mimeType === 'image/webp') ext = '.webp';
+      else if (mimeType === 'image/jpeg') ext = '.jpg';
+      else if (mimeType === 'image/svg+xml') ext = '.svg';
+      else if (mimeType === 'image/png') ext = '.png';
+      else {
+        const originalExt = path.extname(file.originalname || file.filename || '').toLowerCase();
+        if (['.jpg', '.jpeg', '.png', '.webp', '.svg'].includes(originalExt)) ext = originalExt;
+      }
+
+      try {
+        const targetFolder = path.join(uploadBaseDir, fallbackDir);
+        if (!fs.existsSync(targetFolder)) {
+          fs.mkdirSync(targetFolder, { recursive: true });
+        }
+        const filename = `${Date.now()}-${Math.floor(Math.random() * 1000000000)}${ext}`;
+        const targetFilePath = path.join(targetFolder, filename);
+        fs.writeFileSync(targetFilePath, fileBuf);
+        return `/uploads/${fallbackDir}/${filename}`;
+      } catch (writeErr) {
+        console.warn('Writing file to disk failed, falling back to Data URI:', writeErr.message);
+        const cleanB64 = fileBuf.toString('base64').replace(/[\r\n\s]+/g, '');
+        return `data:${mimeType};base64,${cleanB64}`;
+      }
     }
   } catch (err) {
-    console.warn('Error converting file to Data URI:', err.message);
+    console.warn('Error processing uploaded file:', err.message);
   }
   return file.filename ? `/uploads/${fallbackDir}/${file.filename}` : null;
 };

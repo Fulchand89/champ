@@ -4,6 +4,7 @@ import { categoryService } from '../../api/services/categoryService';
 import { subjectService } from '../../api/services/subjectService';
 import { topicService } from '../../api/services/topicService';
 import { contestService } from '../../api/services/contestService';
+import { getImageUrl } from '../../api/services/api';
 import toast from 'react-hot-toast';
 
 const CreateContest = () => {
@@ -463,7 +464,7 @@ const CreateContest = () => {
 
               {imagePreview && (
                 <div className="flex items-center gap-3 p-2 bg-[#0f1117] rounded-xl border border-white/15">
-                  <img src={imagePreview} alt="Preview" className="w-14 h-14 object-contain rounded-lg" />
+                  <img src={getImageUrl(imagePreview)} alt="Preview" className="w-14 h-14 object-contain rounded-lg" />
                   <div>
                     <p className="text-xs font-semibold text-white">Selected Image</p>
                     <button
