@@ -74,37 +74,13 @@ const detectMimeFromBase64 = (base64Data, declaredMime) => {
  * - Resolves /uploads/ paths to full backend URLs.
  * - Returns empty string for null/invalid input so callers can use || fallback.
  */
-export const getImageUrl = (imgPath) => {
-  if (!imgPath || typeof imgPath !== 'string') return '';
-  const cleanStr = imgPath.trim().replace(/[\r\n\s]+/g, '');
+export const getImageUrl = (image) => {
+  if (!image || typeof image !== 'string') return '';
+  const cleanStr = image.trim();
   if (!cleanStr) return '';
 
-  // ── Data URI ────────────────────────────────────────────────────────────────
-  if (cleanStr.startsWith('data:')) {
-    const commaIdx = cleanStr.indexOf(',');
-    if (commaIdx === -1) return ''; // malformed — no comma separator
-
-    const header = cleanStr.slice(5, commaIdx);       // e.g. "image/png;base64"
-    const base64Data = cleanStr.slice(commaIdx + 1);
-
-    // Must have enough bytes to decode a real image header (at least 48 base64 chars = 36 bytes)
-    if (!base64Data || base64Data.length < 48) return '';
-
-    if (header.includes(';base64')) {
-      // Detect truncation: a valid base64 string without padding will have length % 4 of 0, 2, or 3.
-      // If it is 1, the string is definitely truncated or malformed.
-      const stripped = base64Data.replace(/=+$/, '');
-      if (stripped.length % 4 === 1) return ''; // truncated — drop it, use fallback image
-
-      const declaredMime = header.split(';')[0].trim();
-      const realMime = detectMimeFromBase64(base64Data, declaredMime);
-      return `data:${realMime};base64,${base64Data}`;
-    }
-    return cleanStr;
-  }
-
-  // ── Absolute HTTP(S) / blob URL ──────────────────────────────────────────────
   if (
+    cleanStr.startsWith('data:') ||
     cleanStr.startsWith('http://') ||
     cleanStr.startsWith('https://') ||
     cleanStr.startsWith('blob:')
@@ -112,14 +88,12 @@ export const getImageUrl = (imgPath) => {
     return cleanStr;
   }
 
-  // ── /uploads/ path — prefix with backend origin ──────────────────────────────
   if (cleanStr.startsWith('/uploads/') || cleanStr.startsWith('uploads/')) {
     const cleanPath = cleanStr.startsWith('/') ? cleanStr : `/${cleanStr}`;
     const backendOrigin = RAW_BASE_URL.replace(/\/api\/v1\/?$/, '');
     return `${backendOrigin}${cleanPath}`;
   }
 
-  // ── Public asset paths (e.g. /cat-sports.png) — return as-is ────────────────
   return cleanStr;
 };
 

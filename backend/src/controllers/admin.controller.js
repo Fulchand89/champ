@@ -43,13 +43,8 @@ const writeJsonFile = (filePath, data) => {
   }
 };
 
-const isVercel = !!process.env.VERCEL;
-const uploadBaseDir = isVercel
-  ? path.join('/tmp', 'uploads')
-  : path.join(__dirname, '../uploads');
-
-// Helper to process uploaded file into persistent relative path or Data URI fallback
-const processUploadedFile = (file, fallbackDir = 'others') => {
+// Helper to convert uploaded file into Base64 Data URI (Vercel serverless compatible)
+const convertImageToBase64 = (file) => {
   if (!file) return null;
   try {
     let fileBuf = null;
@@ -60,26 +55,19 @@ const processUploadedFile = (file, fallbackDir = 'others') => {
     }
 
     if (fileBuf) {
-      // Use file.mimetype as the primary source — the optimizeImage middleware already
-      // sets this to 'image/webp' after converting, so trust it over the original filename
-      // extension which may still say .png or .jpg.
       let mimeType = (file.mimetype && file.mimetype !== 'application/octet-stream')
         ? file.mimetype
         : null;
 
       if (!mimeType) {
-        // Fall back to extension only when mimetype is absent or generic
         const ext = path.extname(file.originalname || file.filename || '').toLowerCase();
         if (ext === '.svg') mimeType = 'image/svg+xml';
         else if (ext === '.jpg' || ext === '.jpeg') mimeType = 'image/jpeg';
         else if (ext === '.webp') mimeType = 'image/webp';
         else if (ext === '.png') mimeType = 'image/png';
-        else mimeType = 'image/png'; // safe last-resort
+        else mimeType = 'image/png';
       }
 
-      // Final safety net: inspect magic bytes to confirm actual format.
-      // This catches any case where the buffer was converted to WebP but the
-      // mimetype string was not updated (e.g. sharp path-based conversion).
       if (fileBuf.length >= 12) {
         const isWebP =
           fileBuf[0] === 0x52 && fileBuf[1] === 0x49 &&
@@ -103,36 +91,24 @@ const processUploadedFile = (file, fallbackDir = 'others') => {
         if (isSvg) mimeType = 'image/svg+xml';
       }
 
-      let ext = '.png';
-      if (mimeType === 'image/webp') ext = '.webp';
-      else if (mimeType === 'image/jpeg') ext = '.jpg';
-      else if (mimeType === 'image/svg+xml') ext = '.svg';
-      else if (mimeType === 'image/png') ext = '.png';
-      else {
-        const originalExt = path.extname(file.originalname || file.filename || '').toLowerCase();
-        if (['.jpg', '.jpeg', '.png', '.webp', '.svg'].includes(originalExt)) ext = originalExt;
-      }
-
-      try {
-        const targetFolder = path.join(uploadBaseDir, fallbackDir);
-        if (!fs.existsSync(targetFolder)) {
-          fs.mkdirSync(targetFolder, { recursive: true });
-        }
-        const filename = `${Date.now()}-${Math.floor(Math.random() * 1000000000)}${ext}`;
-        const targetFilePath = path.join(targetFolder, filename);
-        fs.writeFileSync(targetFilePath, fileBuf);
-        return `/uploads/${fallbackDir}/${filename}`;
-      } catch (writeErr) {
-        console.warn('Writing file to disk failed, falling back to Data URI:', writeErr.message);
-        const cleanB64 = fileBuf.toString('base64').replace(/[\r\n\s]+/g, '');
-        return `data:${mimeType};base64,${cleanB64}`;
-      }
+      const cleanB64 = fileBuf.toString('base64').replace(/[\r\n\s]+/g, '');
+      return `data:${mimeType};base64,${cleanB64}`;
     }
   } catch (err) {
-    console.warn('Error processing uploaded file:', err.message);
+    console.warn('Error converting file to Base64:', err.message);
   }
-  return file.filename ? `/uploads/${fallbackDir}/${file.filename}` : null;
+  return null;
 };
+
+const processUploadedFile = (file) => {
+  return convertImageToBase64(file);
+};
+
+// Proactively ensure image columns in MySQL database are LONGTEXT to store Base64 images safely
+try {
+  sequelize.query("ALTER TABLE categories MODIFY COLUMN image LONGTEXT NULL").catch(() => {});
+  sequelize.query("ALTER TABLE contests MODIFY COLUMN image LONGTEXT NULL").catch(() => {});
+} catch (e) {}
 
 // Helper to parse booleans
 const parseBool = (val) => {
