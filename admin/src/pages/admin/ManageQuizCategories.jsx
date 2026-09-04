@@ -70,8 +70,8 @@ const ManageQuizCategories = () => {
     { value: 'hover:border-yellow-400/50 hover:shadow-[0_0_20px_rgba(250,204,21,0.25)]', label: 'Yellow' },
   ];
 
-  const fetchCategories = async () => {
-    setLoading(true);
+  const fetchCategories = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await categoryService.getCategories();
       if (res?.success) {
@@ -81,7 +81,7 @@ const ManageQuizCategories = () => {
       console.error('Error fetching categories:', err);
       toast.error(err.response?.data?.message || 'Failed to load categories');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -195,7 +195,7 @@ const ManageQuizCategories = () => {
 
       if (res?.success || res?.data) {
         toast.success(`Category ${modalType === 'add' ? 'created' : 'updated'} successfully`);
-        fetchCategories();
+        fetchCategories(false);
         setIsModalOpen(false);
       } else {
         toast.error(res?.message || `Failed to ${modalType === 'add' ? 'create' : 'update'} category`);
@@ -234,7 +234,7 @@ const ManageQuizCategories = () => {
       const res = await categoryService.deleteCategory(categoryToDelete);
       if (res?.success) {
         toast.success('Category deleted successfully');
-        fetchCategories();
+        fetchCategories(false);
         setDeleteModalOpen(false);
         setCategoryToDelete(null);
       }

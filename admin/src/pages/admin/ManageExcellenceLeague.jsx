@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import {
   Award,
-  Crown,
   Trophy,
   Plus,
   Trash2,
@@ -230,9 +229,6 @@ const ManageExcellenceLeague = () => {
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0f1117] p-6 rounded-2xl border border-white/10 shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-red-600 flex items-center justify-center text-white shadow-md">
-            <Crown className="w-6 h-6" />
-          </div>
           <div>
             <h1 className="text-xl font-bold text-white">Manage Excellence League Page</h1>
             <p className="text-xs text-gray-400">Edit hero banner, league tier divisions, player standings & fair play rules</p>

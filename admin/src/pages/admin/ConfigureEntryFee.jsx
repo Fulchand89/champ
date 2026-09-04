@@ -28,8 +28,8 @@ const ConfigureEntryFee = () => {
   const [platformCut, setPlatformCut] = useState('10%');
   const [status, setStatus] = useState('Active');
 
-  const fetchTiers = async () => {
-    setLoading(true);
+  const fetchTiers = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await contestService.getEntryFeeTiers();
       if (res?.success && res.data) {
@@ -38,7 +38,7 @@ const ConfigureEntryFee = () => {
     } catch (err) {
       console.error('Error loading fee tiers:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -89,14 +89,14 @@ const ConfigureEntryFee = () => {
         const res = await contestService.createEntryFeeTier(payload);
         if (res?.success) {
           toast.success('Fee tier created successfully');
-          fetchTiers();
+          fetchTiers(false);
           setIsModalOpen(false);
         }
       } else {
         const res = await contestService.updateEntryFeeTier(currentTier.id, payload);
         if (res?.success) {
           toast.success('Fee tier updated successfully');
-          fetchTiers();
+          fetchTiers(false);
           setIsModalOpen(false);
         }
       }
@@ -120,7 +120,7 @@ const ConfigureEntryFee = () => {
       const res = await contestService.deleteEntryFeeTier(tierToDelete);
       if (res?.success) {
         toast.success('Fee tier deleted successfully');
-        fetchTiers();
+        fetchTiers(false);
         setDeleteModalOpen(false);
         setTierToDelete(null);
       }

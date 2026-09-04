@@ -34,8 +34,8 @@ const ManageFAQ = () => {
   const [isActive, setIsActive] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const fetchFAQs = async () => {
-    setLoading(true);
+  const fetchFAQs = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const [faqRes, contestRes] = await Promise.all([
         faqService.getFAQs(),
@@ -51,7 +51,7 @@ const ManageFAQ = () => {
       console.error('Error fetching FAQs:', err);
       toast.error('Failed to load FAQs');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -126,14 +126,14 @@ const ManageFAQ = () => {
         const res = await faqService.createFAQ(payload);
         if (res?.success) {
           toast.success('FAQ created successfully');
-          fetchFAQs();
+          fetchFAQs(false);
           setIsModalOpen(false);
         }
       } else {
         const res = await faqService.updateFAQ(currentFAQ.id, payload);
         if (res?.success) {
           toast.success('FAQ updated successfully');
-          fetchFAQs();
+          fetchFAQs(false);
           setIsModalOpen(false);
         }
       }
@@ -158,7 +158,7 @@ const ManageFAQ = () => {
       const res = await faqService.deleteFAQ(faqToDelete);
       if (res?.success) {
         toast.success('FAQ deleted successfully');
-        fetchFAQs();
+        fetchFAQs(false);
         setDeleteModalOpen(false);
         setFaqToDelete(null);
       }

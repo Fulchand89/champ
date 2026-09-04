@@ -86,8 +86,8 @@ const ManageQuestionBank = () => {
     return topics.filter((t) => String(t.subjectId) === String(formSubjectId));
   }, [formSubjectId, topics]);
 
-  const fetchQuestions = async () => {
-    setLoading(true);
+  const fetchQuestions = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const params = {};
       if (searchTerm.trim()) params.search = searchTerm.trim();
@@ -108,7 +108,7 @@ const ManageQuestionBank = () => {
         toast.error(err.response?.data?.message || 'Failed to load questions');
       }
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -296,7 +296,7 @@ const ManageQuestionBank = () => {
         const res = await questionService.createQuestion(payload);
         if (res?.success) {
           toast.success('Question added successfully');
-          fetchQuestions();
+          fetchQuestions(false);
           setIsModalOpen(false);
         } else {
           toast.error(res?.message || 'Failed to create question');
@@ -305,7 +305,7 @@ const ManageQuestionBank = () => {
         const res = await questionService.updateQuestion(currentQuestion.id, payload);
         if (res?.success) {
           toast.success('Question updated successfully');
-          fetchQuestions();
+          fetchQuestions(false);
           setIsModalOpen(false);
         } else {
           toast.error(res?.message || 'Failed to update question');
@@ -333,7 +333,7 @@ const ManageQuestionBank = () => {
       const res = await questionService.deleteQuestion(id);
       if (res?.success) {
         toast.success('Question deleted successfully');
-        fetchQuestions();
+        fetchQuestions(false);
         setDeleteModalOpen(false);
         setQuestionToDelete(null);
       } else {

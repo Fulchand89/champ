@@ -42,8 +42,8 @@ const ScheduleContest = () => {
   const [imagePreview, setImagePreview] = useState('');
   const fileInputRef = useRef(null);
 
-  const fetchContestsAndCategories = async () => {
-    setLoading(true);
+  const fetchContestsAndCategories = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const [contestRes, categoryRes] = await Promise.allSettled([
         contestService.getContests(),
@@ -60,7 +60,7 @@ const ScheduleContest = () => {
     } catch (err) {
       console.error('Error fetching data:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -190,7 +190,7 @@ const ScheduleContest = () => {
 
       if (res?.success || res?.data) {
         toast.success(`Contest ${modalType === 'add' ? 'scheduled' : 'updated'} successfully`);
-        fetchContestsAndCategories();
+        fetchContestsAndCategories(false);
         setIsModalOpen(false);
       } else {
         toast.error(res?.message || `Failed to ${modalType === 'add' ? 'schedule' : 'update'} contest`);
@@ -229,7 +229,7 @@ const ScheduleContest = () => {
       const res = await contestService.deleteContest(contestToDelete);
       if (res?.success) {
         toast.success('Contest deleted successfully');
-        fetchContestsAndCategories();
+        fetchContestsAndCategories(false);
         setDeleteModalOpen(false);
         setContestToDelete(null);
       }
@@ -249,7 +249,7 @@ const ScheduleContest = () => {
       const res = await contestService.updateContest(cnt.id, formData);
       if (res?.success) {
         toast.success(`Contest ${!cnt.isActive ? 'activated' : 'deactivated'}`);
-        fetchContestsAndCategories();
+        fetchContestsAndCategories(false);
       }
     } catch (err) {
       console.error('Error toggling status:', err);

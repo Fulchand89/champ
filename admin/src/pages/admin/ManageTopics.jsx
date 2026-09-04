@@ -29,8 +29,8 @@ const ManageTopics = () => {
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(true);
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const [topRes, subRes] = await Promise.allSettled([
         topicService.getTopics(),
@@ -46,7 +46,7 @@ const ManageTopics = () => {
     } catch (err) {
       console.error('Error loading topics:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -98,14 +98,14 @@ const ManageTopics = () => {
         const res = await topicService.createTopic(payload);
         if (res?.success) {
           toast.success('Topic created successfully');
-          fetchData();
+          fetchData(false);
           setIsModalOpen(false);
         }
       } else {
         const res = await topicService.updateTopic(currentTopic.id, payload);
         if (res?.success) {
           toast.success('Topic updated successfully');
-          fetchData();
+          fetchData(false);
           setIsModalOpen(false);
         }
       }
@@ -129,7 +129,7 @@ const ManageTopics = () => {
       const res = await topicService.deleteTopic(topicToDelete);
       if (res?.success) {
         toast.success('Topic deleted successfully');
-        fetchData();
+        fetchData(false);
         setDeleteModalOpen(false);
         setTopicToDelete(null);
       }

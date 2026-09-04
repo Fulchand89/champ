@@ -29,8 +29,8 @@ const ManageSubjects = () => {
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(true);
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const [subRes, catRes] = await Promise.allSettled([
         subjectService.getSubjects(),
@@ -46,7 +46,7 @@ const ManageSubjects = () => {
     } catch (err) {
       console.error('Error loading subjects:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -98,14 +98,14 @@ const ManageSubjects = () => {
         const res = await subjectService.createSubject(payload);
         if (res?.success) {
           toast.success('Subject created successfully');
-          fetchData();
+          fetchData(false);
           setIsModalOpen(false);
         }
       } else {
         const res = await subjectService.updateSubject(currentSubject.id, payload);
         if (res?.success) {
           toast.success('Subject updated successfully');
-          fetchData();
+          fetchData(false);
           setIsModalOpen(false);
         }
       }
@@ -129,7 +129,7 @@ const ManageSubjects = () => {
       const res = await subjectService.deleteSubject(subjectToDelete);
       if (res?.success) {
         toast.success('Subject deleted successfully');
-        fetchData();
+        fetchData(false);
         setDeleteModalOpen(false);
         setSubjectToDelete(null);
       }

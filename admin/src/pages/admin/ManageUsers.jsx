@@ -61,8 +61,8 @@ const ManageUsers = () => {
   // Form State for Add / Edit
   const [formData, setFormData] = useState(initialFormData);
 
-  const fetchUsers = async () => {
-    setLoading(true);
+  const fetchUsers = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await userService.getUsers();
       if (res?.success && Array.isArray(res.data)) {
@@ -100,7 +100,7 @@ const ManageUsers = () => {
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error loading users');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -210,7 +210,7 @@ const ManageUsers = () => {
         toast.success('User updated successfully');
         setIsEditModalOpen(false);
         setSelectedUser(null);
-        fetchUsers();
+        fetchUsers(false);
       } else {
         toast.error(res?.message || 'Failed to update user');
       }

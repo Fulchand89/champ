@@ -28,8 +28,8 @@ const ConfigurePrizePool = () => {
   const [platformFee, setPlatformFee] = useState('10%');
   const [status, setStatus] = useState('Active');
 
-  const fetchPools = async () => {
-    setLoading(true);
+  const fetchPools = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await contestService.getPrizeTemplates();
       if (res?.success && res.data) {
@@ -38,7 +38,7 @@ const ConfigurePrizePool = () => {
     } catch (err) {
       console.error('Error loading prize pools:', err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -93,14 +93,14 @@ const ConfigurePrizePool = () => {
         const res = await contestService.createPrizeTemplate(payload);
         if (res?.success) {
           toast.success('Prize template created successfully');
-          fetchPools();
+          fetchPools(false);
           setIsModalOpen(false);
         }
       } else {
         const res = await contestService.updatePrizeTemplate(currentPool.id, payload);
         if (res?.success) {
           toast.success('Prize template updated successfully');
-          fetchPools();
+          fetchPools(false);
           setIsModalOpen(false);
         }
       }
@@ -124,7 +124,7 @@ const ConfigurePrizePool = () => {
       const res = await contestService.deletePrizeTemplate(poolToDelete);
       if (res?.success) {
         toast.success('Prize template deleted successfully');
-        fetchPools();
+        fetchPools(false);
         setDeleteModalOpen(false);
         setPoolToDelete(null);
       }

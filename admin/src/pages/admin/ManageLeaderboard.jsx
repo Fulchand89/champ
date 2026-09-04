@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import {
-  Trophy,
   Plus,
   Trash2,
   Edit2,
@@ -180,9 +179,6 @@ const ManageLeaderboard = () => {
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0f1117] p-6 rounded-2xl border border-white/10 shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 to-orange-600 flex items-center justify-center text-white shadow-md">
-            <Trophy className="w-6 h-6" />
-          </div>
           <div>
             <h1 className="text-xl font-bold text-white">Manage Leaderboard Page</h1>
             <p className="text-xs text-gray-400">Edit hero content, rankings, top player payouts & standings displayed on the website</p>

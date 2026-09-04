@@ -33,8 +33,8 @@ const ManageFeatures = () => {
   const [colorClass, setColorClass] = useState('text-[#E94B4B]');
   const [isActive, setIsActive] = useState(true);
 
-  const fetchFeatures = async () => {
-    setLoading(true);
+  const fetchFeatures = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const [featRes, contestRes] = await Promise.all([
         featureService.getFeatures(),
@@ -50,7 +50,7 @@ const ManageFeatures = () => {
       console.error('Error fetching features:', err);
       toast.error('Failed to load features');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -107,14 +107,14 @@ const ManageFeatures = () => {
         const res = await featureService.createFeature(payload);
         if (res?.success) {
           toast.success('Feature created successfully');
-          fetchFeatures();
+          fetchFeatures(false);
           setIsModalOpen(false);
         }
       } else {
         const res = await featureService.updateFeature(currentFeature.id, payload);
         if (res?.success) {
           toast.success('Feature updated successfully');
-          fetchFeatures();
+          fetchFeatures(false);
           setIsModalOpen(false);
         }
       }
@@ -137,7 +137,7 @@ const ManageFeatures = () => {
       const res = await featureService.deleteFeature(featureToDelete);
       if (res?.success) {
         toast.success('Feature deleted successfully');
-        fetchFeatures();
+        fetchFeatures(false);
         setDeleteModalOpen(false);
         setFeatureToDelete(null);
       }
