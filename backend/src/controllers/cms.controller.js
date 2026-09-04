@@ -2,49 +2,122 @@ const fs = require('fs');
 const path = require('path');
 const asyncHandler = require('../shared/utils/asyncHandler');
 const { getIO } = require('../config/socket');
+const { sequelize } = require('../config/db');
 
 const cmsFilePath = path.join(__dirname, '../database/cms.json');
 
-// Global in-memory cache so Admin Panel updates stick instantly in server memory
-let memoryCmsStore = null;
+// In-memory cache for fast response & instant cache invalidation
+let inMemoryCmsCache = {};
 
-// Helper to read JSON safely
-const readCmsData = () => {
-  if (memoryCmsStore) {
-    return memoryCmsStore;
-  }
+// Helper to ensure MySQL database table exists
+let dbTableInitialized = false;
+const ensureCmsTableExists = async () => {
+  if (dbTableInitialized || !sequelize) return;
   try {
-    if (!fs.existsSync(cmsFilePath)) {
-      return {};
-    }
-    const content = fs.readFileSync(cmsFilePath, 'utf8');
-    memoryCmsStore = JSON.parse(content);
-    return memoryCmsStore;
+    await sequelize.query(`
+      CREATE TABLE IF NOT EXISTS \`cms_contents\` (
+        \`key\` VARCHAR(100) PRIMARY KEY,
+        \`content\` LONGTEXT NOT NULL,
+        \`createdAt\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        \`updatedAt\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    `);
+    dbTableInitialized = true;
   } catch (err) {
-    console.error('Error reading cms.json:', err);
+    console.warn('CMS database table creation warning:', err.message);
+  }
+};
+
+// Helper to read JSON file fallback
+const readCmsJsonFile = () => {
+  try {
+    if (!fs.existsSync(cmsFilePath)) return {};
+    const content = fs.readFileSync(cmsFilePath, 'utf8');
+    return JSON.parse(content);
+  } catch (err) {
+    console.error('Error reading cms.json file:', err);
     return {};
   }
 };
 
-// Helper to write JSON safely
-const writeCmsData = (data) => {
-  memoryCmsStore = data;
-  try {
-    fs.writeFileSync(cmsFilePath, JSON.stringify(data, null, 2), 'utf8');
-    return true;
-  } catch (err) {
-    console.error('Error writing cms.json:', err);
-    return true; // Keep in-memory store active even if disk write fails
+// Helper to fetch section data from MySQL DB or JSON fallback
+const getCmsSectionData = async (sectionKey) => {
+  // Check in-memory cache first if populated
+  if (inMemoryCmsCache[sectionKey]) {
+    return inMemoryCmsCache[sectionKey];
   }
+
+  await ensureCmsTableExists();
+
+  if (sequelize && dbTableInitialized) {
+    try {
+      const [rows] = await sequelize.query(
+        'SELECT content FROM cms_contents WHERE `key` = :key LIMIT 1',
+        { replacements: { key: sectionKey } }
+      );
+      if (rows && rows.length > 0 && rows[0].content) {
+        const parsed = JSON.parse(rows[0].content);
+        inMemoryCmsCache[sectionKey] = parsed;
+        return parsed;
+      }
+    } catch (err) {
+      console.warn(`Error querying cms_contents DB for key '${sectionKey}':`, err.message);
+    }
+  }
+
+  // Fallback to cms.json file
+  const jsonFile = readCmsJsonFile();
+  const fallbackData = jsonFile[sectionKey] || null;
+  if (fallbackData) {
+    inMemoryCmsCache[sectionKey] = fallbackData;
+    // Auto-seed data into MySQL DB asynchronously
+    if (sequelize && dbTableInitialized) {
+      sequelize.query(
+        'INSERT INTO cms_contents (`key`, `content`, `createdAt`, `updatedAt`) VALUES (:key, :content, NOW(), NOW()) ON DUPLICATE KEY UPDATE `content` = :content, `updatedAt` = NOW()',
+        { replacements: { key: sectionKey, content: JSON.stringify(fallbackData) } }
+      ).catch(() => {});
+    }
+  }
+  return fallbackData;
+};
+
+// Helper to save section data to MySQL DB & JSON Backup
+const saveCmsSectionData = async (sectionKey, data) => {
+  // Invalidate & update in-memory cache immediately
+  inMemoryCmsCache[sectionKey] = data;
+
+  await ensureCmsTableExists();
+
+  // Save to MySQL Database
+  if (sequelize) {
+    try {
+      await sequelize.query(
+        'INSERT INTO cms_contents (`key`, `content`, `createdAt`, `updatedAt`) VALUES (:key, :content, NOW(), NOW()) ON DUPLICATE KEY UPDATE `content` = :content, `updatedAt` = NOW()',
+        { replacements: { key: sectionKey, content: JSON.stringify(data) } }
+      );
+    } catch (err) {
+      console.error(`Error saving cms_contents to DB for key '${sectionKey}':`, err.message);
+    }
+  }
+
+  // Update cms.json file backup
+  try {
+    const fileData = readCmsJsonFile();
+    fileData[sectionKey] = data;
+    fs.writeFileSync(cmsFilePath, JSON.stringify(fileData, null, 2), 'utf8');
+  } catch (err) {
+    console.warn('CMS file backup update note:', err.message);
+  }
+
+  return true;
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// 1. LEADERBOARD CMS CONTROLLERS (Strictly Admin Managed)
+// 1. LEADERBOARD CMS CONTROLLERS
 // ═══════════════════════════════════════════════════════════════════
 
 const getLeaderboardCms = asyncHandler(async (req, res) => {
-  const cmsData = readCmsData();
-  const leaderboardData = cmsData.leaderboard || {
+  const leaderboardData = (await getCmsSectionData('leaderboard')) || {
     hero: { title: 'Leaderboard', subtitle: 'Track top earners and compare your scores with other global players.' },
     leaders: [],
   };
@@ -56,40 +129,37 @@ const getLeaderboardCms = asyncHandler(async (req, res) => {
 });
 
 const updateLeaderboardCms = asyncHandler(async (req, res) => {
-  const { hero, leaders } = req.body;
-  const cmsData = readCmsData();
+  const { hero, leaders } = req.body || {};
+  const existing = (await getCmsSectionData('leaderboard')) || {};
 
-  cmsData.leaderboard = {
-    hero: hero || cmsData.leaderboard?.hero || { title: 'Leaderboard', subtitle: '' },
-    leaders: Array.isArray(leaders) ? leaders : (cmsData.leaderboard?.leaders || []),
+  const leaderboardData = {
+    hero: hero || existing.hero || { title: 'Leaderboard', subtitle: '' },
+    leaders: Array.isArray(leaders) ? leaders : (existing.leaders || []),
   };
 
-  writeCmsData(cmsData);
+  await saveCmsSectionData('leaderboard', leaderboardData);
 
-  // Socket notification for real-time updates
+  // Broadcast real-time Socket notification
   try {
     const io = getIO();
-    if (io) {
-      io.emit('cms_leaderboard_updated', cmsData.leaderboard);
+    if (io && typeof io.emit === 'function') {
+      io.emit('cms_leaderboard_updated', leaderboardData);
     }
-  } catch (e) {
-    // Ignore socket error if not connected
-  }
+  } catch (e) {}
 
   res.status(200).json({
     success: true,
-    message: 'Leaderboard CMS content updated successfully',
-    data: cmsData.leaderboard,
+    message: 'Leaderboard content saved and updated successfully',
+    data: leaderboardData,
   });
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// 2. EXCELLENCE LEAGUE CMS CONTROLLERS (Strictly Admin Managed)
+// 2. EXCELLENCE LEAGUE CMS CONTROLLERS
 // ═══════════════════════════════════════════════════════════════════
 
 const getExcellenceLeagueCms = asyncHandler(async (req, res) => {
-  const cmsData = readCmsData();
-  const excellenceData = cmsData.excellenceLeague || {
+  const excellenceData = (await getCmsSectionData('excellenceLeague')) || {
     hero: { title: 'Excellence League', subtitle: 'Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.' },
     tiers: [],
     leaders: [],
@@ -103,32 +173,30 @@ const getExcellenceLeagueCms = asyncHandler(async (req, res) => {
 });
 
 const updateExcellenceLeagueCms = asyncHandler(async (req, res) => {
-  const { hero, tiers, leaders, rules } = req.body;
-  const cmsData = readCmsData();
+  const { hero, tiers, leaders, rules } = req.body || {};
+  const existing = (await getCmsSectionData('excellenceLeague')) || {};
 
-  cmsData.excellenceLeague = {
-    hero: hero || cmsData.excellenceLeague?.hero || { title: 'Excellence League', subtitle: '' },
-    tiers: Array.isArray(tiers) ? tiers : (cmsData.excellenceLeague?.tiers || []),
-    leaders: Array.isArray(leaders) ? leaders : (cmsData.excellenceLeague?.leaders || []),
-    rules: Array.isArray(rules) ? rules : (cmsData.excellenceLeague?.rules || []),
+  const excellenceData = {
+    hero: hero || existing.hero || { title: 'Excellence League', subtitle: '' },
+    tiers: Array.isArray(tiers) ? tiers : (existing.tiers || []),
+    leaders: Array.isArray(leaders) ? leaders : (existing.leaders || []),
+    rules: Array.isArray(rules) ? rules : (existing.rules || []),
   };
 
-  writeCmsData(cmsData);
+  await saveCmsSectionData('excellenceLeague', excellenceData);
 
-  // Socket notification for real-time updates
+  // Broadcast real-time Socket notification
   try {
     const io = getIO();
-    if (io) {
-      io.emit('cms_excellence_league_updated', cmsData.excellenceLeague);
+    if (io && typeof io.emit === 'function') {
+      io.emit('cms_excellence_league_updated', excellenceData);
     }
-  } catch (e) {
-    // Ignore socket error if not connected
-  }
+  } catch (e) {}
 
   res.status(200).json({
     success: true,
-    message: 'Excellence League CMS content updated successfully',
-    data: cmsData.excellenceLeague,
+    message: 'Excellence League content saved and updated successfully',
+    data: excellenceData,
   });
 });
 
