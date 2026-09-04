@@ -1152,7 +1152,7 @@ const ViewReports = () => {
 
             <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10 flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold text-gray-400">Gross Collections</p>
+                <p className="text-xs font-semibold text-gray-400">Total Collections</p>
                 <h3 className="text-xl font-bold text-white mt-1">₹{financialData.summary?.totalInflow?.toLocaleString() || '2,48,500'}</h3>
                 <p className="text-[10px] text-gray-400 mt-0.5">Entry Fees & Packs</p>
               </div>
@@ -1363,7 +1363,7 @@ const ViewReports = () => {
           {/* Summary KPIs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-[#0f1117] p-4 rounded-2xl border border-white/10">
-              <p className="text-xs text-gray-400">Gross Collections</p>
+              <p className="text-xs text-gray-400">Total Collections</p>
               <h3 className="text-xl font-bold text-emerald-400 mt-1">
                 ₹{contestPaymentData.reduce((s, c) => s + (c.grossInflow || 0), 0).toLocaleString()}
               </h3>
@@ -1742,7 +1742,7 @@ const ViewReports = () => {
                     <span className="text-white font-mono">{modalData.paidParticipants} users @ ₹{modalData.entryFee}</span>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-white/5">
-                    <span className="text-gray-400">Gross Collections Inflow</span>
+                    <span className="text-gray-400">Total Collections Inflow</span>
                     <span className="text-emerald-400 font-bold font-mono">₹{modalData.grossInflow}</span>
                   </div>
                   <div className="flex justify-between py-1.5 border-b border-white/5">
