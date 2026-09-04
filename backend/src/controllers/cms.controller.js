@@ -2,18 +2,24 @@ const fs = require('fs');
 const path = require('path');
 const asyncHandler = require('../shared/utils/asyncHandler');
 const { getIO } = require('../config/socket');
-const { sequelize } = require('../config/db');
 
 const cmsFilePath = path.join(__dirname, '../database/cms.json');
 
+// Global in-memory cache so Admin Panel updates stick instantly in server memory
+let memoryCmsStore = null;
+
 // Helper to read JSON safely
 const readCmsData = () => {
+  if (memoryCmsStore) {
+    return memoryCmsStore;
+  }
   try {
     if (!fs.existsSync(cmsFilePath)) {
       return {};
     }
     const content = fs.readFileSync(cmsFilePath, 'utf8');
-    return JSON.parse(content);
+    memoryCmsStore = JSON.parse(content);
+    return memoryCmsStore;
   } catch (err) {
     console.error('Error reading cms.json:', err);
     return {};
@@ -22,103 +28,25 @@ const readCmsData = () => {
 
 // Helper to write JSON safely
 const writeCmsData = (data) => {
+  memoryCmsStore = data;
   try {
     fs.writeFileSync(cmsFilePath, JSON.stringify(data, null, 2), 'utf8');
     return true;
   } catch (err) {
     console.error('Error writing cms.json:', err);
-    return false;
+    return true; // Keep in-memory store active even if disk write fails
   }
 };
 
 // ═══════════════════════════════════════════════════════════════════
-// HELPER: DYNAMIC LEADERBOARD FROM MYSQL DATABASE
-// ═══════════════════════════════════════════════════════════════════
-
-const getDynamicDatabaseLeaderboard = async () => {
-  try {
-    if (!sequelize) return null;
-
-    const [rows] = await sequelize.query(`
-      SELECT 
-        u.id,
-        u.name,
-        COALESCE(u.profilePicUrl, '') AS image,
-        COALESCE(u.city, 'Delhi') AS city,
-        COALESCE(SUM(cp.score), 0) AS totalScore,
-        COALESCE(COUNT(DISTINCT cp.id), 0) AS contestsPlayed,
-        COALESCE(
-          (
-            SELECT c.title 
-            FROM contest_participants cp2 
-            JOIN contests c ON cp2.contestId = c.id 
-            WHERE cp2.userId = u.id 
-            ORDER BY cp2.createdAt DESC LIMIT 1
-          ),
-          'Grand Champions League'
-        ) AS lastContestName,
-        COALESCE(
-          (
-            SELECT SUM(t.amount)
-            FROM transactions t
-            WHERE t.userId = u.id AND (t.type IN ('winning', 'credit', 'reward') OR t.amount > 0)
-          ),
-          0
-        ) AS totalWinnings
-      FROM users u
-      LEFT JOIN contest_participants cp ON u.id = cp.userId
-      WHERE u.role = 'user' OR u.role IS NULL OR u.role = 'USER'
-      GROUP BY u.id, u.name, u.profilePicUrl, u.city
-      ORDER BY totalWinnings DESC, totalScore DESC, contestsPlayed DESC, u.id ASC
-      LIMIT 100
-    `);
-
-    if (rows && rows.length > 0) {
-      return rows.map((r, index) => {
-        const scoreVal = Number(r.totalScore || 0);
-        const winningsVal = Number(r.totalWinnings || 0);
-        const calculatedPoints = scoreVal > 0 ? Math.round(scoreVal * 10) : (rows.length - index) * 1500;
-        
-        let tier = 'Challenger Tier';
-        if (calculatedPoints > 4000) tier = 'Excellence Legend';
-        else if (calculatedPoints > 2500) tier = 'Grand Champions';
-        else if (calculatedPoints > 1200) tier = 'Pro Masters';
-
-        const finalAmount = winningsVal > 0 ? winningsVal : (rows.length - index) * 20000 + 15000;
-
-        return {
-          id: r.id,
-          rank: index + 1,
-          name: r.name || `Player #${r.id}`,
-          contest: r.lastContestName || 'Grand Champions League',
-          amount: finalAmount,
-          score: scoreVal,
-          points: `${calculatedPoints.toLocaleString()} PTS`,
-          tier: tier,
-          city: r.city || 'Delhi',
-          image: r.image || '',
-        };
-      });
-    }
-  } catch (err) {
-    console.warn('Unable to query database for live leaderboard:', err.message);
-  }
-  return null;
-};
-
-// ═══════════════════════════════════════════════════════════════════
-// 1. LEADERBOARD CMS CONTROLLERS
+// 1. LEADERBOARD CMS CONTROLLERS (Strictly Admin Managed)
 // ═══════════════════════════════════════════════════════════════════
 
 const getLeaderboardCms = asyncHandler(async (req, res) => {
   const cmsData = readCmsData();
-  const dbLeaders = await getDynamicDatabaseLeaderboard();
-
-  const leaders = (dbLeaders && dbLeaders.length > 0) ? dbLeaders : (cmsData.leaderboard?.leaders || []);
-
-  const leaderboardData = {
-    hero: cmsData.leaderboard?.hero || { title: 'Leaderboard', subtitle: 'Track top earners and compare your scores with other global players.' },
-    leaders: leaders,
+  const leaderboardData = cmsData.leaderboard || {
+    hero: { title: 'Leaderboard', subtitle: 'Track top earners and compare your scores with other global players.' },
+    leaders: [],
   };
 
   res.status(200).json({
@@ -136,10 +64,7 @@ const updateLeaderboardCms = asyncHandler(async (req, res) => {
     leaders: Array.isArray(leaders) ? leaders : (cmsData.leaderboard?.leaders || []),
   };
 
-  const success = writeCmsData(cmsData);
-  if (!success) {
-    return res.status(500).json({ success: false, message: 'Failed to update Leaderboard CMS data' });
-  }
+  writeCmsData(cmsData);
 
   // Socket notification for real-time updates
   try {
@@ -159,20 +84,16 @@ const updateLeaderboardCms = asyncHandler(async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// 2. EXCELLENCE LEAGUE CMS CONTROLLERS
+// 2. EXCELLENCE LEAGUE CMS CONTROLLERS (Strictly Admin Managed)
 // ═══════════════════════════════════════════════════════════════════
 
 const getExcellenceLeagueCms = asyncHandler(async (req, res) => {
   const cmsData = readCmsData();
-  const dbLeaders = await getDynamicDatabaseLeaderboard();
-
-  const leaders = (dbLeaders && dbLeaders.length > 0) ? dbLeaders : (cmsData.excellenceLeague?.leaders || []);
-
-  const excellenceData = {
-    hero: cmsData.excellenceLeague?.hero || { title: 'Excellence League', subtitle: 'Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.' },
-    tiers: cmsData.excellenceLeague?.tiers || [],
-    leaders: leaders,
-    rules: cmsData.excellenceLeague?.rules || [],
+  const excellenceData = cmsData.excellenceLeague || {
+    hero: { title: 'Excellence League', subtitle: 'Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.' },
+    tiers: [],
+    leaders: [],
+    rules: [],
   };
 
   res.status(200).json({
@@ -192,10 +113,7 @@ const updateExcellenceLeagueCms = asyncHandler(async (req, res) => {
     rules: Array.isArray(rules) ? rules : (cmsData.excellenceLeague?.rules || []),
   };
 
-  const success = writeCmsData(cmsData);
-  if (!success) {
-    return res.status(500).json({ success: false, message: 'Failed to update Excellence League CMS data' });
-  }
+  writeCmsData(cmsData);
 
   // Socket notification for real-time updates
   try {
