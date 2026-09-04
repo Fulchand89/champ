@@ -16,6 +16,9 @@ import {
 } from 'lucide-react';
 import cmsService from '../../api/services/cmsService';
 
+// Module-level cache — persists for the entire browser session
+let _excellenceLeagueCache = null;
+
 const ManageExcellenceLeague = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -37,21 +40,43 @@ const ManageExcellenceLeague = () => {
   const [leaderForm, setLeaderForm] = useState({ rank: 1, name: '', contest: '', amount: '', points: '', tier: '', city: '', image: '' });
   const [ruleForm, setRuleForm] = useState({ title: '', desc: '' });
 
-  // Fetch initial data
-  const fetchData = async () => {
-    setLoading(true);
+  // Populate state from a data object (cache or API response)
+  const applyData = (data) => {
+    if (!data) return;
+    setHeroTitle(data.hero?.title || 'Excellence League');
+    setHeroSubtitle(data.hero?.subtitle || '');
+    setTiers(data.tiers || []);
+    setLeaders(data.leaders || []);
+    setRules(data.rules || []);
+  };
+
+  // Fetch data — instant from cache, silent background refresh
+  const fetchData = async (showSpinner = true) => {
+    // If cache is warm, apply instantly and refresh silently
+    if (_excellenceLeagueCache) {
+      applyData(_excellenceLeagueCache);
+      setLoading(false);
+      // Silent background refresh (no spinner)
+      try {
+        const res = await cmsService.getAdminExcellenceLeague();
+        if (res?.success && res.data) {
+          _excellenceLeagueCache = res.data;
+          applyData(res.data);
+        }
+      } catch (_) {}
+      return;
+    }
+    // First-ever load — show spinner
+    if (showSpinner) setLoading(true);
     try {
       const res = await cmsService.getAdminExcellenceLeague();
       if (res?.success && res.data) {
-        setHeroTitle(res.data.hero?.title || 'Excellence League');
-        setHeroSubtitle(res.data.hero?.subtitle || '');
-        setTiers(res.data.tiers || []);
-        setLeaders(res.data.leaders || []);
-        setRules(res.data.rules || []);
+        _excellenceLeagueCache = res.data;
+        applyData(res.data);
       }
     } catch (err) {
       console.error('Error fetching Excellence League CMS:', err);
-      toast.error('Failed to load Excellence League CMS content');
+      toast.error('Failed to load Excellence League content');
     } finally {
       setLoading(false);
     }

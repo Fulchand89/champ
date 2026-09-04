@@ -2,10 +2,46 @@ import { useState, Suspense, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from '../components/admin/Sidebar'
 import Header from '../components/admin/Header'
+import userService from '../api/services/userService'
+import { contestService } from '../api/services/contestService'
+import { categoryService } from '../api/services/categoryService'
+import { subjectService } from '../api/services/subjectService'
+import { topicService } from '../api/services/topicService'
+import { transactionService } from '../api/services/transactionService'
+import { withdrawalService } from '../api/services/withdrawalService'
+import { cmsService } from '../api/services/cmsService'
+import { faqService } from '../api/services/faqService'
+import { featureService } from '../api/services/featureService'
+import { systemSettingsService } from '../api/services/systemSettingsService'
+import legalService from '../api/services/legalService'
 
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(window.innerWidth < 768)
   const location = useLocation()
+
+  // Silent background pre-fetch for instant section loading across the entire admin panel
+  useEffect(() => {
+    const prefetchAdminData = async () => {
+      try {
+        userService.getUsers().catch(() => {});
+        contestService.getContests().catch(() => {});
+        categoryService.getCategories().catch(() => {});
+        subjectService.getSubjects().catch(() => {});
+        topicService.getTopics().catch(() => {});
+        transactionService.getTransactions().catch(() => {});
+        withdrawalService.getWithdrawals().catch(() => {});
+        cmsService.getPublicLeaderboard().catch(() => {});
+        cmsService.getPublicExcellenceLeague().catch(() => {});
+        cmsService.getPublicHowItWorks().catch(() => {});
+        faqService.getFAQs().catch(() => {});
+        featureService.getFeatures().catch(() => {});
+        systemSettingsService.getSettings().catch(() => {});
+        legalService.getTermsConditions().catch(() => {});
+        legalService.getPrivacyPolicies().catch(() => {});
+      } catch (_) {}
+    };
+    prefetchAdminData();
+  }, []);
 
   // Auto collapse/expand sidebar on window resize
   useEffect(() => {

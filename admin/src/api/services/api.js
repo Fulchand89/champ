@@ -152,4 +152,91 @@ api.interceptors.response.use(
   }
 );
 
+// ═══════════════════════════════════════════════════════════════════
+// INSTANT DATA CACHING LAYER FOR 0-SECOND ADMIN PANEL LOAD
+// ═══════════════════════════════════════════════════════════════════
+const apiGetCache = new Map();
+
+/**
+ * Safely clone Axios response object data to preserve immutability
+ */
+const cloneResponse = (res) => {
+  if (!res) return res;
+  try {
+    return {
+      ...res,
+      data: res.data !== undefined ? JSON.parse(JSON.stringify(res.data)) : res.data,
+    };
+  } catch (_) {
+    return res;
+  }
+};
+
+/**
+ * Clears the in-memory GET cache (or specific endpoint pattern).
+ */
+export const clearApiCache = (urlPattern) => {
+  if (!urlPattern) {
+    apiGetCache.clear();
+    return;
+  }
+  for (const key of apiGetCache.keys()) {
+    if (key.includes(urlPattern)) {
+      apiGetCache.delete(key);
+    }
+  }
+};
+
+const originalGet = api.get.bind(api);
+const originalPost = api.post.bind(api);
+const originalPut = api.put.bind(api);
+const originalPatch = api.patch.bind(api);
+const originalDelete = api.delete.bind(api);
+
+api.get = function (url, config = {}) {
+  const skipCache = config?.headers?.['x-skip-cache'] === 'true' || config?.skipCache || config?.responseType === 'blob';
+  const cacheKey = `${url}?${JSON.stringify(config?.params || {})}`;
+
+  if (!skipCache && apiGetCache.has(cacheKey)) {
+    const cachedResponse = apiGetCache.get(cacheKey);
+
+    // Silently revalidate in background to keep cache fresh for future requests
+    originalGet(url, config)
+      .then((res) => {
+        apiGetCache.set(cacheKey, res);
+      })
+      .catch(() => {});
+
+    // Return cached response INSTANTLY in 0ms!
+    return Promise.resolve(cloneResponse(cachedResponse));
+  }
+
+  return originalGet(url, config).then((res) => {
+    if (!skipCache) {
+      apiGetCache.set(cacheKey, res);
+    }
+    return res;
+  });
+};
+
+api.post = function (url, data, config) {
+  clearApiCache();
+  return originalPost(url, data, config);
+};
+
+api.put = function (url, data, config) {
+  clearApiCache();
+  return originalPut(url, data, config);
+};
+
+api.patch = function (url, data, config) {
+  clearApiCache();
+  return originalPatch(url, data, config);
+};
+
+api.delete = function (url, config) {
+  clearApiCache();
+  return originalDelete(url, config);
+};
+
 export default api;

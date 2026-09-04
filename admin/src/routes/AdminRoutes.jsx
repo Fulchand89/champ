@@ -1,37 +1,37 @@
-import React, { lazy } from 'react'
+import React from 'react'
 import { Navigate } from 'react-router-dom'
 import AdminLayout from '../layouts/AdminLayout'
 import { ROUTES } from '../constants/routes'
 import ProtectedRoute from './ProtectedRoute'
 
-const Dashboard = lazy(() => import('../pages/admin/Dashboard'))
-const ManageUsers = lazy(() => import('../pages/admin/ManageUsers'))
-const ManageQuizCategories = lazy(() => import('../pages/admin/ManageQuizCategories'))
-const ManageSubjects = lazy(() => import('../pages/admin/ManageSubjects'))
-const ManageTopics = lazy(() => import('../pages/admin/ManageTopics'))
-const UploadQuestions = lazy(() => import('../pages/admin/UploadQuestions'))
-const ManageQuestionBank = lazy(() => import('../pages/admin/ManageQuestionBank'))
-const CreateContest = lazy(() => import('../pages/admin/CreateContest'))
-const ScheduleContest = lazy(() => import('../pages/admin/ScheduleContest'))
-const ConfigureEntryFee = lazy(() => import('../pages/admin/ConfigureEntryFee'))
-const ConfigurePrizePool = lazy(() => import('../pages/admin/ConfigurePrizePool'))
-const MonitorLiveContests = lazy(() => import('../pages/admin/MonitorLiveContests'))
-const Transactions = lazy(() => import('../pages/admin/Transactions'))
-const Deposits = lazy(() => import('../pages/admin/Deposits'))
-const Withdrawals = lazy(() => import('../pages/admin/Withdrawals'))
-const ViewReports = lazy(() => import('../pages/admin/ViewReports'))
-const PrivacyPolicy = lazy(() => import('../pages/admin/PrivacyPolicy'))
-const TermsConditions = lazy(() => import('../pages/admin/TermsConditions'))
-const RefundPolicy = lazy(() => import('../pages/admin/RefundPolicy'))
-const SupportContact = lazy(() => import('../pages/admin/SupportContact'))
-const Profile = lazy(() => import('../pages/admin/Profile'))
-const Settings = lazy(() => import('../pages/admin/Settings'))
-const NotificationsPage = lazy(() => import('../pages/admin/NotificationsPage'))
-const ManageFeatures = lazy(() => import('../pages/admin/ManageFeatures'))
-const ManageFAQ = lazy(() => import('../pages/admin/ManageFAQ'))
-const ManageLeaderboard = lazy(() => import('../pages/admin/ManageLeaderboard'))
-const ManageExcellenceLeague = lazy(() => import('../pages/admin/ManageExcellenceLeague'))
-const ManageHowItWorks = lazy(() => import('../pages/admin/ManageHowItWorks'))
+import Dashboard from '../pages/admin/Dashboard'
+import ManageUsers from '../pages/admin/ManageUsers'
+import ManageQuizCategories from '../pages/admin/ManageQuizCategories'
+import ManageSubjects from '../pages/admin/ManageSubjects'
+import ManageTopics from '../pages/admin/ManageTopics'
+import UploadQuestions from '../pages/admin/UploadQuestions'
+import ManageQuestionBank from '../pages/admin/ManageQuestionBank'
+import CreateContest from '../pages/admin/CreateContest'
+import ScheduleContest from '../pages/admin/ScheduleContest'
+import ConfigureEntryFee from '../pages/admin/ConfigureEntryFee'
+import ConfigurePrizePool from '../pages/admin/ConfigurePrizePool'
+import MonitorLiveContests from '../pages/admin/MonitorLiveContests'
+import Transactions from '../pages/admin/Transactions'
+import Deposits from '../pages/admin/Deposits'
+import Withdrawals from '../pages/admin/Withdrawals'
+import ViewReports from '../pages/admin/ViewReports'
+import PrivacyPolicy from '../pages/admin/PrivacyPolicy'
+import TermsConditions from '../pages/admin/TermsConditions'
+import RefundPolicy from '../pages/admin/RefundPolicy'
+import SupportContact from '../pages/admin/SupportContact'
+import Profile from '../pages/admin/Profile'
+import Settings from '../pages/admin/Settings'
+import NotificationsPage from '../pages/admin/NotificationsPage'
+import ManageFeatures from '../pages/admin/ManageFeatures'
+import ManageFAQ from '../pages/admin/ManageFAQ'
+import ManageLeaderboard from '../pages/admin/ManageLeaderboard'
+import ManageExcellenceLeague from '../pages/admin/ManageExcellenceLeague'
+import ManageHowItWorks from '../pages/admin/ManageHowItWorks'
 
 const AdminRoutes = {
   path: ROUTES.ADMIN.ROOT,
