@@ -244,16 +244,35 @@ const HowItWorks = () => {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
     loadData();
 
-    // Listen for real-time admin updates via socket
+    // Socket listener for instant updates from admin CMS
     const socket = initAdminSocket();
     const handleUpdate = (updatedData) => {
-      if (updatedData) setCmsData(updatedData);
+      if (isMounted && updatedData) setCmsData(updatedData);
     };
     socket.on('cms_how_it_works_updated', handleUpdate);
+
+    // Polling fallback — refetches every 4 seconds to ensure dynamic updates work even without sockets
+    const pollInterval = setInterval(() => {
+      if (isMounted) loadData();
+    }, 4000);
+
+    // Immediate refetch on tab focus or visibility change
+    const handleFocus = () => {
+      if (isMounted) loadData();
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
     return () => {
+      isMounted = false;
       socket.off('cms_how_it_works_updated', handleUpdate);
+      clearInterval(pollInterval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
   }, [loadData]);
 
@@ -261,6 +280,27 @@ const HowItWorks = () => {
   const hero = data.hero || DEFAULT_DATA.hero;
   const callout = data.callout || DEFAULT_DATA.callout;
   const bulletPoints = Array.isArray(callout.bulletPoints) ? callout.bulletPoints : DEFAULT_DATA.callout.bulletPoints;
+
+  // Dynamically map CMS steps or fallback to 8-stage journey
+  const rawCmsSteps = Array.isArray(data.steps) && data.steps.length > 0
+    ? [...data.steps].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+    : [];
+
+  const displaySteps = rawCmsSteps.length >= 5
+    ? rawCmsSteps.map((s, idx) => {
+        const IconComponent = ICON_MAP[s.icon] || UserCheck;
+        const fallbackStep = JOURNEY_STEPS[idx] || {};
+        return {
+          step: s.stepNumber || String(idx + 1).padStart(2, '0'),
+          title: s.title,
+          shortDesc: fallbackStep.shortDesc || `Stage ${idx + 1}`,
+          desc: s.description,
+          icon: IconComponent,
+          color: fallbackStep.color || 'from-red-500 to-rose-600',
+          badge: `Step ${idx + 1}`,
+        };
+      })
+    : JOURNEY_STEPS;
 
   return (
     <div className="min-h-screen bg-[#090b15] text-white flex flex-col font-sans select-none overflow-x-hidden">
@@ -315,10 +355,10 @@ const HowItWorks = () => {
             </p>
           </div>
 
-          {/* 8 Step Grid Cards */}
+          {/* Dynamic 8 Step Grid Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-            {JOURNEY_STEPS.map((item, idx) => {
-              const StepIcon = item.icon;
+            {displaySteps.map((item, idx) => {
+              const StepIcon = item.icon || UserCheck;
               return (
                 <div
                   key={idx}
@@ -353,13 +393,13 @@ const HowItWorks = () => {
                   </div>
 
                   {/* Step Connector Indicator for Next Step */}
-                  {idx < JOURNEY_STEPS.length - 1 && (
+                  {idx < displaySteps.length - 1 && (
                     <div className="mt-4 pt-3 border-t border-gray-800/50 flex items-center text-[11px] font-semibold text-gray-500 group-hover:text-red-400 transition">
                       <span>Next Stage</span>
                       <ArrowRight className="w-3.5 h-3.5 ms-auto" />
                     </div>
                   )}
-                  {idx === JOURNEY_STEPS.length - 1 && (
+                  {idx === displaySteps.length - 1 && (
                     <div className="mt-4 pt-3 border-t border-amber-500/20 flex items-center text-[11px] font-bold text-amber-400">
                       <span>Crown Champion!</span>
                       <Crown className="w-3.5 h-3.5 ms-auto" />
