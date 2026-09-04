@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import {
+  Trophy,
   Plus,
   Trash2,
   Edit2,
