@@ -12,6 +12,11 @@ export const cmsService = {
     return response.data;
   },
 
+  getPublicHowItWorks: async () => {
+    const response = await api.get('/public/cms/how-it-works');
+    return response.data;
+  },
+
   // Admin CMS methods
   getAdminLeaderboard: async () => {
     const response = await api.get('/admin/cms/leaderboard');
@@ -32,6 +37,17 @@ export const cmsService = {
     const response = await api.put('/admin/cms/excellence-league', data);
     return response.data;
   },
+
+  getAdminHowItWorks: async () => {
+    const response = await api.get('/admin/cms/how-it-works');
+    return response.data;
+  },
+
+  updateAdminHowItWorks: async (data) => {
+    const response = await api.put('/admin/cms/how-it-works', data);
+    return response.data;
+  },
 };
 
 export default cmsService;
+

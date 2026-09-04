@@ -230,6 +230,8 @@ router.get('/public/support-contact', legalController.getSupportContact);
 const cmsController = require('../controllers/cms.controller');
 router.get('/public/cms/leaderboard', cmsController.getLeaderboardCms);
 router.get('/public/cms/excellence-league', cmsController.getExcellenceLeagueCms);
+router.get('/public/cms/how-it-works', cmsController.getHowItWorksCms);
+
 
 router.post('/public/contact', async (req, res, next) => {
   try {

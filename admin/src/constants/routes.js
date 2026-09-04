@@ -44,5 +44,6 @@ export const ROUTES = {
     MANAGE_FAQ: '/admin/faq',
     MANAGE_LEADERBOARD: '/admin/cms/leaderboard',
     MANAGE_EXCELLENCE_LEAGUE: '/admin/cms/excellence-league',
+    MANAGE_HOW_IT_WORKS: '/admin/cms/how-it-works',
   },
 }

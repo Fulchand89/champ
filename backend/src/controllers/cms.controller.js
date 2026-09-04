@@ -200,9 +200,80 @@ const updateExcellenceLeagueCms = asyncHandler(async (req, res) => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════════
+// 3. HOW IT WORKS CMS CONTROLLERS
+// ═══════════════════════════════════════════════════════════════════
+
+const defaultHowItWorks = {
+  hero: {
+    title: 'How It',
+    titleHighlight: 'Works',
+    subtitle: 'Getting started is quick and easy. Follow these simple steps to learn, play, and win cash prizes daily.',
+  },
+  steps: [
+    { id: 1, stepNumber: '01', icon: 'Download', title: 'Download & Install', description: 'Download the official KnowChamp App from our website and install it on your device.', displayOrder: 1 },
+    { id: 2, stepNumber: '02', icon: 'UserCheck', title: 'Create Account', description: 'Register in seconds using your mobile number and verify via a secure OTP.', displayOrder: 2 },
+    { id: 3, stepNumber: '03', icon: 'Wallet', title: 'Add Wallet Money', description: 'Deposit funds using secure payment gateways (UPI, cards, wallets) to join cash contests.', displayOrder: 3 },
+    { id: 4, stepNumber: '04', icon: 'PlayCircle', title: 'Play Live Quizzes', description: 'Join active contests, answer multiple-choice questions accurately, and score points.', displayOrder: 4 },
+    { id: 5, stepNumber: '05', icon: 'Trophy', title: 'Win & Withdraw', description: 'Rank high on the leaderboard, earn cash prizes, and withdraw instantly to your bank account.', displayOrder: 5 },
+  ],
+  callout: {
+    title: 'Rules & Fair Play Guidelines',
+    description: 'We employ state-of-the-art anti-cheat detection, quick results calculation, and multi-signature security protocols to ensure that all contests are completely clean, secure, and 100% fair.',
+    bulletPoints: ['No emulator support', 'Single device account', 'Automated anti-bot detection', '24/7 support desk'],
+    ctaText: 'Start Playing Now',
+    ctaLink: '/contests',
+  },
+};
+
+const getHowItWorksCms = asyncHandler(async (req, res) => {
+  const howItWorksData = (await getCmsSectionData('howItWorks')) || defaultHowItWorks;
+
+  res.status(200).json({
+    success: true,
+    data: howItWorksData,
+  });
+});
+
+const updateHowItWorksCms = asyncHandler(async (req, res) => {
+  const { hero, steps, callout } = req.body || {};
+  const existing = (await getCmsSectionData('howItWorks')) || {};
+
+  const howItWorksData = {
+    hero: hero || existing.hero || defaultHowItWorks.hero,
+    steps: Array.isArray(steps)
+      ? steps.map((s, idx) => ({
+          ...s,
+          id: s.id || idx + 1,
+          displayOrder: Number(s.displayOrder) || idx + 1,
+        }))
+      : (existing.steps || defaultHowItWorks.steps),
+    callout: callout || existing.callout || defaultHowItWorks.callout,
+  };
+
+  await saveCmsSectionData('howItWorks', howItWorksData);
+
+  // Broadcast real-time Socket notification
+  try {
+    const io = getIO();
+    if (io && typeof io.emit === 'function') {
+      io.emit('cms_how_it_works_updated', howItWorksData);
+    }
+  } catch (e) { }
+
+  res.status(200).json({
+    success: true,
+    message: 'How It Works content saved and updated successfully',
+    data: howItWorksData,
+  });
+});
+
 module.exports = {
   getLeaderboardCms,
   updateLeaderboardCms,
   getExcellenceLeagueCms,
   updateExcellenceLeagueCms,
+  getHowItWorksCms,
+  updateHowItWorksCms,
 };
+

@@ -192,4 +192,8 @@ router.put('/cms/leaderboard', cmsController.updateLeaderboardCms);
 router.get('/cms/excellence-league', cmsController.getExcellenceLeagueCms);
 router.put('/cms/excellence-league', cmsController.updateExcellenceLeagueCms);
 
+router.get('/cms/how-it-works', cmsController.getHowItWorksCms);
+router.put('/cms/how-it-works', cmsController.updateHowItWorksCms);
+
 module.exports = router;
+

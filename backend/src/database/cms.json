@@ -55,6 +55,67 @@
       }
     ]
   },
+  "howItWorks": {
+    "hero": {
+      "title": "How It",
+      "titleHighlight": "Works",
+      "subtitle": "Getting started is quick and easy. Follow these simple steps to learn, play, and win cash prizes daily."
+    },
+    "steps": [
+      {
+        "id": 1,
+        "stepNumber": "01",
+        "icon": "Download",
+        "title": "Download & Install",
+        "description": "Download the official KnowChamp App from our website and install it on your device.",
+        "displayOrder": 1
+      },
+      {
+        "id": 2,
+        "stepNumber": "02",
+        "icon": "UserCheck",
+        "title": "Create Account",
+        "description": "Register in seconds using your mobile number and verify via a secure OTP.",
+        "displayOrder": 2
+      },
+      {
+        "id": 3,
+        "stepNumber": "03",
+        "icon": "Wallet",
+        "title": "Add Wallet Money",
+        "description": "Deposit funds using secure payment gateways (UPI, cards, wallets) to join cash contests.",
+        "displayOrder": 3
+      },
+      {
+        "id": 4,
+        "stepNumber": "04",
+        "icon": "PlayCircle",
+        "title": "Play Live Quizzes",
+        "description": "Join active contests, answer multiple-choice questions accurately, and score points.",
+        "displayOrder": 4
+      },
+      {
+        "id": 5,
+        "stepNumber": "05",
+        "icon": "Trophy",
+        "title": "Win & Withdraw",
+        "description": "Rank high on the leaderboard, earn cash prizes, and withdraw instantly to your bank account.",
+        "displayOrder": 5
+      }
+    ],
+    "callout": {
+      "title": "Rules & Fair Play Guidelines",
+      "description": "We employ state-of-the-art anti-cheat detection, quick results calculation, and multi-signature security protocols to ensure that all contests are completely clean, secure, and 100% fair.",
+      "bulletPoints": [
+        "No emulator support",
+        "Single device account",
+        "Automated anti-bot detection",
+        "24/7 support desk"
+      ],
+      "ctaText": "Start Playing Now",
+      "ctaLink": "/contests"
+    }
+  },
   "excellenceLeague": {
     "hero": {
       "title": "Excellence League",
