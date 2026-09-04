@@ -1,11 +1,12 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
 import {
-  Download, UserCheck, Wallet, PlayCircle, Trophy, ArrowRight,
-  ShieldCheck, Star, Zap, BookOpen, Gift, Smartphone, CheckCircle,
-  Users, BarChart2, CreditCard, Lock, Headphones,
+  UserCheck, Sparkles, BookOpen, Building2, Trophy, MapPin, Landmark, Crown,
+  Award, Medal, Palette, Book, Mic, Lightbulb, Star, ShieldCheck, CheckCircle2,
+  ArrowRight, ChevronRight, Zap, Target, Brain, HeartHandshake, Compass, Flame,
+  Download, Wallet, PlayCircle, Lock, Headphones, Smartphone, BarChart2, CreditCard, Users
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cmsService } from '../../api/services/cmsService';
@@ -22,9 +23,9 @@ const ICON_MAP = {
   Star,
   Zap,
   BookOpen,
-  Gift,
+  Gift: Trophy,
   Smartphone,
-  CheckCircle,
+  CheckCircle: CheckCircle2,
   Users,
   BarChart2,
   CreditCard,
@@ -33,28 +34,194 @@ const ICON_MAP = {
   Headphones,
 };
 
-// ── Default data (mirrors what's in cms.json) — shown while loading or on error ──
+// ── Default CMS Fallback ──
 const DEFAULT_DATA = {
   hero: {
-    title: 'How It',
+    title: 'How the KnowChamp Excellence League',
     titleHighlight: 'Works',
-    subtitle: 'Getting started is quick and easy. Follow these simple steps to learn, play, and win cash prizes daily.',
+    subtitle: 'Your Journey from School Champion to State Champion Starts Here! Discover, compete, and shine bright.',
   },
   steps: [
-    { id: 1, stepNumber: '01', icon: 'Download', title: 'Download & Install', description: 'Download the official KnowChamp App from our website and install it on your device.', displayOrder: 1 },
-    { id: 2, stepNumber: '02', icon: 'UserCheck', title: 'Create Account', description: 'Register in seconds using your mobile number and verify via a secure OTP.', displayOrder: 2 },
-    { id: 3, stepNumber: '03', icon: 'Wallet', title: 'Add Wallet Money', description: 'Deposit funds using secure payment gateways (UPI, cards, wallets) to join cash contests.', displayOrder: 3 },
-    { id: 4, stepNumber: '04', icon: 'PlayCircle', title: 'Play Live Quizzes', description: 'Join active contests, answer multiple-choice questions accurately, and score points.', displayOrder: 4 },
-    { id: 5, stepNumber: '05', icon: 'Trophy', title: 'Win & Withdraw', description: 'Rank high on the leaderboard, earn cash prizes, and withdraw instantly to your bank account.', displayOrder: 5 },
+    { id: 1, stepNumber: '01', icon: 'UserCheck', title: 'Register', description: 'Register through your School Coordinator or directly on the KnowChamp platform with basic details and DOB.', displayOrder: 1 },
+    { id: 2, stepNumber: '02', icon: 'Zap', title: 'Automatic League Selection', description: 'The system automatically assigns you to your age-appropriate Excellence League.', displayOrder: 2 },
+    { id: 3, stepNumber: '03', icon: 'BookOpen', title: 'Prepare', description: 'Check contest theme, skills assessed, duration, rules, and sample activities before the contest.', displayOrder: 3 },
+    { id: 4, stepNumber: '04', icon: 'Users', title: 'School Competition', description: 'Participate at your school in quizzes, creative tasks, public speaking, and problem solving.', displayOrder: 4 },
+    { id: 5, stepNumber: '05', icon: 'Trophy', title: 'State Grand Finale', description: 'Advance through Sub-Division and District rounds to reach the State Grand Finale and win cash prizes!', displayOrder: 5 },
   ],
   callout: {
     title: 'Rules & Fair Play Guidelines',
-    description: 'We employ state-of-the-art anti-cheat detection, quick results calculation, and multi-signature security protocols to ensure that all contests are completely clean, secure, and 100% fair.',
+    description: 'State-of-the-art anti-cheat detection, quick results calculation, and multi-signature security protocols ensure all contests are completely clean, secure, and 100% fair.',
     bulletPoints: ['No emulator support', 'Single device account', 'Automated anti-bot detection', '24/7 support desk'],
     ctaText: 'Start Playing Now',
     ctaLink: '/contests',
   },
 };
+
+// ── Journey Steps 8-Stage Pipeline Data ──
+const JOURNEY_STEPS = [
+  {
+    step: '01',
+    title: 'Register',
+    shortDesc: 'Quick & Simple Onboarding',
+    desc: 'Register through your School Coordinator or directly on the KnowChamp platform. Simply enter basic details including your Date of Birth.',
+    icon: UserCheck,
+    color: 'from-red-500 to-rose-600',
+    badge: 'Step 1'
+  },
+  {
+    step: '02',
+    title: 'Automatic League Selection',
+    shortDesc: 'Age-Tailored Assignment',
+    desc: 'Based on your age, the system automatically assigns you to the appropriate Excellence League. No manual choice needed!',
+    icon: Sparkles,
+    color: 'from-amber-500 to-orange-600',
+    badge: 'Step 2'
+  },
+  {
+    step: '03',
+    title: 'View Details & Prepare',
+    shortDesc: 'Confident Preparation',
+    desc: 'Visit the Contest Details page to review theme, assessed skills, pattern, duration, official rules, and sample practice activities.',
+    icon: BookOpen,
+    color: 'from-yellow-500 to-amber-600',
+    badge: 'Step 3'
+  },
+  {
+    step: '04',
+    title: 'School Competition',
+    shortDesc: 'Compete at Your School',
+    desc: 'On competition day, all registered students compete at their own school in quizzes, creative arts, speaking, and problem-solving.',
+    icon: Building2,
+    color: 'from-emerald-500 to-teal-600',
+    badge: 'Step 4'
+  },
+  {
+    step: '05',
+    title: 'School Champions',
+    shortDesc: 'Top 3 Qualifiers',
+    desc: 'Schools announce 1st 🥇, 2nd 🥈, and 3rd 🥉 place winners per league who qualify for Sub-Division. Every participant gets recognized!',
+    icon: Medal,
+    color: 'from-cyan-500 to-blue-600',
+    badge: 'Step 5'
+  },
+  {
+    step: '06',
+    title: 'Sub-Division Level',
+    shortDesc: 'Broader Stage Platform',
+    desc: 'School winners across the same Sub-Division compete head-to-head, giving students a broader platform to showcase talent.',
+    icon: MapPin,
+    color: 'from-blue-500 to-indigo-600',
+    badge: 'Step 6'
+  },
+  {
+    step: '07',
+    title: 'District Championship',
+    shortDesc: 'Best Across District',
+    desc: 'Top performers from Sub-Divisions advance to the District Level, competing with elite minds from across the entire district.',
+    icon: Landmark,
+    color: 'from-indigo-500 to-purple-600',
+    badge: 'Step 7'
+  },
+  {
+    step: '08',
+    title: 'State Grand Finale',
+    shortDesc: 'Grand Pinnacle Event',
+    desc: 'District champions clash at the State Grand Finale for prestigious titles, trophies, medals, certificates, and cash prizes!',
+    icon: Crown,
+    color: 'from-purple-500 to-pink-600',
+    badge: 'Step 8'
+  },
+];
+
+// ── 5 Excellence Leagues ──
+const EXCELLENCE_LEAGUES = [
+  {
+    emoji: '🎨',
+    icon: Palette,
+    name: 'Creative League',
+    age: 'Age 3–5 Years',
+    desc: 'Engaging, age-appropriate activities, craft & drawing to ignite early imagination and creative confidence.',
+    accent: 'border-pink-500/30 hover:border-pink-500 text-pink-400 bg-pink-500/5',
+    badgeBg: 'bg-pink-500/10 text-pink-400 border-pink-500/20'
+  },
+  {
+    emoji: '📚',
+    icon: Book,
+    name: 'Knowledge League',
+    age: 'Age 6–8 Years',
+    desc: 'Interactive quizzes, curious exploration, and general awareness designed to build foundational understanding.',
+    accent: 'border-blue-500/30 hover:border-blue-500 text-blue-400 bg-blue-500/5',
+    badgeBg: 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+  },
+  {
+    emoji: '🎤',
+    icon: Mic,
+    name: 'Communication League',
+    age: 'Age 9–12 Years',
+    desc: 'Storytelling, public speaking, dynamic expression, and clear articulation to cultivate confident speakers.',
+    accent: 'border-amber-500/30 hover:border-amber-500 text-amber-400 bg-amber-500/5',
+    badgeBg: 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+  },
+  {
+    emoji: '💡',
+    icon: Lightbulb,
+    name: 'Innovation League',
+    age: 'Age 13–16 Years',
+    desc: 'Practical problem solving, innovation challenges, and creative thinking for future-ready problem solvers.',
+    accent: 'border-emerald-500/30 hover:border-emerald-500 text-emerald-400 bg-emerald-500/5',
+    badgeBg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+  },
+  {
+    emoji: '🌟',
+    icon: Star,
+    name: 'Character League',
+    age: 'Age 17–19 Years',
+    desc: 'Personality and character assessment, ethics, leadership, and emotional intelligence for young leaders.',
+    accent: 'border-purple-500/30 hover:border-purple-500 text-purple-400 bg-purple-500/5',
+    badgeBg: 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+  },
+];
+
+// ── Preparation Details ──
+const PREPARATION_ITEMS = [
+  { title: 'Contest Theme', desc: 'Detailed theme overview provided beforehand so students can research effectively.' },
+  { title: 'Skills Assessed', desc: 'Clear list of key competencies and skills evaluated during the challenge.' },
+  { title: 'Contest Pattern', desc: 'Full pattern details so participants know the exact structure of the competition.' },
+  { title: 'Time Duration', desc: 'Explicit duration guidelines to help manage time wisely during live rounds.' },
+  { title: 'Rules & Instructions', desc: 'Comprehensive instructions ensuring fair play, compliance, and clarity.' },
+  { title: 'Sample Activities', desc: 'Practice examples and sample tasks where applicable for hands-on practice.' },
+];
+
+// ── Competition Activities ──
+const COMPETITION_ACTIVITIES = [
+  'Quiz Questions', 'Creative Activities', 'Drawing & Craft',
+  'Storytelling', 'Public Speaking', 'Innovation Challenges',
+  'Practical Activities', 'Problem Solving', 'Character Assessment'
+];
+
+// ── Recognition Stages ──
+const RECOGNITION_STAGES = [
+  { icon: Medal, title: 'Participation Certificate', desc: 'Awarded to every student to value and celebrate their effort and courage.', color: 'text-blue-400', bg: 'bg-blue-500/10' },
+  { icon: Award, title: 'Merit Recognition', desc: 'Special certificates acknowledging commendable performance and effort.', color: 'text-teal-400', bg: 'bg-teal-500/10' },
+  { icon: Trophy, title: 'School Champion', desc: '1st, 2nd, and 3rd place winners per league qualify for the Sub-Division level.', color: 'text-amber-400', bg: 'bg-amber-500/10' },
+  { icon: MapPin, title: 'Sub-Division Champion', desc: 'Sub-Division winners gain regional honors and advance to the District round.', color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
+  { icon: Landmark, title: 'District Champion', desc: 'Top performers in each district earn prestige and qualify for the State Grand Finale.', color: 'text-purple-400', bg: 'bg-purple-500/10' },
+  { icon: Crown, title: 'State Champion', desc: 'Grand trophies, gold medals, certificates, cash prizes, and Champions Community entry.', color: 'text-red-400', bg: 'bg-red-500/10' },
+];
+
+// ── Skills Developed ──
+const SKILLS_DEVELOPED = [
+  { name: 'Creativity', icon: Palette },
+  { name: 'Knowledge', icon: BookOpen },
+  { name: 'Critical Thinking', icon: Brain },
+  { name: 'Communication', icon: Mic },
+  { name: 'Innovation', icon: Lightbulb },
+  { name: 'Confidence', icon: Flame },
+  { name: 'Leadership', icon: Crown },
+  { name: 'Character', icon: Star },
+  { name: 'Problem Solving', icon: Compass },
+  { name: 'Competitive Spirit', icon: Trophy },
+];
 
 const HowItWorks = () => {
   const [cmsData, setCmsData] = useState(null);
@@ -90,12 +257,8 @@ const HowItWorks = () => {
     };
   }, [loadData]);
 
-  // Use live data or fall back to defaults while loading
   const data = cmsData || DEFAULT_DATA;
   const hero = data.hero || DEFAULT_DATA.hero;
-  const steps = Array.isArray(data.steps) && data.steps.length > 0
-    ? [...data.steps].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
-    : DEFAULT_DATA.steps;
   const callout = data.callout || DEFAULT_DATA.callout;
   const bulletPoints = Array.isArray(callout.bulletPoints) ? callout.bulletPoints : DEFAULT_DATA.callout.bulletPoints;
 
@@ -104,119 +267,389 @@ const HowItWorks = () => {
       <ScrollToTop />
       <Navbar />
 
-      {/* Hero Header */}
-      <div className="relative pt-36 pb-20 bg-gradient-to-b from-[#0b0c16] via-[#100713] to-[#090b15] border-b border-gray-900 flex flex-col items-center text-center">
-        {loading ? (
-          <>
-            <div className="h-12 w-64 bg-white/10 rounded-xl animate-pulse mb-4" />
-            <div className="h-5 w-80 bg-white/5 rounded-lg animate-pulse" />
-          </>
-        ) : (
-          <>
-            <h1 className="text-3xl sm:text-5xl font-black mb-4 text-[#FFFFFF]">
-              {hero.title}{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
-                {hero.titleHighlight}
-              </span>
-            </h1>
-            <p className="text-[#FFFFFF] max-w-xl mx-auto text-sm sm:text-base">
-              {hero.subtitle}
-            </p>
-          </>
-        )}
+      {/* ── 1. Hero Header ── */}
+      <div className="relative pt-36 pb-20 bg-gradient-to-b from-[#0b0c16] via-[#120917] to-[#090b15] border-b border-gray-900 flex flex-col items-center text-center px-4">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs sm:text-sm font-semibold mb-6">
+          <Sparkles className="w-4 h-4" />
+          <span>India's First Holistic Child Excellence League</span>
+        </div>
+
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black mb-4 text-[#FFFFFF] max-w-4xl leading-tight">
+          How the KnowChamp{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 to-amber-500">
+            Excellence League Works
+          </span>
+        </h1>
+
+        <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed">
+          Your Journey from School Champion to State Champion Starts Here! Simple, exciting, and fair — every participant gets the opportunity to learn, compete, and shine bright.
+        </p>
+
+        {/* Quick Journey Navigation Pill Bar */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-xs font-semibold text-gray-400 bg-[#0e1121] px-4 py-3 rounded-2xl border border-gray-800/80 shadow-lg">
+          <span className="text-red-400 font-bold">The Journey:</span>
+          <span>Register</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+          <span>Auto League</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+          <span>Prepare</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+          <span>School Contest</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+          <span>School Champion</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+          <span>Sub-Division</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+          <span>District</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+          <span className="text-amber-400 font-bold">State Grand Finale</span>
+        </div>
       </div>
 
-      <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1 space-y-20">
+      <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1 space-y-24">
 
-        {/* Step-by-Step Flow */}
-        <div className="relative">
-          {/* Connecting Line (desktop) */}
-          <div className="hidden lg:block absolute top-[50%] left-10 right-10 h-0.5 bg-gradient-to-r from-red-500/20 via-orange-500/20 to-blue-500/20 z-0" />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 relative z-10">
-            {loading
-              ? Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="bg-[#0e1121] border border-gray-800/80 rounded-2xl p-6 animate-pulse">
-                    <div className="w-12 h-12 rounded-xl bg-white/5 mb-6" />
-                    <div className="h-4 w-3/4 bg-white/5 rounded mb-3" />
-                    <div className="h-3 w-full bg-white/5 rounded mb-2" />
-                    <div className="h-3 w-5/6 bg-white/5 rounded" />
-                  </div>
-                ))
-              : steps.map((item, idx) => {
-                  const IconComponent = ICON_MAP[item.icon] || Download;
-                  return (
-                    <div
-                      key={item.id || idx}
-                      className="group relative bg-[#0e1121] border border-gray-800/80 rounded-2xl p-6 hover:border-red-500/30 transition-all duration-300 hover:-translate-y-1"
-                    >
-                      {/* Step number badge */}
-                      <span className="absolute top-4 right-4 text-xs font-black text-red-500/20 group-hover:text-red-500/40 transition duration-300 font-mono tracking-widest text-2xl">
-                        {item.stepNumber}
-                      </span>
-
-                      {/* Icon Wrapper */}
-                      <div className="w-12 h-12 rounded-xl bg-red-500/5 group-hover:bg-red-500/10 border border-red-500/10 group-hover:border-red-500/30 flex items-center justify-center mb-6 transition duration-300">
-                        <IconComponent className="w-6 h-6 text-red-500" />
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-red-400 transition duration-300">
-                        {item.title}
-                      </h3>
-
-                      {/* Description */}
-                      <p className="text-xs sm:text-sm text-gray-[#FFFFFF] leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                  );
-                })}
+        {/* ── 2. The 8-Step Visual Journey Roadmap ── */}
+        <section className="space-y-12">
+          <div className="text-center space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
+              Step-by-Step Pathway
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
+              The KnowChamp Excellence Journey
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
+              Follow this clear 8-stage roadmap from registration at your school all the way to statewide glory!
+            </p>
           </div>
-        </div>
 
-        {/* Callout Banner */}
-        <div className="rounded-3xl bg-gradient-to-r from-[#140b20] to-[#0a0d24] border border-red-500/10 p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-10">
-          {loading ? (
-            <div className="space-y-4 max-w-xl w-full">
-              <div className="h-8 w-2/3 bg-white/10 rounded-xl animate-pulse" />
-              <div className="h-4 w-full bg-white/5 rounded animate-pulse" />
-              <div className="h-4 w-5/6 bg-white/5 rounded animate-pulse" />
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                {[1,2,3,4].map(i => <div key={i} className="h-4 bg-white/5 rounded animate-pulse" />)}
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="space-y-4 max-w-xl">
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-                  {callout.title}
-                </h2>
-                <p className="text-sm sm:text-base text-[#FFFFFF] leading-relaxed">
-                  {callout.description}
-                </p>
-                {bulletPoints.length > 0 && (
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-[#FFFFFF] pt-2 font-semibold">
-                    {bulletPoints.map((point, idx) => (
-                      <li key={idx} className="flex items-center gap-2">
-                        <span className="text-red-500 font-bold">✔</span> {point}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <div>
-                <Link
-                  to={callout.ctaLink || '/contests'}
-                  className="inline-flex items-center gap-2 px-8 py-4 btn-brand-primary text-white font-bold rounded-xl shadow-lg transition-all duration-300"
+          {/* 8 Step Grid Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+            {JOURNEY_STEPS.map((item, idx) => {
+              const StepIcon = item.icon;
+              return (
+                <div
+                  key={idx}
+                  className="group relative bg-[#0e1121] border border-gray-800/80 hover:border-red-500/40 rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(239,68,68,0.1)] flex flex-col justify-between"
                 >
-                  {callout.ctaText || 'Start Playing Now'}
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
+                  {/* Step Badge */}
+                  <div className="flex items-center justify-between mb-4">
+                    <span className={`text-xs font-black px-3 py-1 rounded-full text-white bg-gradient-to-r ${item.color}`}>
+                      {item.badge}
+                    </span>
+                    <span className="text-3xl font-black text-gray-800 group-hover:text-gray-700 font-mono transition duration-300">
+                      {item.step}
+                    </span>
+                  </div>
+
+                  {/* Icon */}
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} p-0.5 mb-5 shadow-md flex items-center justify-center`}>
+                    <div className="w-full h-full bg-[#0e1121] rounded-[14px] flex items-center justify-center group-hover:bg-transparent transition-all duration-300">
+                      <StepIcon className="w-7 h-7 text-white" />
+                    </div>
+                  </div>
+
+                  {/* Body */}
+                  <div className="flex-1 space-y-2">
+                    <h3 className="text-lg font-bold text-white group-hover:text-red-400 transition duration-200">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs font-semibold text-amber-400/90">{item.shortDesc}</p>
+                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed pt-1">
+                      {item.desc}
+                    </p>
+                  </div>
+
+                  {/* Step Connector Indicator for Next Step */}
+                  {idx < JOURNEY_STEPS.length - 1 && (
+                    <div className="mt-4 pt-3 border-t border-gray-800/50 flex items-center text-[11px] font-semibold text-gray-500 group-hover:text-red-400 transition">
+                      <span>Next Stage</span>
+                      <ArrowRight className="w-3.5 h-3.5 ms-auto" />
+                    </div>
+                  )}
+                  {idx === JOURNEY_STEPS.length - 1 && (
+                    <div className="mt-4 pt-3 border-t border-amber-500/20 flex items-center text-[11px] font-bold text-amber-400">
+                      <span>Crown Champion!</span>
+                      <Crown className="w-3.5 h-3.5 ms-auto" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ── 3. Five Excellence Leagues Section ── */}
+        <section className="space-y-10">
+          <div className="text-center space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+              Tailored for Every Age
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
+              Five Excellence Leagues
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
+              Our system automatically assigns participants to the appropriate league based on their age — no manual choice required!
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            {EXCELLENCE_LEAGUES.map((league, idx) => {
+              const LeagueIcon = league.icon;
+              return (
+                <div
+                  key={idx}
+                  className={`rounded-3xl bg-[#0e1121] border p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 shadow-md ${league.accent}`}
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-3xl">{league.emoji}</span>
+                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${league.badgeBg}`}>
+                        {league.age}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <LeagueIcon className="w-5 h-5" />
+                      <h3 className="text-base font-bold text-white leading-tight">
+                        {league.name}
+                      </h3>
+                    </div>
+
+                    <p className="text-xs text-gray-300 leading-relaxed">
+                      {league.desc}
+                    </p>
+                  </div>
+
+                  <div className="mt-6 pt-3 border-t border-gray-800/60 text-[11px] text-gray-400 flex items-center justify-between">
+                    <span>Selection</span>
+                    <span className="font-semibold text-emerald-400">Automatic</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ── 4. Preparation & Competition Details Section ── */}
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Contest Preparation Card */}
+          <div className="bg-[#0e1121] border border-gray-800 rounded-3xl p-8 space-y-6 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <BookOpen className="w-6 h-6" />
               </div>
-            </>
-          )}
-        </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-white">
+                Contest Preparation Details
+              </h3>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Before every contest, participants can visit the Contest Details page to prepare with full clarity and confidence:
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              {PREPARATION_ITEMS.map((item, idx) => (
+                <div key={idx} className="p-3.5 rounded-2xl bg-[#12162c] border border-gray-800/80 flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-1" />
+                  <div>
+                    <h4 className="text-xs font-bold text-white">{item.title}</h4>
+                    <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-4 border-t border-gray-800 text-xs text-amber-400/90 font-medium">
+              💡 Sample activities provided where applicable to boost student confidence!
+            </div>
+          </div>
+
+          {/* School Competition & Activities Card */}
+          <div className="bg-[#0e1121] border border-gray-800 rounded-3xl p-8 space-y-6 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <Building2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-white">
+                Participate at Your School
+              </h3>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                On competition day, registered participants compete right at their own school. Depending on the league, challenges include:
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2.5 pt-2">
+              {COMPETITION_ACTIVITIES.map((activity, idx) => (
+                <span
+                  key={idx}
+                  className="px-3.5 py-2 rounded-xl bg-[#12162c] border border-gray-700/60 text-xs font-semibold text-gray-200 hover:text-white hover:border-red-500/40 transition duration-200 flex items-center gap-2"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-red-400" />
+                  {activity}
+                </span>
+              ))}
+            </div>
+
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 text-xs text-emerald-300 leading-relaxed">
+              🏆 <strong>School Winner Progression:</strong> Top 3 participants (1st 🥇, 2nd 🥈, 3rd 🥉) from each league qualify for the Sub-Division level!
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5. Recognition at Every Stage ── */}
+        <section className="space-y-10">
+          <div className="text-center space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
+              Celebrated Endeavors
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
+              Recognition at Every Stage
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
+              Every participant's effort is valued and celebrated at every step of their journey.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {RECOGNITION_STAGES.map((stage, idx) => {
+              const StageIcon = stage.icon;
+              return (
+                <div
+                  key={idx}
+                  className="p-6 rounded-3xl bg-[#0e1121] border border-gray-800 hover:border-gray-700 transition duration-300 flex items-start gap-4"
+                >
+                  <div className={`w-12 h-12 rounded-2xl ${stage.bg} flex items-center justify-center shrink-0`}>
+                    <StageIcon className={`w-6 h-6 ${stage.color}`} />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-base font-bold text-white">{stage.title}</h3>
+                    <p className="text-xs text-gray-300 leading-relaxed">{stage.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="p-6 rounded-3xl bg-gradient-to-r from-[#140b20] via-[#0e1121] to-[#0a0d24] border border-amber-500/20 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold text-white flex items-center justify-center sm:justify-start gap-2">
+                <Crown className="w-5 h-5 text-amber-400" />
+                KnowChamp Champions Community
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-300">
+                Outstanding performers receive certificates, medals, trophies, cash prizes, and the honor of joining our Champions Community.
+              </p>
+            </div>
+            <Link
+              to="/register"
+              className="px-6 py-3 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg whitespace-nowrap transition duration-200"
+            >
+              Join Champions
+            </Link>
+          </div>
+        </section>
+
+        {/* ── 6. More Than Just a Competition & Skills Developed ── */}
+        <section className="bg-[#0e1121] border border-gray-800 rounded-3xl p-8 sm:p-12 space-y-10">
+          <div className="max-w-3xl space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+              Holistic Growth
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
+              More Than Just a Competition
+            </h2>
+            <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+              The KnowChamp Excellence League is not just about winning prizes. It is about discovering potential and building lifelong skills that help children succeed in school and beyond.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">
+              Essential Skills Developed:
+            </h3>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {SKILLS_DEVELOPED.map((skill, idx) => {
+                const SkillIcon = skill.icon;
+                return (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-2xl bg-[#12162c] border border-gray-800/80 flex items-center gap-3 hover:border-red-500/30 transition duration-200 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-red-500/10 group-hover:bg-red-500/20 flex items-center justify-center text-red-400 shrink-0">
+                      <SkillIcon className="w-4 h-4" />
+                    </div>
+                    <span className="text-xs font-bold text-gray-200 group-hover:text-white">
+                      {skill.name}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 7. Rules & Fair Play Callout Banner (Preserving existing Callout CMS & CTA) ── */}
+        <section className="rounded-3xl bg-gradient-to-r from-[#140b20] to-[#0a0d24] border border-red-500/20 p-8 sm:p-12 flex flex-col lg:flex-row items-center justify-between gap-10">
+          <div className="space-y-4 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-bold border border-red-500/20">
+              <ShieldCheck className="w-4 h-4" />
+              <span>Fair Play Guarantee</span>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+              {callout.title || 'Rules & Fair Play Guidelines'}
+            </h2>
+            <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
+              {callout.description || 'We employ state-of-the-art anti-cheat detection, quick results calculation, and multi-signature security protocols to ensure that all contests are completely clean, secure, and 100% fair.'}
+            </p>
+
+            {bulletPoints.length > 0 && (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-gray-200 pt-2 font-semibold">
+                {bulletPoints.map((point, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <span className="text-red-500 font-bold">✔</span> {point}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-lg transition-all duration-300"
+            >
+              <span>Register Now</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+
+            <Link
+              to={callout.ctaLink || '/contests'}
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#12162c] hover:bg-gray-800 text-white font-bold rounded-xl border border-gray-700 transition-all duration-300"
+            >
+              <span>{callout.ctaText || 'Explore Contests'}</span>
+            </Link>
+          </div>
+        </section>
+
+        {/* ── 8. Final Roadmap Summary Banner ── */}
+        <section className="text-center bg-gradient-to-b from-[#0e1121] to-[#0a0d1e] border border-gray-800 rounded-3xl p-8 sm:p-12 space-y-6">
+          <h3 className="text-xl sm:text-3xl font-black text-white">
+            Your Journey to Excellence
+          </h3>
+
+          <div className="max-w-4xl mx-auto p-4 rounded-2xl bg-[#090b15] border border-gray-800 text-xs sm:text-sm font-semibold text-gray-300 flex flex-wrap items-center justify-center gap-2 leading-relaxed">
+            <span className="text-red-400">Register</span> ➔
+            <span className="text-amber-400">Get League Automatically</span> ➔
+            <span className="text-yellow-400">Prepare</span> ➔
+            <span className="text-emerald-400">Compete at School</span> ➔
+            <span className="text-cyan-400">Qualify for Sub-Division</span> ➔
+            <span className="text-indigo-400">District</span> ➔
+            <span className="text-purple-400">State</span> ➔
+            <span className="text-amber-300 font-bold">Become a KnowChamp Champion!</span>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-lg font-bold text-white">KnowChamp Excellence League</p>
+            <p className="text-sm text-gray-400">India's First Holistic Child Excellence League</p>
+            <p className="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 pt-2">
+              Answer Right. Shine Bright.
+            </p>
+          </div>
+        </section>
 
       </div>
 
@@ -226,3 +659,4 @@ const HowItWorks = () => {
 };
 
 export default HowItWorks;
+
