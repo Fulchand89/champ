@@ -83,11 +83,8 @@ const ManageExcellenceLeague = () => {
       const res = await cmsService.updateAdminExcellenceLeague(payload);
       if (res?.success) {
         toast.success('Excellence League CMS content saved successfully!');
-        if (res.data) {
-          setTiers(res.data.tiers || []);
-          setLeaders(res.data.leaders || []);
-          setRules(res.data.rules || []);
-        }
+        // Re-fetch from backend to sync state with saved data
+        await fetchData();
       } else {
         toast.error(res?.message || 'Failed to save changes');
       }

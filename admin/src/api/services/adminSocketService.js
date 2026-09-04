@@ -23,7 +23,7 @@ const SOCKET_URL = getSocketUrl();
 let socket = null;
 
 export const initAdminSocket = () => {
-  if (socket && socket.connected) return socket;
+  if (socket) return socket;
 
   // Vercel serverless backend does not support persistent WebSockets
   if (SOCKET_URL.includes('vercel.app')) {

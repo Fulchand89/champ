@@ -16,6 +16,7 @@ const Leaderboard = () => {
 
   useEffect(() => {
     let isMounted = true;
+
     const fetchLeaderboardCms = async () => {
       try {
         const res = await cmsService.getPublicLeaderboard();
@@ -36,7 +37,7 @@ const Leaderboard = () => {
 
     fetchLeaderboardCms();
 
-    // Socket listener for instant CMS updates
+    // Socket listener for instant CMS updates (works only when backend supports WebSocket)
     const socket = initAdminSocket();
     const handleCmsUpdate = (updatedData) => {
       if (updatedData) {
@@ -44,12 +45,26 @@ const Leaderboard = () => {
         if (Array.isArray(updatedData.leaders)) setLeaders(updatedData.leaders);
       }
     };
-
     socket.on('cms_leaderboard_updated', handleCmsUpdate);
+
+    // Polling fallback — ensures data stays fresh dynamically (e.g. Vercel serverless / HTTP fallback)
+    const pollInterval = setInterval(() => {
+      if (isMounted) fetchLeaderboardCms();
+    }, 4000); // refresh every 4 seconds
+
+    // Immediate refetch on tab focus or visibility change
+    const handleFocus = () => {
+      if (isMounted) fetchLeaderboardCms();
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
 
     return () => {
       isMounted = false;
       socket.off('cms_leaderboard_updated', handleCmsUpdate);
+      clearInterval(pollInterval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
 

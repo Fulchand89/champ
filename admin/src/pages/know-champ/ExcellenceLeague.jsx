@@ -21,6 +21,7 @@ const ExcellenceLeague = () => {
 
   useEffect(() => {
     let isMounted = true;
+
     const fetchExcellenceCms = async () => {
       try {
         const res = await cmsService.getPublicExcellenceLeague();
@@ -39,7 +40,7 @@ const ExcellenceLeague = () => {
 
     fetchExcellenceCms();
 
-    // Socket listener for instant updates
+    // Socket listener for instant updates (works only when backend supports WebSocket)
     const socket = initAdminSocket();
     const handleCmsUpdate = (updatedData) => {
       if (updatedData) {
@@ -49,12 +50,26 @@ const ExcellenceLeague = () => {
         if (Array.isArray(updatedData.rules)) setRules(updatedData.rules);
       }
     };
-
     socket.on('cms_excellence_league_updated', handleCmsUpdate);
+
+    // Polling fallback — ensures data stays fresh dynamically (e.g. Vercel serverless / HTTP fallback)
+    const pollInterval = setInterval(() => {
+      if (isMounted) fetchExcellenceCms();
+    }, 4000); // refresh every 4 seconds
+
+    // Immediate refetch on tab focus or visibility change
+    const handleFocus = () => {
+      if (isMounted) fetchExcellenceCms();
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
 
     return () => {
       isMounted = false;
       socket.off('cms_excellence_league_updated', handleCmsUpdate);
+      clearInterval(pollInterval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
 

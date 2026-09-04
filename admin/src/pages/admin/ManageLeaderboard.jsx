@@ -78,9 +78,8 @@ const ManageLeaderboard = () => {
       const res = await cmsService.updateAdminLeaderboard(payload);
       if (res?.success) {
         toast.success('Leaderboard CMS content saved successfully!');
-        if (res.data) {
-          setLeaders(res.data.leaders || []);
-        }
+        // Re-fetch from backend to sync state with saved data
+        await fetchData();
       } else {
         toast.error(res?.message || 'Failed to save changes');
       }
