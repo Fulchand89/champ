@@ -184,4 +184,12 @@ router.patch('/legal/refund/:id/restore', legalController.restoreRefundVersion);
 router.get('/support-contact', legalController.getSupportContact);
 router.put('/support-contact', legalController.updateSupportContact);
 
+// Admin CMS Endpoints
+const cmsController = require('../controllers/cms.controller');
+router.get('/cms/leaderboard', cmsController.getLeaderboardCms);
+router.put('/cms/leaderboard', cmsController.updateLeaderboardCms);
+
+router.get('/cms/excellence-league', cmsController.getExcellenceLeagueCms);
+router.put('/cms/excellence-league', cmsController.updateExcellenceLeagueCms);
+
 module.exports = router;

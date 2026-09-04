@@ -29,6 +29,8 @@ const Settings = lazy(() => import('../pages/admin/Settings'))
 const NotificationsPage = lazy(() => import('../pages/admin/NotificationsPage'))
 const ManageFeatures = lazy(() => import('../pages/admin/ManageFeatures'))
 const ManageFAQ = lazy(() => import('../pages/admin/ManageFAQ'))
+const ManageLeaderboard = lazy(() => import('../pages/admin/ManageLeaderboard'))
+const ManageExcellenceLeague = lazy(() => import('../pages/admin/ManageExcellenceLeague'))
 
 const AdminRoutes = {
   path: ROUTES.ADMIN.ROOT,
@@ -141,6 +143,14 @@ const AdminRoutes = {
     {
       path: ROUTES.ADMIN.MANAGE_FAQ.replace(ROUTES.ADMIN.ROOT + '/', ''),
       element: <ManageFAQ />,
+    },
+    {
+      path: ROUTES.ADMIN.MANAGE_LEADERBOARD.replace(ROUTES.ADMIN.ROOT + '/', ''),
+      element: <ManageLeaderboard />,
+    },
+    {
+      path: ROUTES.ADMIN.MANAGE_EXCELLENCE_LEAGUE.replace(ROUTES.ADMIN.ROOT + '/', ''),
+      element: <ManageExcellenceLeague />,
     },
     {
       path: '*',

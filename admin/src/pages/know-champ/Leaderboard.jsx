@@ -1,21 +1,65 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
-import { Award, Zap, Trophy, ShieldAlert } from 'lucide-react';
 import { KNOW_CHAMP_WINNERS } from '../../constants/knowChampData';
-import { motion } from 'framer-motion';
+import cmsService from '../../api/services/cmsService';
+import { initAdminSocket } from '../../api/services/adminSocketService';
 
 const Leaderboard = () => {
+  const [hero, setHero] = useState({
+    title: 'Leaderboard',
+    subtitle: 'Track top earners and compare your scores with other global players.',
+  });
+  const [leaders, setLeaders] = useState(KNOW_CHAMP_WINNERS);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLeaderboardCms = async () => {
+      try {
+        const res = await cmsService.getPublicLeaderboard();
+        if (isMounted && res?.success && res.data) {
+          if (res.data.hero?.title) {
+            setHero(res.data.hero);
+          }
+          if (Array.isArray(res.data.leaders) && res.data.leaders.length > 0) {
+            setLeaders(res.data.leaders);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching public leaderboard CMS:', err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchLeaderboardCms();
+
+    // Socket listener for instant CMS updates
+    const socket = initAdminSocket();
+    const handleCmsUpdate = (updatedData) => {
+      if (updatedData) {
+        if (updatedData.hero?.title) setHero(updatedData.hero);
+        if (Array.isArray(updatedData.leaders)) setLeaders(updatedData.leaders);
+      }
+    };
+
+    socket.on('cms_leaderboard_updated', handleCmsUpdate);
+
+    return () => {
+      isMounted = false;
+      socket.off('cms_leaderboard_updated', handleCmsUpdate);
+    };
+  }, []);
+
   // Sort winners by rank/amount
-  const sortedLeaders = [...KNOW_CHAMP_WINNERS].sort((a, b) => a.rank - b.rank);
+  const sortedLeaders = [...leaders].sort((a, b) => (a.rank || 0) - (b.rank || 0));
   const podium = [
     sortedLeaders[1], // Rank 2
     sortedLeaders[0], // Rank 1
     sortedLeaders[2], // Rank 3
   ];
-
-
 
   return (
     <div className="min-h-screen bg-[#090b15] text-white flex flex-col font-sans select-none overflow-x-hidden">
@@ -25,10 +69,10 @@ const Leaderboard = () => {
       {/* Hero Header */}
       <div className="relative pt-32 pb-16 bg-gradient-to-b from-[#0a0715] via-[#100810] to-[#090b15] border-b border-gray-900 flex flex-col items-center text-center">
         <h1 className="text-3xl sm:text-5xl font-black mb-4 text-[#FFFFFF]">
-          Leaderboard
+          {hero.title || 'Leaderboard'}
         </h1>
         <p className="text-[#FFFFFF] max-w-xl mx-auto text-sm sm:text-base">
-          Track top earners and compare your scores with other global players.
+          {hero.subtitle || 'Track top earners and compare your scores with other global players.'}
         </p>
       </div>
 
@@ -59,7 +103,7 @@ const Leaderboard = () => {
                 <p className="text-xs text-[#FFFFFF]">{podium[0].contest}</p>
               </div>
               <div className="text-slate-400 font-extrabold text-lg">
-                ₹{podium[0].amount.toLocaleString()}
+                ₹{Number(podium[0].amount || 0).toLocaleString()}
               </div>
             </div>
           )}
@@ -92,7 +136,7 @@ const Leaderboard = () => {
                 <p className="text-xs text-[#FFFFFF]">{podium[1].contest}</p>
               </div>
               <div className="text-amber-400 font-black text-2xl">
-                ₹{podium[1].amount.toLocaleString()}
+                ₹{Number(podium[1].amount || 0).toLocaleString()}
               </div>
             </div>
           )}
@@ -119,14 +163,12 @@ const Leaderboard = () => {
                 <p className="text-xs text-[#FFFFFF]">{podium[2].contest}</p>
               </div>
               <div className="text-amber-600 font-extrabold text-base">
-                ₹{podium[2].amount.toLocaleString()}
+                ₹{Number(podium[2].amount || 0).toLocaleString()}
               </div>
             </div>
           )}
 
         </div>
-
-
 
         {/* Global Standings Table */}
         <div className="space-y-6">
@@ -144,14 +186,15 @@ const Leaderboard = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-800/40">
                   {sortedLeaders.map((player, idx) => (
-                    <tr key={idx} className="hover:bg-gray-800/20 transition duration-200">
+                    <tr key={player.id || idx} className="hover:bg-gray-800/20 transition duration-200">
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${player.rank === 1 ? 'bg-amber-400 text-gray-950 font-black' :
-                          player.rank === 2 ? 'bg-slate-400 text-[#FFFFFF] font-black' :
-                            player.rank === 3 ? 'bg-amber-600 text-[#FFFFFF] font-black' :
-                              'text-gray-400'
-                          }`}>
-                          {player.rank}
+                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
+                          (player.rank || idx + 1) === 1 ? 'bg-amber-400 text-gray-950 font-black' :
+                          (player.rank || idx + 1) === 2 ? 'bg-slate-400 text-[#FFFFFF] font-black' :
+                          (player.rank || idx + 1) === 3 ? 'bg-amber-600 text-[#FFFFFF] font-black' :
+                          'text-gray-400'
+                        }`}>
+                          {player.rank || idx + 1}
                         </span>
                       </td>
                       <td className="px-6 py-4 font-bold text-white flex items-center gap-3">
@@ -163,14 +206,14 @@ const Leaderboard = () => {
                               className="w-full h-full object-cover object-top"
                             />
                           ) : (
-                            <span>{player.name.charAt(0)}</span>
+                            <span>{player.name ? player.name.charAt(0) : 'P'}</span>
                           )}
                         </div>
                         <span>{player.name}</span>
                       </td>
                       <td className="px-6 py-4 text-[#FFFFFF]">{player.contest}</td>
                       <td className="px-6 py-4 text-right font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
-                        ₹{player.amount.toLocaleString()}
+                        ₹{Number(player.amount || 0).toLocaleString()}
                       </td>
                     </tr>
                   ))}

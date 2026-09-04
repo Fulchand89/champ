@@ -226,6 +226,11 @@ router.get('/public/legal/refund', legalController.getPublicPolicy('refund'));
 
 router.get('/public/support-contact', legalController.getSupportContact);
 
+// Public CMS Endpoints
+const cmsController = require('../controllers/cms.controller');
+router.get('/public/cms/leaderboard', cmsController.getLeaderboardCms);
+router.get('/public/cms/excellence-league', cmsController.getExcellenceLeagueCms);
+
 router.post('/public/contact', async (req, res, next) => {
   try {
     const { name, email, subject, message } = req.body;

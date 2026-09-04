@@ -1,0 +1,192 @@
+{
+  "leaderboard": {
+    "hero": {
+      "title": "Leaderboard",
+      "subtitle": "Track top earners and compare your scores with other global players."
+    },
+    "leaders": [
+      {
+        "id": 1,
+        "rank": 1,
+        "name": "Aarav Sharma",
+        "contest": "Grand Champions League",
+        "amount": 124000,
+        "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": 2,
+        "rank": 2,
+        "name": "Priya Patel",
+        "contest": "Pro Masters League",
+        "amount": 98500,
+        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": 3,
+        "rank": 3,
+        "name": "Rohan Verma",
+        "contest": "Speed Trivia League",
+        "amount": 76200,
+        "image": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": 4,
+        "rank": 4,
+        "name": "Ananya Deshmukh",
+        "contest": "Weekly Mega Battle",
+        "amount": 62000,
+        "image": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": 5,
+        "rank": 5,
+        "name": "Vikramaditya Rao",
+        "contest": "Challenger Arena",
+        "amount": 54500,
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": 6,
+        "rank": 6,
+        "name": "Kavita Singh",
+        "contest": "State Championship",
+        "amount": 48000,
+        "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+      }
+    ]
+  },
+  "excellenceLeague": {
+    "hero": {
+      "title": "Excellence League",
+      "subtitle": "Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards."
+    },
+    "tiers": [
+      {
+        "id": 1,
+        "name": "Challenger Tier",
+        "icon": "🥉",
+        "badge": "Entry Level",
+        "minRating": "0 - 1,200 PTS",
+        "poolShare": "15% Prize Pool",
+        "desc": "Ideal for newcomers mastering speed quizzes."
+      },
+      {
+        "id": 2,
+        "name": "Pro Masters",
+        "icon": "🥈",
+        "badge": "Competitive",
+        "minRating": "1,201 - 2,500 PTS",
+        "poolShare": "25% Prize Pool",
+        "desc": "Multi-category trivia with double coin rewards."
+      },
+      {
+        "id": 3,
+        "name": "Grand Champions",
+        "icon": "🥇",
+        "badge": "Elite Tier",
+        "minRating": "2,501 - 4,000 PTS",
+        "poolShare": "35% Prize Pool",
+        "desc": "Top verified champions with daily mega payouts."
+      },
+      {
+        "id": 4,
+        "name": "Excellence Legend",
+        "icon": "👑",
+        "badge": "Hall of Fame",
+        "minRating": "4,000+ PTS",
+        "poolShare": "25% Jackpot",
+        "desc": "Top 1% national quiz wizards & season trophies."
+      }
+    ],
+    "leaders": [
+      {
+        "id": 1,
+        "rank": 1,
+        "name": "Aarav Sharma",
+        "contest": "Grand Champions League",
+        "amount": 124000,
+        "points": "18,450 PTS",
+        "tier": "Excellence Legend",
+        "city": "Delhi",
+        "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": 2,
+        "rank": 2,
+        "name": "Priya Patel",
+        "contest": "Pro Masters League",
+        "amount": 98500,
+        "points": "16,890 PTS",
+        "tier": "Grand Champion",
+        "city": "Ahmedabad",
+        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": 3,
+        "rank": 3,
+        "name": "Rohan Verma",
+        "contest": "Speed Trivia League",
+        "amount": 76200,
+        "points": "15,420 PTS",
+        "tier": "Grand Champion",
+        "city": "Bengaluru",
+        "image": "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": 4,
+        "rank": 4,
+        "name": "Ananya Deshmukh",
+        "contest": "Weekly Mega Battle",
+        "amount": 62000,
+        "points": "14,100 PTS",
+        "tier": "Pro Master",
+        "city": "Pune",
+        "image": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": 5,
+        "rank": 5,
+        "name": "Vikramaditya Rao",
+        "contest": "Challenger Arena",
+        "amount": 54500,
+        "points": "13,780 PTS",
+        "tier": "Pro Master",
+        "city": "Hyderabad",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80"
+      },
+      {
+        "id": 6,
+        "rank": 6,
+        "name": "Kavita Singh",
+        "contest": "State Championship",
+        "amount": 48000,
+        "points": "12,950 PTS",
+        "tier": "Challenger",
+        "city": "Jaipur",
+        "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+      }
+    ],
+    "rules": [
+      {
+        "id": 1,
+        "title": "Anti-Cheat Engine",
+        "desc": "Real-time response verification ensures complete fair play."
+      },
+      {
+        "id": 2,
+        "title": "Speed Multipliers",
+        "desc": "Answer within 3 seconds to trigger bonus score multipliers."
+      },
+      {
+        "id": 3,
+        "title": "Instant UPI Payouts",
+        "desc": "Winnings are directly credited to your verified wallet."
+      },
+      {
+        "id": 4,
+        "title": "Weekly Season Resets",
+        "desc": "Scores reset every Sunday midnight for a fresh start."
+      }
+    ]
+  }
+}

@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
-import { Trophy, Crown, Zap, ShieldCheck, CheckCircle2 } from 'lucide-react';
-import { KNOW_CHAMP_WINNERS } from '../../constants/knowChampData';
+import { Crown, CheckCircle2 } from 'lucide-react';
+import cmsService from '../../api/services/cmsService';
+import { initAdminSocket } from '../../api/services/adminSocketService';
 
 const ExcellenceLeague = () => {
   const [activeTab, setActiveTab] = useState('weekly');
 
-  const leagueLeaders = [
+  const [hero, setHero] = useState({
+    title: 'Excellence League',
+    subtitle: 'Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.',
+  });
+
+  const [leagueLeaders, setLeagueLeaders] = useState([
     { rank: 1, name: 'Aarav Sharma', contest: 'Grand Champions League', amount: 124000, points: '18,450 PTS', tier: 'Excellence Legend', city: 'Delhi', image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80' },
     { rank: 2, name: 'Priya Patel', contest: 'Pro Masters League', amount: 98500, points: '16,890 PTS', tier: 'Grand Champion', city: 'Ahmedabad', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80' },
     { rank: 3, name: 'Rohan Verma', contest: 'Speed Trivia League', amount: 76200, points: '15,420 PTS', tier: 'Grand Champion', city: 'Bengaluru', image: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80' },
     { rank: 4, name: 'Ananya Deshmukh', contest: 'Weekly Mega Battle', amount: 62000, points: '14,100 PTS', tier: 'Pro Master', city: 'Pune', image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&auto=format&fit=crop&q=80' },
     { rank: 5, name: 'Vikramaditya Rao', contest: 'Challenger Arena', amount: 54500, points: '13,780 PTS', tier: 'Pro Master', city: 'Hyderabad', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80' },
     { rank: 6, name: 'Kavita Singh', contest: 'State Championship', amount: 48000, points: '12,950 PTS', tier: 'Challenger', city: 'Jaipur', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80' },
-  ];
+  ]);
 
-  const podium = [
-    leagueLeaders[1], // Rank 2
-    leagueLeaders[0], // Rank 1
-    leagueLeaders[2], // Rank 3
-  ];
-
-  const leagueTiers = [
+  const [leagueTiers, setLeagueTiers] = useState([
     {
       name: 'Challenger Tier',
       icon: '🥉',
@@ -56,13 +56,57 @@ const ExcellenceLeague = () => {
       poolShare: '25% Jackpot',
       desc: 'Top 1% national quiz wizards & season trophies.'
     }
-  ];
+  ]);
 
-  const rules = [
+  const [rules, setRules] = useState([
     { title: 'Anti-Cheat Engine', desc: 'Real-time response verification ensures complete fair play.' },
     { title: 'Speed Multipliers', desc: 'Answer within 3 seconds to trigger bonus score multipliers.' },
     { title: 'Instant UPI Payouts', desc: 'Winnings are directly credited to your verified wallet.' },
     { title: 'Weekly Season Resets', desc: 'Scores reset every Sunday midnight for a fresh start.' }
+  ]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchExcellenceCms = async () => {
+      try {
+        const res = await cmsService.getPublicExcellenceLeague();
+        if (isMounted && res?.success && res.data) {
+          if (res.data.hero?.title) setHero(res.data.hero);
+          if (Array.isArray(res.data.tiers) && res.data.tiers.length > 0) setLeagueTiers(res.data.tiers);
+          if (Array.isArray(res.data.leaders) && res.data.leaders.length > 0) setLeagueLeaders(res.data.leaders);
+          if (Array.isArray(res.data.rules) && res.data.rules.length > 0) setRules(res.data.rules);
+        }
+      } catch (err) {
+        console.error('Error fetching Excellence League CMS:', err);
+      }
+    };
+
+    fetchExcellenceCms();
+
+    // Socket listener for instant updates
+    const socket = initAdminSocket();
+    const handleCmsUpdate = (updatedData) => {
+      if (updatedData) {
+        if (updatedData.hero?.title) setHero(updatedData.hero);
+        if (Array.isArray(updatedData.tiers)) setLeagueTiers(updatedData.tiers);
+        if (Array.isArray(updatedData.leaders)) setLeagueLeaders(updatedData.leaders);
+        if (Array.isArray(updatedData.rules)) setRules(updatedData.rules);
+      }
+    };
+
+    socket.on('cms_excellence_league_updated', handleCmsUpdate);
+
+    return () => {
+      isMounted = false;
+      socket.off('cms_excellence_league_updated', handleCmsUpdate);
+    };
+  }, []);
+
+  const sortedLeaders = [...leagueLeaders].sort((a, b) => (a.rank || 0) - (b.rank || 0));
+  const podium = [
+    sortedLeaders[1], // Rank 2
+    sortedLeaders[0], // Rank 1
+    sortedLeaders[2], // Rank 3
   ];
 
   return (
@@ -73,10 +117,10 @@ const ExcellenceLeague = () => {
       {/* Hero Header */}
       <div className="relative pt-32 pb-16 bg-gradient-to-b from-[#0a0715] via-[#100810] to-[#090b15] border-b border-gray-900 flex flex-col items-center text-center">
         <h1 className="text-3xl sm:text-5xl font-black mb-4 text-[#FFFFFF]">
-          Excellence League
+          {hero.title || 'Excellence League'}
         </h1>
         <p className="text-[#FFFFFF] max-w-xl mx-auto text-sm sm:text-base">
-          Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.
+          {hero.subtitle || 'Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.'}
         </p>
       </div>
 
@@ -99,7 +143,7 @@ const ExcellenceLeague = () => {
                     className="w-full h-full object-cover object-top"
                   />
                 ) : (
-                  <span className="text-lg font-bold text-white">{podium[0].name.charAt(0)}</span>
+                  <span className="text-lg font-bold text-white">{podium[0].name ? podium[0].name.charAt(0) : 'P'}</span>
                 )}
               </div>
               <div className="text-center">
@@ -107,7 +151,7 @@ const ExcellenceLeague = () => {
                 <p className="text-xs text-gray-400">{podium[0].contest}</p>
               </div>
               <div className="text-slate-400 font-extrabold text-lg">
-                ₹{podium[0].amount.toLocaleString()}
+                ₹{Number(podium[0].amount || 0).toLocaleString()}
               </div>
             </div>
           )}
@@ -130,7 +174,7 @@ const ExcellenceLeague = () => {
                     className="w-full h-full object-cover object-top"
                   />
                 ) : (
-                  <span className="text-2xl font-bold text-white">{podium[1].name.charAt(0)}</span>
+                  <span className="text-2xl font-bold text-white">{podium[1].name ? podium[1].name.charAt(0) : 'P'}</span>
                 )}
               </div>
               <div className="text-center">
@@ -138,7 +182,7 @@ const ExcellenceLeague = () => {
                 <p className="text-xs text-gray-400">{podium[1].contest}</p>
               </div>
               <div className="text-amber-400 font-black text-2xl">
-                ₹{podium[1].amount.toLocaleString()}
+                ₹{Number(podium[1].amount || 0).toLocaleString()}
               </div>
             </div>
           )}
@@ -157,7 +201,7 @@ const ExcellenceLeague = () => {
                     className="w-full h-full object-cover object-top"
                   />
                 ) : (
-                  <span className="text-base font-bold text-white">{podium[2].name.charAt(0)}</span>
+                  <span className="text-base font-bold text-white">{podium[2].name ? podium[2].name.charAt(0) : 'P'}</span>
                 )}
               </div>
               <div className="text-center">
@@ -165,7 +209,7 @@ const ExcellenceLeague = () => {
                 <p className="text-xs text-gray-400">{podium[2].contest}</p>
               </div>
               <div className="text-amber-600 font-extrabold text-base">
-                ₹{podium[2].amount.toLocaleString()}
+                ₹{Number(podium[2].amount || 0).toLocaleString()}
               </div>
             </div>
           )}
@@ -178,12 +222,12 @@ const ExcellenceLeague = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {leagueTiers.map((tier, idx) => (
               <div
-                key={idx}
+                key={tier.id || idx}
                 className="p-5 rounded-2xl bg-[#0e1121] border border-gray-800 flex flex-col justify-between space-y-3"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-2xl">{tier.icon}</span>
+                    <span className="text-2xl">{tier.icon || '🏆'}</span>
                     <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300">
                       {tier.badge}
                     </span>
@@ -237,16 +281,16 @@ const ExcellenceLeague = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-800/40">
-                  {leagueLeaders.map((player, idx) => (
-                    <tr key={idx} className="hover:bg-gray-800/20 transition duration-200">
+                  {sortedLeaders.map((player, idx) => (
+                    <tr key={player.id || idx} className="hover:bg-gray-800/20 transition duration-200">
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                          player.rank === 1 ? 'bg-amber-400 text-gray-950 font-black' :
-                          player.rank === 2 ? 'bg-slate-400 text-white font-black' :
-                          player.rank === 3 ? 'bg-amber-600 text-white font-black' :
+                          (player.rank || idx + 1) === 1 ? 'bg-amber-400 text-gray-950 font-black' :
+                          (player.rank || idx + 1) === 2 ? 'bg-slate-400 text-white font-black' :
+                          (player.rank || idx + 1) === 3 ? 'bg-amber-600 text-white font-black' :
                           'text-gray-400'
                         }`}>
-                          {player.rank}
+                          {player.rank || idx + 1}
                         </span>
                       </td>
                       <td className="px-6 py-4 font-bold text-white flex items-center gap-3">
@@ -258,18 +302,18 @@ const ExcellenceLeague = () => {
                               className="w-full h-full object-cover object-top"
                             />
                           ) : (
-                            <span>{player.name.charAt(0)}</span>
+                            <span>{player.name ? player.name.charAt(0) : 'P'}</span>
                           )}
                         </div>
                         <div>
                           <p className="leading-tight">{player.name}</p>
-                          <span className="text-[11px] text-gray-400 font-normal">{player.city}</span>
+                          <span className="text-[11px] text-gray-400 font-normal">{player.city || 'India'}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-gray-300 text-xs font-semibold">{player.tier}</td>
-                      <td className="px-6 py-4 text-amber-400 font-bold">{player.points}</td>
+                      <td className="px-6 py-4 text-gray-300 text-xs font-semibold">{player.tier || 'Pro Master'}</td>
+                      <td className="px-6 py-4 text-amber-400 font-bold">{player.points || '10,000 PTS'}</td>
                       <td className="px-6 py-4 text-right font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
-                        ₹{player.amount.toLocaleString()}
+                        ₹{Number(player.amount || 0).toLocaleString()}
                       </td>
                     </tr>
                   ))}
@@ -284,7 +328,7 @@ const ExcellenceLeague = () => {
           <h2 className="text-xl sm:text-2xl font-extrabold text-white">League Rules & Fair Play</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {rules.map((rule, idx) => (
-              <div key={idx} className="p-4 rounded-xl bg-[#0e1121] border border-gray-800 flex items-start gap-3.5">
+              <div key={rule.id || idx} className="p-4 rounded-xl bg-[#0e1121] border border-gray-800 flex items-start gap-3.5">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 </div>

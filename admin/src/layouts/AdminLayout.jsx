@@ -30,7 +30,7 @@ const AdminLayout = () => {
   else if (path.includes('/withdrawals')) pageTitle = "Wallet";
   else if (path.includes('/transactions')) pageTitle = "Transactions";
   else if (path.includes('/reports')) pageTitle = "Reports & Analytics";
-  else if (path.includes('/features') || path.includes('/faq') || path.includes('/privacy-policy') || path.includes('/terms-conditions') || path.includes('/refund-policy') || path.includes('/support-contact')) pageTitle = "Content & Support";
+  else if (path.includes('/features') || path.includes('/faq') || path.includes('/cms') || path.includes('/privacy-policy') || path.includes('/terms-conditions') || path.includes('/refund-policy') || path.includes('/support-contact')) pageTitle = "Content & Support";
   else if (path.includes('/settings') || path.includes('/profile')) pageTitle = "Settings";
 
   return (

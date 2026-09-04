@@ -42,5 +42,7 @@ export const ROUTES = {
     NOTIFICATIONS: '/admin/notifications',
     MANAGE_FEATURES: '/admin/features',
     MANAGE_FAQ: '/admin/faq',
+    MANAGE_LEADERBOARD: '/admin/cms/leaderboard',
+    MANAGE_EXCELLENCE_LEAGUE: '/admin/cms/excellence-league',
   },
 }

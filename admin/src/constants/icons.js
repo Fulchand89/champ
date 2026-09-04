@@ -42,6 +42,8 @@ import {
   ArrowUpCircleIcon,
   ArrowsRightLeftIcon,
   WalletIcon,
+  TrophyIcon,
+  AcademicCapIcon,
 } from '@heroicons/react/24/outline'
 
 export const ICONS = {
@@ -88,4 +90,6 @@ export const ICONS = {
   Withdrawals: ArrowUpCircleIcon,
   Transactions: ArrowsRightLeftIcon,
   Wallet: WalletIcon,
+  Leaderboard: TrophyIcon,
+  ExcellenceLeague: AcademicCapIcon,
 }
