@@ -33,6 +33,14 @@ const PublicRoutes = [
     element: withSuspense(ExcellenceLeaguePage),
   },
   {
+    path: '/excellence-league/:leagueSlug',
+    element: withSuspense(ExcellenceLeaguePage),
+  },
+  {
+    path: '/excellence-leagues/:leagueSlug',
+    element: withSuspense(ExcellenceLeaguePage),
+  },
+  {
     path: '/league',
     element: withSuspense(ExcellenceLeaguePage),
   },
