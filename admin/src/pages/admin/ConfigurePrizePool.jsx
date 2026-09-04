@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, RotateCw, Plus, Edit, Trash2, Award, X } from 'lucide-react';
+import { Search, RotateCw, Plus, Edit, Trash2, Award, X, Loader2 } from 'lucide-react';
 import Table from '../../components/common/Table';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import { contestService } from '../../api/services/contestService';
@@ -9,6 +9,7 @@ const ConfigurePrizePool = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [pools, setPools] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,6 +87,7 @@ const ConfigurePrizePool = () => {
       status
     };
 
+    setSubmitting(true);
     try {
       if (modalType === 'add') {
         const res = await contestService.createPrizeTemplate(payload);
@@ -103,8 +105,10 @@ const ConfigurePrizePool = () => {
         }
       }
     } catch (err) {
-      console.error('Error saving prize template:', err);
+      console.error('Error saving prize pool:', err);
       toast.error(err.response?.data?.message || 'Error saving prize template');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -187,10 +191,10 @@ const ConfigurePrizePool = () => {
         </div>
         <button
           onClick={handleOpenAddModal}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all duration-200 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-[#E94B4B]/35 active:translate-y-0 active:scale-[0.97]"
+          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all duration-150 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-115 hover:shadow-lg hover:shadow-[#E94B4B]/35 active:translate-y-0.5 active:scale-95 active:brightness-90"
           style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
         >
-          <Plus size={16} /> Create Prize Template
+          <Plus size={16} /> Create Template
         </button>
       </div>
 
@@ -209,7 +213,7 @@ const ConfigurePrizePool = () => {
           <div className="flex gap-2">
             <button 
               onClick={fetchPools}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-600 hover:bg-gray-800 rounded-lg text-sm transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 border border-gray-600 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer select-none active:scale-95 active:translate-y-0.5 active:brightness-90"
             >
               <RotateCw size={16} /> Refresh
             </button>
@@ -301,16 +305,18 @@ const ConfigurePrizePool = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-gray-600 hover:bg-gray-800 text-white rounded-lg text-sm font-semibold transition-all cursor-pointer"
+                  className="px-4 py-2 border border-gray-600 hover:bg-gray-800 text-white rounded-lg text-sm font-semibold transition-all cursor-pointer select-none active:scale-95 active:translate-y-0.5 active:brightness-90"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all duration-200 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-[#E94B4B]/35 active:translate-y-0 active:scale-[0.97]"
+                  disabled={submitting}
+                  className="flex items-center justify-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all duration-150 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-115 hover:shadow-lg hover:shadow-[#E94B4B]/35 active:translate-y-0.5 active:scale-95 active:brightness-90 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                   style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
                 >
-                  {modalType === 'add' ? 'Create Template' : 'Save Changes'}
+                  {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
+                  {submitting ? (modalType === 'add' ? 'Creating...' : 'Saving...') : (modalType === 'add' ? 'Create Template' : 'Save Changes')}
                 </button>
               </div>
             </form>

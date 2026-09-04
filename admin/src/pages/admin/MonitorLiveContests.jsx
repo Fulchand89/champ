@@ -131,7 +131,7 @@ const MonitorLiveContests = () => {
           <div className="flex gap-2">
             <button 
               onClick={fetchLiveContests}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-600 hover:bg-gray-800 rounded-lg text-sm transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 border border-gray-600 hover:bg-gray-800 text-white rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer select-none active:scale-95 active:translate-y-0.5 active:brightness-90"
             >
               <RotateCw size={16} /> Refresh
             </button>

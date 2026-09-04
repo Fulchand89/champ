@@ -605,7 +605,7 @@ const CreateContest = () => {
             <button
               disabled={submitting}
               type="submit"
-              className="w-full sm:w-auto px-6 py-2.5 text-white rounded-lg text-sm font-semibold transition-all duration-200 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-[#E94B4B]/35 active:translate-y-0 active:scale-[0.97] flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full sm:w-auto px-6 py-2.5 text-white rounded-xl text-sm font-bold transition-all duration-150 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-115 hover:shadow-lg hover:shadow-[#E94B4B]/40 active:translate-y-0.5 active:scale-95 active:brightness-90 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
               style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
             >
               {submitting ? <Loader2 size={16} className="animate-spin" /> : null}
