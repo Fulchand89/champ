@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
-import { Crown, CheckCircle2, Trophy, Users, ArrowRight, Sparkles, ShieldCheck, Calendar, DollarSign, Award, Star, BookOpen, Mic, Lightbulb, Palette } from 'lucide-react';
+import { Trophy, Users, ArrowRight, Star, BookOpen, Mic, Lightbulb, Palette } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import cmsService from '../../api/services/cmsService';
 import { initAdminSocket } from '../../api/services/adminSocketService';
@@ -84,7 +84,6 @@ const LEAGUES_CATALOG = {
 const ExcellenceLeague = () => {
   const { leagueSlug } = useParams();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('weekly');
   const [selectedSlug, setSelectedSlug] = useState('creative-league');
 
   const [leaguesCatalog, setLeaguesCatalog] = useState(LEAGUES_CATALOG);
@@ -94,9 +93,6 @@ const ExcellenceLeague = () => {
     subtitle: 'Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.',
   });
 
-  const [leagueLeaders, setLeagueLeaders] = useState([]);
-  const [leagueTiers, setLeagueTiers] = useState([]);
-  const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Sync selected league slug from route or default
@@ -134,9 +130,6 @@ const ExcellenceLeague = () => {
           return updated;
         });
       }
-      if (Array.isArray(data.tiers)) setLeagueTiers(data.tiers);
-      if (Array.isArray(data.leaders)) setLeagueLeaders(data.leaders);
-      if (Array.isArray(data.rules)) setRules(data.rules);
     };
 
     const fetchExcellenceCms = async () => {
@@ -182,8 +175,6 @@ const ExcellenceLeague = () => {
       document.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
-
-  const sortedLeaders = [...leagueLeaders].sort((a, b) => (a.rank || 0) - (b.rank || 0));
 
   return (
     <div className="min-h-screen bg-[#090b15] text-white flex flex-col font-sans select-none overflow-x-hidden">
@@ -335,4 +326,3 @@ const ExcellenceLeague = () => {
 };
 
 export default ExcellenceLeague;
-
