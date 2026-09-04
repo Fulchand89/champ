@@ -47,7 +47,8 @@ class AuthService {
     formData.append('mobile', userData.mobile);
     formData.append('password', userData.password);
     formData.append('city', userData.city || 'Delhi');
-    formData.append('adharNumber', userData.adharNumber || '123456789012');
+    const uniqueAdhar = userData.adharNumber || String(Math.floor(100000000000 + Math.random() * 900000000000));
+    formData.append('adharNumber', uniqueAdhar);
     formData.append('isTermAccpeted', 'true');
 
     // Valid 1x1 PNG image bytes for dummy documents
