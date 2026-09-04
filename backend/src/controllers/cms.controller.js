@@ -75,7 +75,7 @@ const getCmsSectionData = async (sectionKey) => {
       sequelize.query(
         'INSERT INTO cms_contents (`key`, `content`, `createdAt`, `updatedAt`) VALUES (:key, :content, NOW(), NOW()) ON DUPLICATE KEY UPDATE `content` = :content, `updatedAt` = NOW()',
         { replacements: { key: sectionKey, content: JSON.stringify(fallbackData) } }
-      ).catch(() => {});
+      ).catch(() => { });
     }
   }
   return fallbackData;
@@ -145,7 +145,7 @@ const updateLeaderboardCms = asyncHandler(async (req, res) => {
     if (io && typeof io.emit === 'function') {
       io.emit('cms_leaderboard_updated', leaderboardData);
     }
-  } catch (e) {}
+  } catch (e) { }
 
   res.status(200).json({
     success: true,
@@ -191,7 +191,7 @@ const updateExcellenceLeagueCms = asyncHandler(async (req, res) => {
     if (io && typeof io.emit === 'function') {
       io.emit('cms_excellence_league_updated', excellenceData);
     }
-  } catch (e) {}
+  } catch (e) { }
 
   res.status(200).json({
     success: true,
