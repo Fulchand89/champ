@@ -198,7 +198,7 @@ const ManageLeaderboard = () => {
           <button
             onClick={handleSaveAll}
             disabled={saving || loading}
-            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/30 active:scale-[0.98] text-white text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 transition-all duration-200 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/35 active:translate-y-0 active:scale-[0.97] text-white text-xs font-bold disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Saving...' : 'Save All Changes'}
@@ -460,7 +460,7 @@ const ManageLeaderboard = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/30 active:scale-[0.98] text-white text-xs font-bold transition-all cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 transition-all duration-200 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/35 active:translate-y-0 active:scale-[0.97] text-white text-xs font-bold"
                 >
                   {editingItem ? 'Update Player' : 'Add Player'}
                 </button>

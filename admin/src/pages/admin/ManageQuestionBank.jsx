@@ -461,7 +461,7 @@ const ManageQuestionBank = () => {
         </div>
         <button
           onClick={handleOpenAddModal}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer hover:opacity-90 hover:brightness-110 hover:shadow-lg hover:shadow-[#E94B4B]/30 active:scale-[0.98] shrink-0"
+          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all duration-200 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-[#E94B4B]/35 active:translate-y-0 active:scale-[0.97] shrink-0"
           style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
         >
           <Plus size={16} /> Add Question
@@ -963,7 +963,7 @@ const ManageQuestionBank = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 text-white rounded-lg text-xs font-semibold cursor-pointer hover:opacity-90 hover:brightness-110 hover:shadow-lg hover:shadow-[#E94B4B]/30 active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
+                  className="px-5 py-2 text-white rounded-lg text-xs font-semibold cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-[#E94B4B]/35 active:translate-y-0 active:scale-[0.97] transition-all duration-200 ease-out disabled:opacity-50"
                   style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
                 >
                   {submitting ? 'Saving...' : modalType === 'add' ? 'Create Question' : 'Save Changes'}

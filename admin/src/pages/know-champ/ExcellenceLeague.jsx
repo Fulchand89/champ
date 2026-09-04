@@ -14,56 +14,10 @@ const ExcellenceLeague = () => {
     subtitle: 'Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.',
   });
 
-  const [leagueLeaders, setLeagueLeaders] = useState([
-    { rank: 1, name: 'Aarav Sharma', contest: 'Grand Champions League', amount: 124000, points: '18,450 PTS', tier: 'Excellence Legend', city: 'Delhi', image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80' },
-    { rank: 2, name: 'Priya Patel', contest: 'Pro Masters League', amount: 98500, points: '16,890 PTS', tier: 'Grand Champion', city: 'Ahmedabad', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80' },
-    { rank: 3, name: 'Rohan Verma', contest: 'Speed Trivia League', amount: 76200, points: '15,420 PTS', tier: 'Grand Champion', city: 'Bengaluru', image: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&auto=format&fit=crop&q=80' },
-    { rank: 4, name: 'Ananya Deshmukh', contest: 'Weekly Mega Battle', amount: 62000, points: '14,100 PTS', tier: 'Pro Master', city: 'Pune', image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&auto=format&fit=crop&q=80' },
-    { rank: 5, name: 'Vikramaditya Rao', contest: 'Challenger Arena', amount: 54500, points: '13,780 PTS', tier: 'Pro Master', city: 'Hyderabad', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80' },
-    { rank: 6, name: 'Kavita Singh', contest: 'State Championship', amount: 48000, points: '12,950 PTS', tier: 'Challenger', city: 'Jaipur', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80' },
-  ]);
-
-  const [leagueTiers, setLeagueTiers] = useState([
-    {
-      name: 'Challenger Tier',
-      icon: '🥉',
-      badge: 'Entry Level',
-      minRating: '0 - 1,200 PTS',
-      poolShare: '15% Prize Pool',
-      desc: 'Ideal for newcomers mastering speed quizzes.'
-    },
-    {
-      name: 'Pro Masters',
-      icon: '🥈',
-      badge: 'Competitive',
-      minRating: '1,201 - 2,500 PTS',
-      poolShare: '25% Prize Pool',
-      desc: 'Multi-category trivia with double coin rewards.'
-    },
-    {
-      name: 'Grand Champions',
-      icon: '🥇',
-      badge: 'Elite Tier',
-      minRating: '2,501 - 4,000 PTS',
-      poolShare: '35% Prize Pool',
-      desc: 'Top verified champions with daily mega payouts.'
-    },
-    {
-      name: 'Excellence Legend',
-      icon: '👑',
-      badge: 'Hall of Fame',
-      minRating: '4,000+ PTS',
-      poolShare: '25% Jackpot',
-      desc: 'Top 1% national quiz wizards & season trophies.'
-    }
-  ]);
-
-  const [rules, setRules] = useState([
-    { title: 'Anti-Cheat Engine', desc: 'Real-time response verification ensures complete fair play.' },
-    { title: 'Speed Multipliers', desc: 'Answer within 3 seconds to trigger bonus score multipliers.' },
-    { title: 'Instant UPI Payouts', desc: 'Winnings are directly credited to your verified wallet.' },
-    { title: 'Weekly Season Resets', desc: 'Scores reset every Sunday midnight for a fresh start.' }
-  ]);
+  const [leagueLeaders, setLeagueLeaders] = useState([]);
+  const [leagueTiers, setLeagueTiers] = useState([]);
+  const [rules, setRules] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -72,12 +26,14 @@ const ExcellenceLeague = () => {
         const res = await cmsService.getPublicExcellenceLeague();
         if (isMounted && res?.success && res.data) {
           if (res.data.hero?.title) setHero(res.data.hero);
-          if (Array.isArray(res.data.tiers) && res.data.tiers.length > 0) setLeagueTiers(res.data.tiers);
-          if (Array.isArray(res.data.leaders) && res.data.leaders.length > 0) setLeagueLeaders(res.data.leaders);
-          if (Array.isArray(res.data.rules) && res.data.rules.length > 0) setRules(res.data.rules);
+          if (Array.isArray(res.data.tiers)) setLeagueTiers(res.data.tiers);
+          if (Array.isArray(res.data.leaders)) setLeagueLeaders(res.data.leaders);
+          if (Array.isArray(res.data.rules)) setRules(res.data.rules);
         }
       } catch (err) {
         console.error('Error fetching Excellence League CMS:', err);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
@@ -219,30 +175,36 @@ const ExcellenceLeague = () => {
         {/* League Tiers Grid */}
         <div className="space-y-6">
           <h2 className="text-xl sm:text-2xl font-extrabold text-white">League Tier Divisions</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {leagueTiers.map((tier, idx) => (
-              <div
-                key={tier.id || idx}
-                className="p-5 rounded-2xl bg-[#0e1121] border border-gray-800 flex flex-col justify-between space-y-3"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-2xl">{tier.icon || '🏆'}</span>
-                    <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300">
-                      {tier.badge}
-                    </span>
+          {leagueTiers.length === 0 ? (
+            <div className="p-6 rounded-2xl bg-[#0e1121] border border-gray-800 text-center text-gray-400 text-sm">
+              {loading ? 'Loading league tier divisions...' : 'No league tier divisions configured.'}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {leagueTiers.map((tier, idx) => (
+                <div
+                  key={tier.id || idx}
+                  className="p-5 rounded-2xl bg-[#0e1121] border border-gray-800 flex flex-col justify-between space-y-3"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{tier.icon || '🏆'}</span>
+                      <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300">
+                        {tier.badge}
+                      </span>
+                    </div>
+                    <h3 className="text-base font-bold text-white">{tier.name}</h3>
+                    <p className="text-xs font-semibold text-amber-400 mt-0.5">{tier.minRating}</p>
+                    <p className="text-xs text-gray-400 mt-2 leading-relaxed">{tier.desc}</p>
                   </div>
-                  <h3 className="text-base font-bold text-white">{tier.name}</h3>
-                  <p className="text-xs font-semibold text-amber-400 mt-0.5">{tier.minRating}</p>
-                  <p className="text-xs text-gray-400 mt-2 leading-relaxed">{tier.desc}</p>
+                  <div className="pt-3 border-t border-gray-800 flex items-center justify-between text-xs">
+                    <span className="text-gray-500">Prize Share</span>
+                    <span className="font-bold text-white">{tier.poolShare}</span>
+                  </div>
                 </div>
-                <div className="pt-3 border-t border-gray-800 flex items-center justify-between text-xs">
-                  <span className="text-gray-500">Prize Share</span>
-                  <span className="font-bold text-white">{tier.poolShare}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Global Standings Table */}
@@ -281,42 +243,50 @@ const ExcellenceLeague = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-800/40">
-                  {sortedLeaders.map((player, idx) => (
-                    <tr key={player.id || idx} className="hover:bg-gray-800/20 transition duration-200">
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                          (player.rank || idx + 1) === 1 ? 'bg-amber-400 text-gray-950 font-black' :
-                          (player.rank || idx + 1) === 2 ? 'bg-slate-400 text-white font-black' :
-                          (player.rank || idx + 1) === 3 ? 'bg-amber-600 text-white font-black' :
-                          'text-gray-400'
-                        }`}>
-                          {player.rank || idx + 1}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 font-bold text-white flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-800 border border-gray-700 flex items-center justify-center text-xs text-gray-300 shrink-0">
-                          {player.image ? (
-                            <img
-                              src={player.image}
-                              alt={player.name}
-                              className="w-full h-full object-cover object-top"
-                            />
-                          ) : (
-                            <span>{player.name ? player.name.charAt(0) : 'P'}</span>
-                          )}
-                        </div>
-                        <div>
-                          <p className="leading-tight">{player.name}</p>
-                          <span className="text-[11px] text-gray-400 font-normal">{player.city || 'India'}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-300 text-xs font-semibold">{player.tier || 'Pro Master'}</td>
-                      <td className="px-6 py-4 text-amber-400 font-bold">{player.points || '10,000 PTS'}</td>
-                      <td className="px-6 py-4 text-right font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
-                        ₹{Number(player.amount || 0).toLocaleString()}
+                  {sortedLeaders.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-8 text-center text-gray-400">
+                        {loading ? 'Loading league standings...' : 'No league standings available.'}
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    sortedLeaders.map((player, idx) => (
+                      <tr key={player.id || idx} className="hover:bg-gray-800/20 transition duration-200">
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
+                            (player.rank || idx + 1) === 1 ? 'bg-amber-400 text-gray-950 font-black' :
+                            (player.rank || idx + 1) === 2 ? 'bg-slate-400 text-white font-black' :
+                            (player.rank || idx + 1) === 3 ? 'bg-amber-600 text-white font-black' :
+                            'text-gray-400'
+                          }`}>
+                            {player.rank || idx + 1}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-bold text-white flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-800 border border-gray-700 flex items-center justify-center text-xs text-gray-300 shrink-0">
+                            {player.image ? (
+                              <img
+                                src={player.image}
+                                alt={player.name}
+                                className="w-full h-full object-cover object-top"
+                              />
+                            ) : (
+                              <span>{player.name ? player.name.charAt(0) : 'P'}</span>
+                            )}
+                          </div>
+                          <div>
+                            <p className="leading-tight">{player.name}</p>
+                            <span className="text-[11px] text-gray-400 font-normal">{player.city || 'India'}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-gray-300 text-xs font-semibold">{player.tier || 'Pro Master'}</td>
+                        <td className="px-6 py-4 text-amber-400 font-bold">{player.points || '10,000 PTS'}</td>
+                        <td className="px-6 py-4 text-right font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">
+                          ₹{Number(player.amount || 0).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -326,19 +296,25 @@ const ExcellenceLeague = () => {
         {/* Rules Section */}
         <div className="space-y-6">
           <h2 className="text-xl sm:text-2xl font-extrabold text-white">League Rules & Fair Play</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {rules.map((rule, idx) => (
-              <div key={rule.id || idx} className="p-4 rounded-xl bg-[#0e1121] border border-gray-800 flex items-start gap-3.5">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          {rules.length === 0 ? (
+            <div className="p-6 rounded-2xl bg-[#0e1121] border border-gray-800 text-center text-gray-400 text-sm">
+              {loading ? 'Loading league rules...' : 'No league rules configured.'}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {rules.map((rule, idx) => (
+                <div key={rule.id || idx} className="p-4 rounded-xl bg-[#0e1121] border border-gray-800 flex items-start gap-3.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white">{rule.title}</h3>
+                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">{rule.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white">{rule.title}</h3>
-                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">{rule.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
       </div>

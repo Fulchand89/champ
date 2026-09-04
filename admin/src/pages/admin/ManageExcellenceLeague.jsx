@@ -248,7 +248,7 @@ const ManageExcellenceLeague = () => {
           <button
             onClick={handleSaveAll}
             disabled={saving || loading}
-            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/30 active:scale-[0.98] text-white text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 transition-all duration-200 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/35 active:translate-y-0 active:scale-[0.97] text-white text-xs font-bold disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Saving...' : 'Save All Changes'}
@@ -595,7 +595,7 @@ const ManageExcellenceLeague = () => {
               </div>
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
                 <button type="button" onClick={() => setModalType(null)} className="px-4 py-2 rounded-xl bg-white/5 text-white text-xs">Cancel</button>
-                <button type="submit" className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/30 active:scale-[0.98] text-white text-xs font-bold transition-all cursor-pointer">Save Tier</button>
+                <button type="submit" className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 transition-all duration-200 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/35 active:translate-y-0 active:scale-[0.97] text-white text-xs font-bold">Save Tier</button>
               </div>
             </form>
           </div>
@@ -686,7 +686,7 @@ const ManageExcellenceLeague = () => {
               </div>
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
                 <button type="button" onClick={() => setModalType(null)} className="px-4 py-2 rounded-xl bg-white/5 text-white text-xs">Cancel</button>
-                <button type="submit" className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/30 active:scale-[0.98] text-white text-xs font-bold transition-all cursor-pointer">Save Player</button>
+                <button type="submit" className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 transition-all duration-200 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/35 active:translate-y-0 active:scale-[0.97] text-white text-xs font-bold">Save Player</button>
               </div>
             </form>
           </div>
@@ -725,7 +725,7 @@ const ManageExcellenceLeague = () => {
               </div>
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
                 <button type="button" onClick={() => setModalType(null)} className="px-4 py-2 rounded-xl bg-white/5 text-white text-xs">Cancel</button>
-                <button type="submit" className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/30 active:scale-[0.98] text-white text-xs font-bold transition-all cursor-pointer">Save Rule</button>
+                <button type="submit" className="px-5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-600 transition-all duration-200 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-red-500/35 active:translate-y-0 active:scale-[0.97] text-white text-xs font-bold">Save Rule</button>
               </div>
             </form>
           </div>
