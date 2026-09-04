@@ -19,6 +19,64 @@ import cmsService from '../../api/services/cmsService';
 // Module-level cache — persists for the entire browser session
 let _excellenceLeagueCache = null;
 
+const DEFAULT_LEAGUES = {
+  'creative-league': {
+    slug: 'creative-league',
+    name: 'Creative League',
+    tagline: 'Identification of imagination, artistic expression, observation, and creative thinking.',
+    ageGroup: '3–5 Years',
+    code: 'K1',
+    schedule: '14 Nov 2026, 10:00 AM',
+    entryFee: '₹100.00',
+    maxScore: '100.00',
+    emoji: '🎨',
+  },
+  'knowledge-league': {
+    slug: 'knowledge-league',
+    name: 'Knowledge League',
+    tagline: 'Fostering general awareness, curiosity, critical thinking, and core knowledge foundation.',
+    ageGroup: '6–8 Years',
+    code: 'K2',
+    schedule: '15 Nov 2026, 10:00 AM',
+    entryFee: '₹100.00',
+    maxScore: '100.00',
+    emoji: '📚',
+  },
+  'communication-league': {
+    slug: 'communication-league',
+    name: 'Communication League',
+    tagline: 'Enhancing storytelling, public speaking, dynamic expression, and clear articulation.',
+    ageGroup: '9–12 Years',
+    code: 'K3',
+    schedule: '16 Nov 2026, 10:00 AM',
+    entryFee: '₹100.00',
+    maxScore: '100.00',
+    emoji: '🎤',
+  },
+  'innovation-league': {
+    slug: 'innovation-league',
+    name: 'Innovation League',
+    tagline: 'Encouraging practical problem solving, tech concepts, innovation, and creative thinking.',
+    ageGroup: '13–16 Years',
+    code: 'K4',
+    schedule: '17 Nov 2026, 10:00 AM',
+    entryFee: '₹100.00',
+    maxScore: '100.00',
+    emoji: '💡',
+  },
+  'character-league': {
+    slug: 'character-league',
+    name: 'Character League',
+    tagline: 'Developing personality, leadership, ethics, integrity, and character assessment.',
+    ageGroup: '17–19 Years',
+    code: 'K5',
+    schedule: '18 Nov 2026, 10:00 AM',
+    entryFee: '₹100.00',
+    maxScore: '100.00',
+    emoji: '🌟',
+  },
+};
+
 const ManageExcellenceLeague = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -27,6 +85,7 @@ const ManageExcellenceLeague = () => {
   // Form State
   const [heroTitle, setHeroTitle] = useState('Excellence League');
   const [heroSubtitle, setHeroSubtitle] = useState('Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.');
+  const [leagues, setLeagues] = useState(DEFAULT_LEAGUES);
   const [tiers, setTiers] = useState([]);
   const [leaders, setLeaders] = useState([]);
   const [rules, setRules] = useState([]);
@@ -45,6 +104,9 @@ const ManageExcellenceLeague = () => {
     if (!data) return;
     setHeroTitle(data.hero?.title || 'Excellence League');
     setHeroSubtitle(data.hero?.subtitle || '');
+    if (data.leagues && typeof data.leagues === 'object') {
+      setLeagues({ ...DEFAULT_LEAGUES, ...data.leagues });
+    }
     setTiers(data.tiers || []);
     setLeaders(data.leaders || []);
     setRules(data.rules || []);
@@ -95,6 +157,7 @@ const ManageExcellenceLeague = () => {
           title: heroTitle,
           subtitle: heroSubtitle,
         },
+        leagues,
         tiers,
         leaders: leaders.map((item, idx) => ({
           ...item,
@@ -110,6 +173,7 @@ const ManageExcellenceLeague = () => {
         if (res.data) {
           if (res.data.hero?.title) setHeroTitle(res.data.hero.title);
           if (res.data.hero?.subtitle) setHeroSubtitle(res.data.hero.subtitle);
+          if (res.data.leagues) setLeagues({ ...DEFAULT_LEAGUES, ...res.data.leagues });
           if (Array.isArray(res.data.tiers)) setTiers(res.data.tiers);
           if (Array.isArray(res.data.leaders)) setLeaders(res.data.leaders);
           if (Array.isArray(res.data.rules)) setRules(res.data.rules);
@@ -291,6 +355,7 @@ const ManageExcellenceLeague = () => {
           <div className="flex items-center gap-2 border-b border-white/10 pb-3 overflow-x-auto">
             {[
               { id: 'hero', label: 'Hero Header', icon: Sparkles },
+              { id: 'leagues', label: '5 Leagues Catalog', icon: Award },
               { id: 'tiers', label: `Tier Divisions (${tiers.length})`, icon: Layers },
               { id: 'leaders', label: `League Standings (${leaders.length})`, icon: Trophy },
               { id: 'rules', label: `Rules & Fair Play (${rules.length})`, icon: ShieldCheck },
@@ -342,6 +407,119 @@ const ManageExcellenceLeague = () => {
                   />
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* TAB: 5 LEAGUES CATALOG */}
+          {activeTab === 'leagues' && (
+            <div className="space-y-6">
+              {Object.keys(leagues).map((slug) => {
+                const lg = leagues[slug];
+                return (
+                  <div key={slug} className="bg-[#0f1117] p-6 rounded-2xl border border-white/10 space-y-4">
+                    <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">{lg.emoji}</span>
+                        <h3 className="text-base font-bold text-white">{lg.name} ({lg.code})</h3>
+                      </div>
+                      <span className="text-xs font-mono text-gray-500">/{lg.slug}</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">League Name</label>
+                        <input
+                          type="text"
+                          value={lg.name}
+                          onChange={(e) => setLeagues({
+                            ...leagues,
+                            [slug]: { ...lg, name: e.target.value }
+                          })}
+                          className="w-full px-3.5 py-2 bg-[#0a0c12] border border-white/10 rounded-xl text-xs text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">Age Group</label>
+                        <input
+                          type="text"
+                          value={lg.ageGroup}
+                          onChange={(e) => setLeagues({
+                            ...leagues,
+                            [slug]: { ...lg, ageGroup: e.target.value }
+                          })}
+                          className="w-full px-3.5 py-2 bg-[#0a0c12] border border-white/10 rounded-xl text-xs text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">League Code</label>
+                        <input
+                          type="text"
+                          value={lg.code}
+                          onChange={(e) => setLeagues({
+                            ...leagues,
+                            [slug]: { ...lg, code: e.target.value }
+                          })}
+                          className="w-full px-3.5 py-2 bg-[#0a0c12] border border-white/10 rounded-xl text-xs text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">Schedule</label>
+                        <input
+                          type="text"
+                          value={lg.schedule}
+                          onChange={(e) => setLeagues({
+                            ...leagues,
+                            [slug]: { ...lg, schedule: e.target.value }
+                          })}
+                          className="w-full px-3.5 py-2 bg-[#0a0c12] border border-white/10 rounded-xl text-xs text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">Entry Fee</label>
+                        <input
+                          type="text"
+                          value={lg.entryFee}
+                          onChange={(e) => setLeagues({
+                            ...leagues,
+                            [slug]: { ...lg, entryFee: e.target.value }
+                          })}
+                          className="w-full px-3.5 py-2 bg-[#0a0c12] border border-white/10 rounded-xl text-xs text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">Max Score</label>
+                        <input
+                          type="text"
+                          value={lg.maxScore}
+                          onChange={(e) => setLeagues({
+                            ...leagues,
+                            [slug]: { ...lg, maxScore: e.target.value }
+                          })}
+                          className="w-full px-3.5 py-2 bg-[#0a0c12] border border-white/10 rounded-xl text-xs text-white"
+                        />
+                      </div>
+
+                      <div className="md:col-span-3">
+                        <label className="block text-xs font-semibold text-gray-300 mb-1">Tagline / Description</label>
+                        <textarea
+                          rows="2"
+                          value={lg.tagline}
+                          onChange={(e) => setLeagues({
+                            ...leagues,
+                            [slug]: { ...lg, tagline: e.target.value }
+                          })}
+                          className="w-full px-3.5 py-2 bg-[#0a0c12] border border-white/10 rounded-xl text-xs text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 

@@ -161,6 +161,7 @@ const updateLeaderboardCms = asyncHandler(async (req, res) => {
 const getExcellenceLeagueCms = asyncHandler(async (req, res) => {
   const excellenceData = (await getCmsSectionData('excellenceLeague')) || {
     hero: { title: 'Excellence League', subtitle: 'Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.' },
+    leagues: {},
     tiers: [],
     leaders: [],
     rules: [],
@@ -173,11 +174,12 @@ const getExcellenceLeagueCms = asyncHandler(async (req, res) => {
 });
 
 const updateExcellenceLeagueCms = asyncHandler(async (req, res) => {
-  const { hero, tiers, leaders, rules } = req.body || {};
+  const { hero, leagues, tiers, leaders, rules } = req.body || {};
   const existing = (await getCmsSectionData('excellenceLeague')) || {};
 
   const excellenceData = {
     hero: hero || existing.hero || { title: 'Excellence League', subtitle: '' },
+    leagues: leagues || existing.leagues || {},
     tiers: Array.isArray(tiers) ? tiers : (existing.tiers || []),
     leaders: Array.isArray(leaders) ? leaders : (existing.leaders || []),
     rules: Array.isArray(rules) ? rules : (existing.rules || []),

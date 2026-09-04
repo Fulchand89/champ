@@ -121,6 +121,63 @@
       "title": "Excellence League",
       "subtitle": "Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards."
     },
+    "leagues": {
+      "creative-league": {
+        "slug": "creative-league",
+        "name": "Creative League",
+        "tagline": "Identification of imagination, artistic expression, observation, and creative thinking.",
+        "ageGroup": "3–5 Years",
+        "code": "K1",
+        "schedule": "14 Nov 2026, 10:00 AM",
+        "entryFee": "₹100.00",
+        "maxScore": "100.00",
+        "emoji": "🎨"
+      },
+      "knowledge-league": {
+        "slug": "knowledge-league",
+        "name": "Knowledge League",
+        "tagline": "Fostering general awareness, curiosity, critical thinking, and core knowledge foundation.",
+        "ageGroup": "6–8 Years",
+        "code": "K2",
+        "schedule": "15 Nov 2026, 10:00 AM",
+        "entryFee": "₹100.00",
+        "maxScore": "100.00",
+        "emoji": "📚"
+      },
+      "communication-league": {
+        "slug": "communication-league",
+        "name": "Communication League",
+        "tagline": "Enhancing storytelling, public speaking, dynamic expression, and clear articulation.",
+        "ageGroup": "9–12 Years",
+        "code": "K3",
+        "schedule": "16 Nov 2026, 10:00 AM",
+        "entryFee": "₹100.00",
+        "maxScore": "100.00",
+        "emoji": "🎤"
+      },
+      "innovation-league": {
+        "slug": "innovation-league",
+        "name": "Innovation League",
+        "tagline": "Encouraging practical problem solving, tech concepts, innovation, and creative thinking.",
+        "ageGroup": "13–16 Years",
+        "code": "K4",
+        "schedule": "17 Nov 2026, 10:00 AM",
+        "entryFee": "₹100.00",
+        "maxScore": "100.00",
+        "emoji": "💡"
+      },
+      "character-league": {
+        "slug": "character-league",
+        "name": "Character League",
+        "tagline": "Developing personality, leadership, ethics, integrity, and character assessment.",
+        "ageGroup": "17–19 Years",
+        "code": "K5",
+        "schedule": "18 Nov 2026, 10:00 AM",
+        "entryFee": "₹100.00",
+        "maxScore": "100.00",
+        "emoji": "🌟"
+      }
+    },
     "tiers": [
       {
         "id": 1,
