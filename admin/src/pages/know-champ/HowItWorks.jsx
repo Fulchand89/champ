@@ -574,7 +574,7 @@ const HowItWorks = () => {
             </div>
             <Link
               to="/register"
-              className="px-6 py-3 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg whitespace-nowrap transition duration-200"
+              className="px-6 py-3 btn-brand-primary text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg whitespace-nowrap transition duration-200"
             >
               Join Champions
             </Link>
@@ -650,7 +650,7 @@ const HowItWorks = () => {
           <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
             <Link
               to="/register"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold rounded-xl shadow-lg transition-all duration-300"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 btn-brand-primary text-white font-bold rounded-xl shadow-lg transition-all duration-300"
             >
               <span>Register Now</span>
               <ArrowRight className="w-5 h-5" />

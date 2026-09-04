@@ -46,13 +46,20 @@ class AuthService {
     formData.append('email', userData.email);
     formData.append('mobile', userData.mobile);
     formData.append('password', userData.password);
-    formData.append('city', 'Delhi');
-    formData.append('adharNumber', '123456789012');
+    formData.append('city', userData.city || 'Delhi');
+    formData.append('adharNumber', userData.adharNumber || '123456789012');
     formData.append('isTermAccpeted', 'true');
 
-    const dummyBlob = new Blob([new Uint8Array([71, 73, 70, 56, 57, 97, 1, 0, 1, 0, 128, 0, 0, 0, 0, 0, 255, 255, 255, 33, 249, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 2, 68, 1, 0, 59])], { type: 'image/gif' });
-    formData.append('adharImages', dummyBlob, 'adhar_front.gif');
-    formData.append('adharImages', dummyBlob, 'adhar_back.gif');
+    // Valid 1x1 PNG image bytes for dummy documents
+    const dummyPngBytes = new Uint8Array([
+      137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82,
+      0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 0, 0, 0, 31, 213, 196, 237, 0, 0, 0,
+      13, 73, 68, 65, 84, 120, 156, 99, 96, 0, 0, 0, 2, 0, 1, 229, 39,
+      222, 106, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130
+    ]);
+    const dummyBlob = new Blob([dummyPngBytes], { type: 'image/png' });
+    formData.append('adharImages', dummyBlob, 'adhar_front.png');
+    formData.append('adharImages', dummyBlob, 'adhar_back.png');
 
     const response = await api.post('auth/register', formData, {
       headers: {

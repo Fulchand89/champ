@@ -56,6 +56,7 @@ const fileFilter = (req, file, cb) => {
     'image/png',
     'image/webp',
     'image/svg+xml',
+    'image/gif',
   ];
 
   const allowedDocMimes = [
@@ -106,6 +107,7 @@ const fileFilter = (req, file, cb) => {
       '.png',
       '.webp',
       '.svg',
+      '.gif',
     ].includes(ext)
   ) {
 
