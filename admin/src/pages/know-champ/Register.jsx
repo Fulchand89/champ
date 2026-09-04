@@ -332,7 +332,11 @@ const Register = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-[48px] flex items-center justify-center gap-2 rounded-xl btn-brand-primary text-white font-bold text-sm tracking-wide shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-102 hover:shadow-red-500/20 active:scale-98 cursor-pointer mt-4"
+                  style={{
+                    background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%)',
+                    boxShadow: '0 4px 18px rgba(239, 68, 68, 0.4)',
+                  }}
+                  className="w-full h-[48px] flex items-center justify-center gap-2 rounded-xl text-white font-bold text-sm tracking-wide transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-95 hover:scale-[1.01] active:scale-[0.99] cursor-pointer mt-4"
                 >
                   {loading ? (
                     <>

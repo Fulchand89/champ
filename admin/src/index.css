@@ -363,32 +363,39 @@ body {
 }
 
 /* ── Brand Button Styles ── */
-.btn-brand-primary {
-  background: linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%) !important;
+.btn-brand-primary,
+.btn-gradient {
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%) !important;
   color: #ffffff !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 10px !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 18px rgba(239, 68, 68, 0.4) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   cursor: pointer !important;
 }
 
-.btn-brand-primary:hover {
-  opacity: 0.95 !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.35) !important;
+.btn-brand-primary:hover,
+.btn-gradient:hover {
+  background: linear-gradient(135deg, #F87171 0%, #EF4444 50%, #B91C1C 100%) !important;
+  box-shadow: 0 6px 24px rgba(239, 68, 68, 0.6) !important;
+  transform: translateY(-2px) !important;
+  color: #ffffff !important;
 }
 
-.btn-brand-primary:active {
-  transform: translateY(1px);
+.btn-brand-primary:active,
+.btn-gradient:active {
+  transform: translateY(0) scale(0.98) !important;
 }
 
 .btn-brand-outline {
-  border: 2px solid #E94B4B !important;
+  border: 2px solid #EF4444 !important;
   color: #ffffff !important;
   background: transparent !important;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease !important;
 }
 
 .btn-brand-outline:hover {
-  background: linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%) !important;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%) !important;
   border-color: transparent !important;
 }

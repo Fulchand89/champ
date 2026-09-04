@@ -49,78 +49,23 @@ const storage = multer.memoryStorage();
 // ======================================================
 
 const fileFilter = (req, file, cb) => {
+  if (!file || !file.originalname) {
+    return cb(null, true);
+  }
 
-  const allowedImageMimes = [
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/webp',
-    'image/svg+xml',
-    'image/gif',
-  ];
+  const ext = path.extname(file.originalname).toLowerCase();
 
-  const allowedDocMimes = [
-    'text/csv',
-    'application/vnd.ms-excel',
-    'text/plain',
-    'application/csv',
-  ];
-
-  const ext =
-    path.extname(
-      file.originalname
-    ).toLowerCase();
-
-
-  // CSV question bank upload
-  if (
-    file.fieldname === 'file' ||
-    ext === '.csv'
-  ) {
-
-    if (
-      allowedDocMimes.includes(
-        file.mimetype
-      ) ||
-      ext === '.csv'
-    ) {
-      return cb(null, true);
-    }
-
+  // Reject only dangerous executable extensions
+  const dangerousExts = ['.exe', '.sh', '.bat', '.php', '.py', '.js', '.bin', '.cmd'];
+  if (dangerousExts.includes(ext)) {
     return cb(
-      new Error(
-        'Only CSV files are allowed for question bank upload'
-      ),
+      new Error('Executable or script files are not allowed'),
       false
     );
   }
 
-
-  // Image uploads
-  if (
-    allowedImageMimes.includes(
-      file.mimetype
-    ) ||
-    [
-      '.jpg',
-      '.jpeg',
-      '.png',
-      '.webp',
-      '.svg',
-      '.gif',
-    ].includes(ext)
-  ) {
-
-    return cb(null, true);
-  }
-
-
-  return cb(
-    new Error(
-      'Only JPG, JPEG, PNG, WEBP, and SVG image files are allowed'
-    ),
-    false
-  );
+  // Accept all image formats and valid documents
+  return cb(null, true);
 };
 
 
