@@ -370,7 +370,7 @@ const ScheduleContest = () => {
         </div>
         <button
           onClick={handleOpenAddModal}
-          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all cursor-pointer hover:opacity-90"
+          className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer hover:opacity-90 hover:brightness-110 hover:shadow-lg hover:shadow-[#E94B4B]/30 active:scale-[0.98]"
           style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
         >
           <Plus size={16} /> Schedule Contest
@@ -610,7 +610,7 @@ const ScheduleContest = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all cursor-pointer hover:opacity-90"
+                  className="px-4 py-2 text-white rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer hover:opacity-90 hover:brightness-110 hover:shadow-lg hover:shadow-[#E94B4B]/30 active:scale-[0.98]"
                   style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
                 >
                   {modalType === 'add' ? 'Schedule' : 'Save Changes'}
