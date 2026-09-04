@@ -78,14 +78,18 @@ const ManageLeaderboard = () => {
       const res = await cmsService.updateAdminLeaderboard(payload);
       if (res?.success) {
         toast.success('Leaderboard CMS content saved successfully!');
-        // Re-fetch from backend to sync state with saved data
-        await fetchData();
+        if (res.data) {
+          if (res.data.hero?.title) setHeroTitle(res.data.hero.title);
+          if (res.data.hero?.subtitle) setHeroSubtitle(res.data.hero.subtitle);
+          if (Array.isArray(res.data.leaders)) setLeaders(res.data.leaders);
+        }
       } else {
         toast.error(res?.message || 'Failed to save changes');
       }
     } catch (err) {
       console.error('Error saving leaderboard CMS:', err);
-      toast.error('An error occurred while saving');
+      const errMsg = err?.response?.data?.message || err?.message || 'An error occurred while saving';
+      toast.error(errMsg);
     } finally {
       setSaving(false);
     }

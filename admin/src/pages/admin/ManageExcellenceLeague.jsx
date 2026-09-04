@@ -83,14 +83,20 @@ const ManageExcellenceLeague = () => {
       const res = await cmsService.updateAdminExcellenceLeague(payload);
       if (res?.success) {
         toast.success('Excellence League CMS content saved successfully!');
-        // Re-fetch from backend to sync state with saved data
-        await fetchData();
+        if (res.data) {
+          if (res.data.hero?.title) setHeroTitle(res.data.hero.title);
+          if (res.data.hero?.subtitle) setHeroSubtitle(res.data.hero.subtitle);
+          if (Array.isArray(res.data.tiers)) setTiers(res.data.tiers);
+          if (Array.isArray(res.data.leaders)) setLeaders(res.data.leaders);
+          if (Array.isArray(res.data.rules)) setRules(res.data.rules);
+        }
       } else {
         toast.error(res?.message || 'Failed to save changes');
       }
     } catch (err) {
       console.error('Error saving Excellence League CMS:', err);
-      toast.error('An error occurred while saving');
+      const errMsg = err?.response?.data?.message || err?.message || 'An error occurred while saving';
+      toast.error(errMsg);
     } finally {
       setSaving(false);
     }
