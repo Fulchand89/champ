@@ -56,9 +56,10 @@ const NAV = [
     items: [
       { label: 'Manage Features', path: ROUTES.ADMIN.MANAGE_FEATURES, icon: 'Sparkles' },
       { label: 'Manage FAQs', path: ROUTES.ADMIN.MANAGE_FAQ, icon: 'FAQ' },
-      { label: 'Leaderboard CMS', path: ROUTES.ADMIN.MANAGE_LEADERBOARD, icon: 'Leaderboard' },
-      { label: 'Excellence League CMS', path: ROUTES.ADMIN.MANAGE_EXCELLENCE_LEAGUE, icon: 'ExcellenceLeague' },
-      { label: 'How It Works CMS', path: ROUTES.ADMIN.MANAGE_HOW_IT_WORKS, icon: 'Globe' },
+      { label: 'Leaderboard', path: ROUTES.ADMIN.MANAGE_LEADERBOARD, icon: 'Leaderboard' },
+      { label: 'Excellence League', path: ROUTES.ADMIN.MANAGE_EXCELLENCE_LEAGUE, icon: 'ExcellenceLeague' },
+      { label: 'How It Works', path: ROUTES.ADMIN.MANAGE_HOW_IT_WORKS, icon: 'Globe' },
+
       { label: 'Privacy Policy', path: ROUTES.ADMIN.PRIVACY_POLICY, icon: 'PrivacyPolicy' },
       { label: 'Terms & Conditions', path: ROUTES.ADMIN.TERMS_CONDITIONS, icon: 'TermsConditions' },
       { label: 'Refund Policy', path: ROUTES.ADMIN.REFUND_POLICY, icon: 'RefundPolicy' },
