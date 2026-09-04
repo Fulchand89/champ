@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import {
   Globe,
@@ -46,26 +46,37 @@ const TABS = [
 const inputClass = 'block w-full px-3 py-2 border border-gray-600 rounded-lg text-sm bg-[#0f1117] text-white focus:outline-none focus:border-[#E94B4B]';
 const labelClass = 'block text-xs font-bold text-gray-300 mb-1.5';
 
+const DEFAULT_EXCELLENCE_STEPS = [
+  { id: 1, stepNumber: '01', icon: 'UserCheck', title: 'Register', description: 'Register through your School Coordinator or directly on the KnowChamp platform with basic details and DOB.', displayOrder: 1 },
+  { id: 2, stepNumber: '02', icon: 'Zap', title: 'Automatic League Selection', description: 'Based on your age, the system automatically assigns you to the appropriate Excellence League.', displayOrder: 2 },
+  { id: 3, stepNumber: '03', icon: 'BookOpen', title: 'View Details & Prepare', description: 'Visit the Contest Details page to review theme, assessed skills, pattern, duration, official rules, and sample activities.', displayOrder: 3 },
+  { id: 4, stepNumber: '04', icon: 'Users', title: 'School Competition', description: 'On competition day, all registered students compete at their own school in quizzes, creative arts, speaking, and problem-solving.', displayOrder: 4 },
+  { id: 5, stepNumber: '05', icon: 'Trophy', title: 'School Champions', description: 'Schools announce 1st 🥇, 2nd 🥈, and 3rd 🥉 place winners per league who qualify for Sub-Division.', displayOrder: 5 },
+  { id: 6, stepNumber: '06', icon: 'MapPin', title: 'Sub-Division Level', description: 'School winners across the same Sub-Division compete head-to-head, giving students a broader platform to showcase talent.', displayOrder: 6 },
+  { id: 7, stepNumber: '07', icon: 'Landmark', title: 'District Championship', description: 'Top performers from Sub-Divisions advance to the District Level, competing with elite minds from across the entire district.', displayOrder: 7 },
+  { id: 8, stepNumber: '08', icon: 'Crown', title: 'State Grand Finale', description: 'District champions clash at the State Grand Finale for prestigious titles, trophies, medals, certificates, and cash prizes!', displayOrder: 8 },
+];
+
 const ManageHowItWorks = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('hero');
 
-  const [heroTitle, setHeroTitle] = useState('How It');
+  const [heroTitle, setHeroTitle] = useState('How the KnowChamp Excellence League');
   const [heroHighlight, setHeroHighlight] = useState('Works');
-  const [heroSubtitle, setHeroSubtitle] = useState('');
+  const [heroSubtitle, setHeroSubtitle] = useState('Your Journey from School Champion to State Champion Starts Here! Discover, compete, and shine bright.');
 
-  const [steps, setSteps] = useState([]);
+  const [steps, setSteps] = useState(DEFAULT_EXCELLENCE_STEPS);
 
-  const [calloutTitle, setCalloutTitle] = useState('');
-  const [calloutDesc, setCalloutDesc] = useState('');
-  const [bulletPoints, setBulletPoints] = useState(['']);
+  const [calloutTitle, setCalloutTitle] = useState('Rules & Fair Play Guidelines');
+  const [calloutDesc, setCalloutDesc] = useState('State-of-the-art anti-cheat detection, quick results calculation, and multi-signature security protocols ensure all contests are completely clean, secure, and 100% fair.');
+  const [bulletPoints, setBulletPoints] = useState(['No emulator support', 'Single device account', 'Automated anti-bot detection', '24/7 support desk']);
   const [ctaText, setCtaText] = useState('Start Playing Now');
   const [ctaLink, setCtaLink] = useState('/contests');
 
   const [stepModalOpen, setStepModalOpen] = useState(false);
   const [editingStep, setEditingStep] = useState(null);
-  const [stepForm, setStepForm] = useState({ stepNumber: '', icon: 'Download', title: '', description: '', displayOrder: 1 });
+  const [stepForm, setStepForm] = useState({ stepNumber: '', icon: 'UserCheck', title: '', description: '', displayOrder: 1 });
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [stepToDelete, setStepToDelete] = useState(null);
@@ -77,13 +88,18 @@ const ManageHowItWorks = () => {
       const res = await cmsService.getAdminHowItWorks();
       if (res?.success && res.data) {
         const d = res.data;
-        setHeroTitle(d.hero?.title || 'How It');
+        setHeroTitle(d.hero?.title || 'How the KnowChamp Excellence League');
         setHeroHighlight(d.hero?.titleHighlight || 'Works');
-        setHeroSubtitle(d.hero?.subtitle || '');
-        setSteps(Array.isArray(d.steps) ? [...d.steps].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0)) : []);
-        setCalloutTitle(d.callout?.title || '');
-        setCalloutDesc(d.callout?.description || '');
-        setBulletPoints(Array.isArray(d.callout?.bulletPoints) && d.callout.bulletPoints.length > 0 ? d.callout.bulletPoints : ['']);
+        setHeroSubtitle(d.hero?.subtitle || 'Your Journey from School Champion to State Champion Starts Here! Discover, compete, and shine bright.');
+        
+        const fetchedSteps = Array.isArray(d.steps) && d.steps.length > 0
+          ? [...d.steps].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
+          : DEFAULT_EXCELLENCE_STEPS;
+        setSteps(fetchedSteps);
+        
+        setCalloutTitle(d.callout?.title || 'Rules & Fair Play Guidelines');
+        setCalloutDesc(d.callout?.description || 'State-of-the-art anti-cheat detection, quick results calculation, and multi-signature security protocols ensure all contests are completely clean, secure, and 100% fair.');
+        setBulletPoints(Array.isArray(d.callout?.bulletPoints) && d.callout.bulletPoints.length > 0 ? d.callout.bulletPoints : ['No emulator support', 'Single device account', 'Automated anti-bot detection', '24/7 support desk']);
         setCtaText(d.callout?.ctaText || 'Start Playing Now');
         setCtaLink(d.callout?.ctaLink || '/contests');
       }

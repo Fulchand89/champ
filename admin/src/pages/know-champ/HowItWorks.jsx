@@ -43,10 +43,13 @@ const DEFAULT_DATA = {
   },
   steps: [
     { id: 1, stepNumber: '01', icon: 'UserCheck', title: 'Register', description: 'Register through your School Coordinator or directly on the KnowChamp platform with basic details and DOB.', displayOrder: 1 },
-    { id: 2, stepNumber: '02', icon: 'Zap', title: 'Automatic League Selection', description: 'The system automatically assigns you to your age-appropriate Excellence League.', displayOrder: 2 },
-    { id: 3, stepNumber: '03', icon: 'BookOpen', title: 'Prepare', description: 'Check contest theme, skills assessed, duration, rules, and sample activities before the contest.', displayOrder: 3 },
-    { id: 4, stepNumber: '04', icon: 'Users', title: 'School Competition', description: 'Participate at your school in quizzes, creative tasks, public speaking, and problem solving.', displayOrder: 4 },
-    { id: 5, stepNumber: '05', icon: 'Trophy', title: 'State Grand Finale', description: 'Advance through Sub-Division and District rounds to reach the State Grand Finale and win cash prizes!', displayOrder: 5 },
+    { id: 2, stepNumber: '02', icon: 'Zap', title: 'Automatic League Selection', description: 'Based on your age, the system automatically assigns you to the appropriate Excellence League.', displayOrder: 2 },
+    { id: 3, stepNumber: '03', icon: 'BookOpen', title: 'View Details & Prepare', description: 'Visit the Contest Details page to review theme, assessed skills, pattern, duration, official rules, and sample activities.', displayOrder: 3 },
+    { id: 4, stepNumber: '04', icon: 'Users', title: 'School Competition', description: 'On competition day, all registered students compete at their own school in quizzes, creative arts, speaking, and problem-solving.', displayOrder: 4 },
+    { id: 5, stepNumber: '05', icon: 'Trophy', title: 'School Champions', description: 'Schools announce 1st 🥇, 2nd 🥈, and 3rd 🥉 place winners per league who qualify for Sub-Division.', displayOrder: 5 },
+    { id: 6, stepNumber: '06', icon: 'MapPin', title: 'Sub-Division Level', description: 'School winners across the same Sub-Division compete head-to-head, giving students a broader platform to showcase talent.', displayOrder: 6 },
+    { id: 7, stepNumber: '07', icon: 'Landmark', title: 'District Championship', description: 'Top performers from Sub-Divisions advance to the District Level, competing with elite minds from across the entire district.', displayOrder: 7 },
+    { id: 8, stepNumber: '08', icon: 'Crown', title: 'State Grand Finale', description: 'District champions clash at the State Grand Finale for prestigious titles, trophies, medals, certificates, and cash prizes!', displayOrder: 8 },
   ],
   callout: {
     title: 'Rules & Fair Play Guidelines',
@@ -286,7 +289,7 @@ const HowItWorks = () => {
     ? [...data.steps].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0))
     : [];
 
-  const displaySteps = rawCmsSteps.length >= 5
+  const displaySteps = rawCmsSteps.length > 0
     ? rawCmsSteps.map((s, idx) => {
         const IconComponent = ICON_MAP[s.icon] || UserCheck;
         const fallbackStep = JOURNEY_STEPS[idx] || {};
