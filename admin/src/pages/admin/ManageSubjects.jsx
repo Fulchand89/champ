@@ -21,6 +21,7 @@ const ManageSubjects = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [subjectToDelete, setSubjectToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // Form states
   const [name, setName] = useState('');
@@ -91,6 +92,7 @@ const ManageSubjects = () => {
       isActive
     };
 
+    setSubmitting(true);
     try {
       if (modalType === 'add') {
         const res = await subjectService.createSubject(payload);
@@ -110,6 +112,8 @@ const ManageSubjects = () => {
     } catch (err) {
       console.error('Error saving subject:', err);
       toast.error(err.response?.data?.message || 'Error saving subject');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -328,10 +332,18 @@ const ManageSubjects = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center justify-center gap-2 px-5 py-2.5 text-white rounded-xl text-sm font-bold transition-all duration-150 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-115 hover:shadow-lg hover:shadow-[#E94B4B]/40 active:translate-y-0.5 active:scale-95 active:brightness-90 shadow-md"
+                  disabled={submitting}
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 text-white rounded-xl text-sm font-bold transition-all duration-150 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-115 hover:shadow-lg hover:shadow-[#E94B4B]/40 active:translate-y-0.5 active:scale-95 active:brightness-90 disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
                   style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
                 >
-                  {modalType === 'add' ? 'Create Subject' : 'Save Changes'}
+                  {submitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>{modalType === 'add' ? 'Creating...' : 'Saving...'}</span>
+                    </>
+                  ) : (
+                    <span>{modalType === 'add' ? 'Create Subject' : 'Save Changes'}</span>
+                  )}
                 </button>
               </div>
             </form>

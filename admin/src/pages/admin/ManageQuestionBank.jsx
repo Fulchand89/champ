@@ -963,10 +963,17 @@ const ManageQuestionBank = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 text-white rounded-lg text-xs font-semibold cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-[#E94B4B]/35 active:translate-y-0 active:scale-[0.97] transition-all duration-200 ease-out disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 text-white rounded-xl text-xs font-bold transition-all duration-150 ease-out cursor-pointer select-none hover:-translate-y-0.5 hover:brightness-115 hover:shadow-lg hover:shadow-[#E94B4B]/40 active:translate-y-0.5 active:scale-95 active:brightness-90 disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
                   style={{ background: 'linear-gradient(178.27deg, #E94B4B 1.6%, #911616 126.9%)' }}
                 >
-                  {submitting ? 'Saving...' : modalType === 'add' ? 'Create Question' : 'Save Changes'}
+                  {submitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>{modalType === 'add' ? 'Creating...' : 'Saving...'}</span>
+                    </>
+                  ) : (
+                    <span>{modalType === 'add' ? 'Create Question' : 'Save Changes'}</span>
+                  )}
                 </button>
               </div>
             </form>
