@@ -244,7 +244,14 @@ const Footer = () => {
           <div className="text-center sm:text-left space-y-1">
             <p>© {currentYear} KnowChamp Quiz. All rights reserved.</p>
             <p className="text-[11px] text-gray-500">
-              Powered by <span className="text-gray-400 font-medium">Zigisa Consultancy Services Private Limited</span>
+              <a
+                href="https://www.zigisa.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline text-gray-500 hover:text-gray-300 transition-colors"
+              >
+                Powered by <span className="text-gray-400 font-medium">Zigisa Consultancy Services Private Limited</span>
+              </a>
             </p>
           </div>
           <div className="flex items-center space-x-6 mt-4 sm:mt-0">

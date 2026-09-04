@@ -57,7 +57,14 @@ const AdminLayout = () => {
         <footer className="text-center text-xs text-gray-500 py-3 border-t border-white/10 bg-[#0f1117] space-y-1">
           <p>© {new Date().getFullYear()} KnowChamp. All rights reserved.</p>
           <p className="text-[11px] text-gray-500">
-            Powered by <span className="text-gray-400 font-medium">Zigisa Consultancy Services Private Limited</span>
+            <a
+              href="https://www.zigisa.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              Powered by <span className="text-gray-400 font-medium">Zigisa Consultancy Services Private Limited</span>
+            </a>
           </p>
         </footer>
       </div>
