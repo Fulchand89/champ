@@ -6,6 +6,7 @@ import { Trophy, Users, ArrowRight, Star, BookOpen, Mic, Lightbulb, Palette } fr
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import cmsService from '../../api/services/cmsService';
 import { initAdminSocket } from '../../api/services/adminSocketService';
+import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
 
 // ── 5 Excellence Leagues Catalog Data ──
 const LEAGUES_CATALOG = {
@@ -93,6 +94,7 @@ const ExcellenceLeague = () => {
     subtitle: 'Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.',
   });
 
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Sync selected league slug from route or default
@@ -246,8 +248,9 @@ const ExcellenceLeague = () => {
 
               {/* Buttons */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-4">
-                <Link
-                  to="/register"
+                <button
+                  type="button"
+                  onClick={() => setIsDownloadModalOpen(true)}
                   style={{
                     background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%)',
                     boxShadow: '0 4px 18px rgba(239, 68, 68, 0.4)',
@@ -256,7 +259,7 @@ const ExcellenceLeague = () => {
                 >
                   <span>Register Student</span>
                   <ArrowRight className="w-5 h-5" />
-                </Link>
+                </button>
 
                 <Link
                   to="/login"
@@ -320,6 +323,12 @@ const ExcellenceLeague = () => {
       </div>
 
       <Footer />
+
+      {/* App Download Modal */}
+      <AppDownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+      />
     </div>
   );
 };

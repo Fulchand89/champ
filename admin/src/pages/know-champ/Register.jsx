@@ -3,12 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Loader2, User, Phone, UserPlus, CheckCircle, Download, LayoutDashboard, ArrowLeft } from 'lucide-react';
 import authService from '../../api/services/authService';
 import toast from 'react-hot-toast';
+import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
 
 const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -97,7 +99,7 @@ const Register = () => {
   };
 
   const handleDownloadApp = () => {
-    toast.success('App download initiated successfully!');
+    setIsDownloadModalOpen(true);
   };
 
   if (isSuccess) {
@@ -139,6 +141,12 @@ const Register = () => {
             </Link>
           </div>
         </div>
+
+        {/* App Download Modal */}
+        <AppDownloadModal
+          isOpen={isDownloadModalOpen}
+          onClose={() => setIsDownloadModalOpen(false)}
+        />
       </div>
     );
   }
@@ -352,13 +360,17 @@ const Register = () => {
                 </button>
               </form>
 
-
-
             </div>
           </div>
 
         </div>
       </div>
+
+      {/* App Download Modal */}
+      <AppDownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+      />
     </div>
   );
 };

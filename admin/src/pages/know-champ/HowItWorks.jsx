@@ -11,6 +11,7 @@ import {
 import { Link } from 'react-router-dom';
 import { cmsService } from '../../api/services/cmsService';
 import { initAdminSocket } from '../../api/services/adminSocketService';
+import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
 
 // ── Map icon name strings (stored in DB) to Lucide components ──
 const ICON_MAP = {
@@ -234,6 +235,7 @@ const SKILLS_DEVELOPED = [
 const HowItWorks = () => {
   const [cmsData, setCmsData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -650,16 +652,17 @@ const HowItWorks = () => {
                 {recognition.communityDesc || 'Outstanding performers receive certificates, medals, trophies, cash prizes, and the honor of joining our Champions Community.'}
               </p>
             </div>
-            <Link
-              to="/register"
+            <button
+              type="button"
+              onClick={() => setIsDownloadModalOpen(true)}
               style={{
                 background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%)',
                 boxShadow: '0 4px 18px rgba(239, 68, 68, 0.4)',
               }}
-              className="px-6 py-3 btn-brand-primary text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg whitespace-nowrap transition duration-200"
+              className="px-6 py-3 btn-brand-primary text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg whitespace-nowrap transition duration-200 cursor-pointer"
             >
               Join Champions
-            </Link>
+            </button>
           </div>
         </section>
 
@@ -725,17 +728,18 @@ const HowItWorks = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-            <Link
-              to="/register"
+            <button
+              type="button"
+              onClick={() => setIsDownloadModalOpen(true)}
               style={{
                 background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%)',
                 boxShadow: '0 4px 18px rgba(239, 68, 68, 0.4)',
               }}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 btn-brand-primary text-white font-bold rounded-xl shadow-lg transition-all duration-300"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 btn-brand-primary text-white font-bold rounded-xl shadow-lg transition-all duration-300 cursor-pointer"
             >
               <span>Register Now</span>
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </button>
 
             <Link
               to={callout.ctaLink || '/contests'}
@@ -766,6 +770,12 @@ const HowItWorks = () => {
       </div>
 
       <Footer />
+
+      {/* App Download Modal */}
+      <AppDownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+      />
     </div>
   );
 };
