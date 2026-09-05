@@ -402,10 +402,7 @@ const HowItWorks = () => {
 
       {/* ── 1. Hero Header ── */}
       <div className="relative pt-36 pb-20 bg-gradient-to-b from-[#0b0c16] via-[#120917] to-[#090b15] border-b border-gray-900 flex flex-col items-center text-center px-4">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs sm:text-sm font-semibold mb-6">
-          <Sparkles className="w-4 h-4" />
-          <span>{hero.badgeText}</span>
-        </div>
+
 
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black mb-4 text-[#FFFFFF] max-w-4xl leading-tight">
           {hero.title}{' '}
@@ -418,18 +415,7 @@ const HowItWorks = () => {
           {hero.subtitle}
         </p>
 
-        {/* Quick Journey Navigation Pill Bar */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-xs font-semibold text-gray-400 bg-[#0e1121] px-4 py-3 rounded-2xl border border-gray-800/80 shadow-lg">
-          <span className="text-red-400 font-bold">The Journey:</span>
-          <span>Register</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-          <span>Auto League</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-          <span>Prepare</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-          <span>School Contest</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-          <span>School Champion</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-          <span>Sub-Division</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-          <span>District</span> <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
-          <span className="text-amber-400 font-bold">State Grand Finale</span>
-        </div>
+
       </div>
 
       <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1 space-y-24">
@@ -437,9 +423,7 @@ const HowItWorks = () => {
         {/* ── 2. The 8-Step Visual Journey Roadmap ── */}
         <section className="space-y-12">
           <div className="text-center space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
-              Step-by-Step Pathway
-            </span>
+
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
               The KnowChamp Excellence Journey
             </h2>
@@ -507,9 +491,7 @@ const HowItWorks = () => {
         {/* ── 3. Five Excellence Leagues Section ── */}
         <section className="space-y-10">
           <div className="text-center space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-              Tailored for Every Age
-            </span>
+
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
               Five Excellence Leagues
             </h2>
@@ -629,9 +611,7 @@ const HowItWorks = () => {
         {/* ── 5. Recognition at Every Stage ── */}
         <section className="space-y-10">
           <div className="text-center space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
-              {recognition.badge || 'Celebrated Endeavors'}
-            </span>
+
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
               {recognition.title || 'Recognition at Every Stage'}
             </h2>
@@ -686,9 +666,7 @@ const HowItWorks = () => {
         {/* ── 6. More Than Just a Competition & Skills Developed ── */}
         <section className="bg-[#0e1121] border border-gray-800 rounded-3xl p-8 sm:p-12 space-y-10">
           <div className="max-w-3xl space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-              {skills.badge || 'Holistic Growth'}
-            </span>
+
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
               {skills.title || 'More Than Just a Competition'}
             </h2>
@@ -726,10 +704,7 @@ const HowItWorks = () => {
         {/* ── 7. Rules & Fair Play Callout Banner (Preserving existing Callout CMS & CTA) ── */}
         <section className="rounded-3xl bg-gradient-to-r from-[#140b20] to-[#0a0d24] border border-red-500/20 p-8 sm:p-12 flex flex-col lg:flex-row items-center justify-between gap-10">
           <div className="space-y-4 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-bold border border-red-500/20">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Fair Play Guarantee</span>
-            </div>
+
 
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
               {callout.title || 'Rules & Fair Play Guidelines'}
@@ -777,16 +752,7 @@ const HowItWorks = () => {
             {summaryBanner.title || 'Your Journey to Excellence'}
           </h3>
 
-          <div className="max-w-4xl mx-auto p-4 rounded-2xl bg-[#090b15] border border-gray-800 text-xs sm:text-sm font-semibold text-gray-300 flex flex-wrap items-center justify-center gap-2 leading-relaxed">
-            <span className="text-red-400">Register</span> ➔
-            <span className="text-amber-400">Get League Automatically</span> ➔
-            <span className="text-yellow-400">Prepare</span> ➔
-            <span className="text-emerald-400">Compete at School</span> ➔
-            <span className="text-cyan-400">Qualify for Sub-Division</span> ➔
-            <span className="text-indigo-400">District</span> ➔
-            <span className="text-purple-400">State</span> ➔
-            <span className="text-amber-300 font-bold">Become a KnowChamp Champion!</span>
-          </div>
+
 
           <div className="space-y-1">
             <p className="text-lg font-bold text-white">{summaryBanner.titleTagline || 'KnowChamp Excellence League'}</p>
