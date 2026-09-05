@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
+import ContestCard from '../../components/know-champ/ContestCard';
 import { Trophy, Users, ArrowRight, Star, BookOpen, Mic, Lightbulb, Palette } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import cmsService from '../../api/services/cmsService';
 import contestService from '../../api/services/contestService';
 import { initAdminSocket } from '../../api/services/adminSocketService';
 import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
+import { getImageUrl } from '../../api/services/api';
 
 // ── 5 Excellence Leagues Catalog Data ──
 const LEAGUES_CATALOG = {
@@ -206,15 +208,63 @@ const ExcellenceLeague = () => {
     };
   }, []);
 
-  // Compute dynamic contest card metrics for active league
-  const getActiveLeagueContestDetails = (league, contestsList) => {
-    if (!league) return {};
+  const getCategoryTheme = (catName = '', catData = {}) => {
+    const nameLower = (catName || '').toLowerCase();
+    const iconVal = catData?.icon || '';
+    const imgVal = catData?.image ? getImageUrl(catData.image) : '';
 
+    let img = null;
+    let icon = iconVal || '📚';
+
+    if (imgVal && typeof imgVal === 'string' && imgVal.trim() !== '') {
+      img = imgVal;
+    } else if (iconVal && typeof iconVal === 'string' && (iconVal.startsWith('data:') || iconVal.startsWith('/') || iconVal.startsWith('http') || iconVal.startsWith('uploads/'))) {
+      img = iconVal;
+    } else if (iconVal === '🔬' || nameLower.includes('science')) {
+      img = '/cat-science.png';
+      icon = '🔬';
+    } else if (iconVal === '💻' || iconVal === '🤖' || nameLower.includes('tech') || nameLower.includes('robot') || nameLower.includes('code') || nameLower.includes('computer')) {
+      img = '/cat-technology.png';
+      icon = iconVal || '💻';
+    } else if (iconVal === '⚽' || nameLower.includes('sport') || nameLower.includes('cricket') || nameLower.includes('football') || nameLower.includes('game')) {
+      img = '/cat-sports.png';
+      icon = '⚽';
+    } else if (iconVal === '🎬' || nameLower.includes('entertain') || nameLower.includes('movie') || nameLower.includes('music') || nameLower.includes('cinema') || nameLower.includes('song')) {
+      img = '/cat-entertainment.png';
+      icon = '🎬';
+    } else if (iconVal === '📜' || nameLower.includes('history') || nameLower.includes('culture') || nameLower.includes('geo') || nameLower.includes('earth')) {
+      img = '/cat-history.png';
+      icon = '📜';
+    } else if (iconVal === '📰' || nameLower.includes('current') || nameLower.includes('news') || nameLower.includes('affair') || nameLower.includes('today')) {
+      img = '/cat-current.png';
+      icon = '📰';
+    } else if (nameLower.includes('health') || nameLower.includes('medic') || nameLower.includes('environ') || nameLower.includes('nature')) {
+      img = '/cat-science.png';
+      icon = '🩺';
+    } else if (nameLower.includes('brain') || nameLower.includes('math') || nameLower.includes('logic') || nameLower.includes('iq')) {
+      img = '/Knowledge.png';
+      icon = '🧠';
+    } else {
+      const presets = ['/cat-science.png', '/cat-technology.png', '/cat-sports.png', '/cat-entertainment.png', '/cat-history.png', '/cat-current.png', '/Knowledge.png'];
+      const charSum = nameLower.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+      img = presets[charSum % presets.length];
+      icon = iconVal || '📚';
+    }
+
+    return {
+      icon: icon,
+      image: img,
+      colorClass: 'text-red-500 bg-red-500/10 border-red-500/20',
+    };
+  };
+
+  const getMatchedContest = (league, contestsList) => {
+    if (!league) return null;
     const slug = (league.slug || '').toLowerCase();
     const leagueName = (league.name || '').toLowerCase();
 
-    // 1. Attempt keyword/category matching against public contests
-    let matchedContest = Array.isArray(contestsList) ? contestsList.find((c) => {
+    // 1. Search for created contest matching this league
+    let matched = Array.isArray(contestsList) ? contestsList.find((c) => {
       if (!c) return false;
       const title = (c.title || '').toLowerCase();
       const catName = (c.category?.name || c.category || '').toLowerCase();
@@ -237,59 +287,32 @@ const ExcellenceLeague = () => {
       return title.includes(leagueName) || catName.includes(leagueName);
     }) : null;
 
-    // 2. Fallback index matching if no specific keyword match
-    if (!matchedContest && Array.isArray(contestsList) && contestsList.length > 0) {
+    // 2. Index fallback
+    if (!matched && Array.isArray(contestsList) && contestsList.length > 0) {
       const slugOrder = ['creative-league', 'knowledge-league', 'communication-league', 'innovation-league', 'character-league'];
       const idx = slugOrder.indexOf(slug);
       if (idx !== -1 && contestsList[idx]) {
-        matchedContest = contestsList[idx];
+        matched = contestsList[idx];
       } else {
-        matchedContest = contestsList[0];
+        matched = contestsList[0];
       }
     }
 
-    // 3. Format dynamic fields matching /contests structure
-    const categoryName = matchedContest?.category?.name || matchedContest?.category || league.category || league.name || 'General Knowledge';
-
-    const rawPrize = matchedContest?.prizePool !== undefined ? parseFloat(matchedContest.prizePool) : (matchedContest?.prize || league.prizePool);
-    const pricePoolFormatted = typeof rawPrize === 'number' && !isNaN(rawPrize)
-      ? `₹${rawPrize.toLocaleString()}`
-      : (league.pricePool || league.prizePool || '₹30,000');
-
-    const rawEntry = matchedContest?.entryFee !== undefined ? parseFloat(matchedContest.entryFee) : (matchedContest?.entry || league.entryFee);
-    const entryFeeFormatted = typeof rawEntry === 'number' && !isNaN(rawEntry)
-      ? `₹${rawEntry}`
-      : (league.entryFee || '₹100.00');
-
-    const scheduleFormatted = matchedContest?.startTime
-      ? new Date(matchedContest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 AM'
-      : (matchedContest?.date || league.schedule || '14 Nov 2026, 10:00 AM');
-
-    const registeredCount = matchedContest?.joined !== undefined
-      ? matchedContest.joined
-      : (matchedContest?.maxParticipants || league.joined || 0);
-    const registeredFormatted = (registeredCount || 0).toLocaleString();
-
-    let statusFormatted = 'Registration Open';
-    if (matchedContest?.status) {
-      const s = matchedContest.status;
-      if (s === 'scheduled') statusFormatted = 'Registration Open';
-      else statusFormatted = s.charAt(0).toUpperCase() + s.slice(1);
-    } else if (league.status) {
-      statusFormatted = league.status;
+    // 3. Fallback object if no backend contests exist
+    if (!matched) {
+      matched = {
+        id: league.slug,
+        title: league.name,
+        category: { name: league.name },
+        prizePool: 30000,
+        entryFee: 100,
+        joined: 0,
+        startTime: new Date('2026-11-14T10:00:00Z'),
+      };
     }
 
-    return {
-      category: categoryName,
-      status: statusFormatted,
-      pricePool: pricePoolFormatted,
-      entryFee: entryFeeFormatted,
-      schedule: scheduleFormatted,
-      registeredStudents: registeredFormatted,
-    };
+    return matched;
   };
-
-  const activeDetails = getActiveLeagueContestDetails(activeLeague, contests);
 
   return (
     <div className="min-h-screen bg-[#090b15] text-white flex flex-col font-sans select-none overflow-x-hidden">
@@ -383,55 +406,38 @@ const ExcellenceLeague = () => {
               </div>
             </div>
 
-            {/* Right Information Card (Dark Website Theme Card) */}
+            {/* Right Side Contest Card (Same card component used on /contests) */}
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
-              <div className="bg-[#0e1121] text-white rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-gray-800/80 max-w-md w-full">
+              <div className="w-full max-w-sm">
+                {(() => {
+                  const contest = getMatchedContest(activeLeague, contests);
+                  const categoryName = contest.category?.name || contest.category || activeLeague.name;
+                  const catTheme = getCategoryTheme(categoryName, contest.category);
+                  const prize = contest.prizePool !== undefined ? parseFloat(contest.prizePool) : (contest.prize || 0);
+                  const entry = contest.entryFee !== undefined ? parseFloat(contest.entryFee) : (contest.entry || 0);
+                  const joined = contest.joined !== undefined ? contest.joined : 0;
+                  const image = getImageUrl(contest.image) || catTheme.image || catTheme.icon;
+                  const date = contest?.startTime
+                    ? new Date(contest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 Am'
+                    : (contest?.date || activeLeague.schedule || '14 Nov 2026, 10:00 AM');
 
-                {/* Trophy Icon */}
-                <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-4 shadow-inner">
-                  <Trophy className="w-8 h-8 stroke-[2.5]" />
-                </div>
-
-                <h3 className="text-xl font-extrabold text-white text-center tracking-tight">
-                  {activeLeague.name}
-                </h3>
-                <p className="text-xs text-gray-400 font-medium text-center mb-6">
-                  Answer right. Shine bright.
-                </p>
-
-                {/* Metrics Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-400 block">Category</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block truncate">{activeDetails.category}</span>
-                  </div>
-
-                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-400 block">Contest Status</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-emerald-400 mt-0.5 block truncate">{activeDetails.status}</span>
-                  </div>
-
-                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-400 block">Price Pool</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-red-500 mt-0.5 block truncate">{activeDetails.pricePool}</span>
-                  </div>
-
-                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-400 block">Entry Fee</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block truncate">{activeDetails.entryFee}</span>
-                  </div>
-
-                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-400 block">Competition Schedule</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block truncate">{activeDetails.schedule}</span>
-                  </div>
-
-                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-400 block">Registered Students</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block truncate">{activeDetails.registeredStudents}</span>
-                  </div>
-                </div>
-
+                  return (
+                    <ContestCard
+                      id={contest.id}
+                      category={categoryName}
+                      title={contest.title}
+                      prize={prize}
+                      entry={entry}
+                      joined={joined}
+                      maxPlayers={contest.maxParticipants || contest.maxPlayers}
+                      icon={catTheme.icon}
+                      colorClass={catTheme.colorClass}
+                      image={image}
+                      date={date}
+                      contest={contest}
+                    />
+                  );
+                })()}
               </div>
             </div>
 
