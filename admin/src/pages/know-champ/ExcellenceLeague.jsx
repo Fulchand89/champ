@@ -5,6 +5,7 @@ import ScrollToTop from '../../components/common/ScrollToTop';
 import { Trophy, Users, ArrowRight, Star, BookOpen, Mic, Lightbulb, Palette } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import cmsService from '../../api/services/cmsService';
+import contestService from '../../api/services/contestService';
 import { initAdminSocket } from '../../api/services/adminSocketService';
 import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
 
@@ -88,6 +89,7 @@ const ExcellenceLeague = () => {
   const [selectedSlug, setSelectedSlug] = useState('creative-league');
 
   const [leaguesCatalog, setLeaguesCatalog] = useState(LEAGUES_CATALOG);
+  const [contests, setContests] = useState([]);
 
   const [hero, setHero] = useState({
     title: 'Excellence League',
@@ -112,6 +114,32 @@ const ExcellenceLeague = () => {
     setSelectedSlug(slug);
     navigate(`/excellence-leagues/${slug}`, { replace: true });
   };
+
+  // Fetch dynamic contest details matching /contests data structure
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchContests = async () => {
+      try {
+        const res = await contestService.getPublicContests();
+        if (isMounted && res?.success && Array.isArray(res.data)) {
+          setContests(res.data);
+        }
+      } catch (err) {
+        console.error('Error fetching public contests for Excellence League:', err);
+      }
+    };
+
+    fetchContests();
+    const interval = setInterval(() => {
+      if (isMounted) fetchContests();
+    }, 4000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -177,6 +205,91 @@ const ExcellenceLeague = () => {
       document.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
+
+  // Compute dynamic contest card metrics for active league
+  const getActiveLeagueContestDetails = (league, contestsList) => {
+    if (!league) return {};
+
+    const slug = (league.slug || '').toLowerCase();
+    const leagueName = (league.name || '').toLowerCase();
+
+    // 1. Attempt keyword/category matching against public contests
+    let matchedContest = Array.isArray(contestsList) ? contestsList.find((c) => {
+      if (!c) return false;
+      const title = (c.title || '').toLowerCase();
+      const catName = (c.category?.name || c.category || '').toLowerCase();
+
+      if (slug.includes('creative')) {
+        return title.includes('creative') || catName.includes('creative') || catName.includes('art');
+      }
+      if (slug.includes('knowledge')) {
+        return title.includes('knowledge') || title.includes('gk') || catName.includes('knowledge') || catName.includes('gk');
+      }
+      if (slug.includes('communication')) {
+        return title.includes('communication') || catName.includes('communication') || catName.includes('entertain') || catName.includes('speak');
+      }
+      if (slug.includes('innovation')) {
+        return title.includes('innovation') || title.includes('tech') || catName.includes('technology') || catName.includes('tech') || catName.includes('science');
+      }
+      if (slug.includes('character')) {
+        return title.includes('character') || catName.includes('character') || catName.includes('history') || catName.includes('ethic');
+      }
+      return title.includes(leagueName) || catName.includes(leagueName);
+    }) : null;
+
+    // 2. Fallback index matching if no specific keyword match
+    if (!matchedContest && Array.isArray(contestsList) && contestsList.length > 0) {
+      const slugOrder = ['creative-league', 'knowledge-league', 'communication-league', 'innovation-league', 'character-league'];
+      const idx = slugOrder.indexOf(slug);
+      if (idx !== -1 && contestsList[idx]) {
+        matchedContest = contestsList[idx];
+      } else {
+        matchedContest = contestsList[0];
+      }
+    }
+
+    // 3. Format dynamic fields matching /contests structure
+    const categoryName = matchedContest?.category?.name || matchedContest?.category || league.category || league.name || 'General Knowledge';
+
+    const rawPrize = matchedContest?.prizePool !== undefined ? parseFloat(matchedContest.prizePool) : (matchedContest?.prize || league.prizePool);
+    const pricePoolFormatted = typeof rawPrize === 'number' && !isNaN(rawPrize)
+      ? `₹${rawPrize.toLocaleString()}`
+      : (league.pricePool || league.prizePool || '₹30,000');
+
+    const rawEntry = matchedContest?.entryFee !== undefined ? parseFloat(matchedContest.entryFee) : (matchedContest?.entry || league.entryFee);
+    const entryFeeFormatted = typeof rawEntry === 'number' && !isNaN(rawEntry)
+      ? `₹${rawEntry}`
+      : (league.entryFee || '₹100.00');
+
+    const scheduleFormatted = matchedContest?.startTime
+      ? new Date(matchedContest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 AM'
+      : (matchedContest?.date || league.schedule || '14 Nov 2026, 10:00 AM');
+
+    const registeredCount = matchedContest?.joined !== undefined
+      ? matchedContest.joined
+      : (matchedContest?.maxParticipants || league.joined || 0);
+    const registeredFormatted = (registeredCount || 0).toLocaleString();
+
+    let statusFormatted = 'Registration Open';
+    if (matchedContest?.status) {
+      const s = matchedContest.status;
+      if (s === 'scheduled') statusFormatted = 'Registration Open';
+      else statusFormatted = s.charAt(0).toUpperCase() + s.slice(1);
+    } else if (league.status) {
+      statusFormatted = league.status;
+    }
+
+    return {
+      category: categoryName,
+      status: statusFormatted,
+      pricePool: pricePoolFormatted,
+      entryFee: entryFeeFormatted,
+      schedule: scheduleFormatted,
+      registeredStudents: registeredFormatted,
+    };
+  };
+
+  const activeDetails = getActiveLeagueContestDetails(activeLeague, contests);
 
   return (
     <div className="min-h-screen bg-[#090b15] text-white flex flex-col font-sans select-none overflow-x-hidden">
@@ -289,28 +402,33 @@ const ExcellenceLeague = () => {
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-400 block">Age Group</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block">{activeLeague.ageGroup}</span>
+                    <span className="text-[11px] font-semibold text-gray-400 block">Category</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block truncate">{activeDetails.category}</span>
+                  </div>
+
+                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
+                    <span className="text-[11px] font-semibold text-gray-400 block">Contest Status</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-emerald-400 mt-0.5 block truncate">{activeDetails.status}</span>
+                  </div>
+
+                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
+                    <span className="text-[11px] font-semibold text-gray-400 block">Price Pool</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-red-500 mt-0.5 block truncate">{activeDetails.pricePool}</span>
                   </div>
 
                   <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
                     <span className="text-[11px] font-semibold text-gray-400 block">Entry Fee</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-emerald-400 mt-0.5 block">{activeLeague.entryFee}</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block truncate">{activeDetails.entryFee}</span>
                   </div>
 
-                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl col-span-2">
+                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
                     <span className="text-[11px] font-semibold text-gray-400 block">Competition Schedule</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block">{activeLeague.schedule}</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block truncate">{activeDetails.schedule}</span>
                   </div>
 
                   <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-400 block">Maximum Score</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block">{activeLeague.maxScore}</span>
-                  </div>
-
-                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-400 block">League Code</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block">{activeLeague.code}</span>
+                    <span className="text-[11px] font-semibold text-gray-400 block">Registered Students</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block truncate">{activeDetails.registeredStudents}</span>
                   </div>
                 </div>
 
