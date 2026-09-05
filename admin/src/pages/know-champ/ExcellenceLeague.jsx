@@ -251,169 +251,67 @@ const ExcellenceLeague = () => {
     return matched;
   };
 
-  // Helper to generate dynamic left-side sections per category/league
+  // Helper to generate dynamic content sections based on matched Contest data
   const getLeagueFullDetails = (activeCat, matchedContest) => {
-    const name = (activeCat?.name || '').toLowerCase();
-    const slug = (activeCat?.slug || name).toLowerCase();
+    const catName = activeCat?.name || 'Contest';
+    const contestTitle = matchedContest?.title || `${catName} Champions`;
+    const contestDesc = matchedContest?.description || activeCat?.description || 'Test your knowledge, speed, and accuracy in this live timed contest battle.';
 
     const entryFeeVal = matchedContest?.entryFee !== undefined ? parseFloat(matchedContest.entryFee) : 100;
     const entryFeeFormatted = typeof entryFeeVal === 'number' && !isNaN(entryFeeVal) ? `₹${entryFeeVal.toFixed(2)}` : '₹100.00';
 
     const startTimeVal = matchedContest?.startTime ? new Date(matchedContest.startTime) : new Date('2026-11-14T10:00:00Z');
     const compDateFormatted = startTimeVal.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    const compTimeFormatted = '10:00 AM';
+    const compTimeFormatted = startTimeVal.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) || '10:00 AM';
 
-    // Registration closes 4 days prior at 11:59 PM
-    const regCloseDate = new Date(startTimeVal.getTime() - 4 * 24 * 60 * 60 * 1000);
-    const regCloseFormatted = '10 Nov 2026, 11:59 PM';
+    // Registration closes 1 day prior at 11:59 PM
+    const regCloseDate = new Date(startTimeVal.getTime() - 1 * 24 * 60 * 60 * 1000);
+    const regCloseFormatted = regCloseDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 11:59 PM';
 
     const ageGroupClean = (activeCat?.ageGroup || '3–5').replace(/\s*Years?/gi, '').trim();
+    const durationMins = matchedContest?.durationMinutes || 30;
+    const totalQuestions = matchedContest?.numQuestions || 10;
+    const maxScoreVal = matchedContest?.maxScore || '100.00';
 
-    // 1. Creative League / Science
-    if (slug.includes('creative') || name.includes('creative') || slug.includes('science') || name.includes('science')) {
-      return {
-        overview: 'Identification of imagination, artistic expression, observation, and creative thinking.',
-        scheduleInfo: {
-          ageGroup: ageGroupClean || '3–5',
-          entryFee: entryFeeFormatted,
-          date: '14 Nov 2026',
-          startTime: compTimeFormatted,
-          registrationClose: regCloseFormatted,
-          maxScore: '100.00',
-        },
-        instructions: {
-          intro: `Competition Structure of ${activeCat.name} (Age ${ageGroupClean || '3–5'})`,
-          description: 'Each participant will take part in various activities across the following three categories.',
-          categories: [
-            { emoji: '🌍', name: 'Imagine & Create', weightage: '33%' },
-            { emoji: '🔬', name: 'Little Maker Challenge', weightage: '33%' },
-            { emoji: '🌱', name: 'Creative Explorer', weightage: '34%' },
-          ],
-          objective: 'This gives you a very important advantage for KnowChamp: a child does not have to be a good writer or reader to participate successfully. The competition measures what a young child can actually demonstrate through drawing, making, observing, imagining and expressing.',
-        },
-        activities: [
-          { emoji: '🌍', name: 'Imagine & Create', weightage: '33%', description: 'Visual Creativity, Imagination Challenge, Shape & Colour Challenge, Creative Expression.' },
-          { emoji: '🔬', name: 'Little Maker Challenge', weightage: '33%', description: 'Creative Craft, Build & Create, Reuse & Recreate, Presentation.' },
-          { emoji: '🌱', name: 'Creative Explorer', weightage: '34%', description: 'Picture Observation, Visual Memory, Pattern & Puzzle, Story from Pictures.' },
-        ],
-      };
-    }
-
-    // 2. Knowledge League / Technology
-    if (slug.includes('knowledge') || name.includes('knowledge') || slug.includes('tech') || name.includes('tech')) {
-      return {
-        overview: 'Fostering general awareness, curiosity, critical thinking, tech concepts, and core knowledge foundation.',
-        scheduleInfo: {
-          ageGroup: ageGroupClean || '6–8',
-          entryFee: entryFeeFormatted,
-          date: '15 Nov 2026',
-          startTime: compTimeFormatted,
-          registrationClose: '11 Nov 2026, 11:59 PM',
-          maxScore: '100.00',
-        },
-        instructions: {
-          intro: `Competition Structure of ${activeCat.name} (Age ${ageGroupClean || '6–8'})`,
-          description: 'Each participant will take part in interactive quizzes and knowledge challenges across three core categories.',
-          categories: [
-            { emoji: '🧠', name: 'General Awareness & Curiosity', weightage: '33%' },
-            { emoji: '🔍', name: 'Critical Thinking & Logic', weightage: '33%' },
-            { emoji: '📚', name: 'Core Knowledge Foundation', weightage: '34%' },
-          ],
-          objective: 'Designed to encourage curiosity, logical reasoning, and broad awareness about science, technology, and the world around them.',
-        },
-        activities: [
-          { emoji: '🧠', name: 'General Awareness & Curiosity', weightage: '33%', description: 'World around us, Nature, Science facts & Current Events.' },
-          { emoji: '🔍', name: 'Critical Thinking & Logic', weightage: '33%', description: 'Logic puzzles, Pattern recognition, Spatial reasoning, Problem solving.' },
-          { emoji: '📚', name: 'Core Knowledge Foundation', weightage: '34%', description: 'Language basics, Numbers & Math concepts, Environmental science.' },
-        ],
-      };
-    }
-
-    // 3. Communication League / Sports
-    if (slug.includes('communication') || name.includes('communication') || slug.includes('sport') || name.includes('sport')) {
-      return {
-        overview: 'Enhancing storytelling, public speaking, dynamic expression, athletic awareness, and clear articulation.',
-        scheduleInfo: {
-          ageGroup: ageGroupClean || '9–12',
-          entryFee: entryFeeFormatted,
-          date: '16 Nov 2026',
-          startTime: compTimeFormatted,
-          registrationClose: '12 Nov 2026, 11:59 PM',
-          maxScore: '100.00',
-        },
-        instructions: {
-          intro: `Competition Structure of ${activeCat.name} (Age ${ageGroupClean || '9–12'})`,
-          description: 'Participants present, articulate, and express ideas across three structured rounds.',
-          categories: [
-            { emoji: '📖', name: 'Storytelling & Narration', weightage: '33%' },
-            { emoji: '🎤', name: 'Public Speaking & Articulation', weightage: '33%' },
-            { emoji: '⚡', name: 'Dynamic Expression & Vocabulary', weightage: '34%' },
-          ],
-          objective: 'Empowers students to speak confidently, express original thoughts clearly, and master effective communication skills.',
-        },
-        activities: [
-          { emoji: '📖', name: 'Storytelling & Narration', weightage: '33%', description: 'Picture prompt stories, Narrative flow, Creative prose.' },
-          { emoji: '🎤', name: 'Public Speaking & Articulation', weightage: '33%', description: 'Extempore talks, Prepared speeches, Voice modulation.' },
-          { emoji: '⚡', name: 'Dynamic Expression & Vocabulary', weightage: '34%', description: 'Vocabulary challenges, Debates, Active listening tasks.' },
-        ],
-      };
-    }
-
-    // 4. Innovation League / Entertainment
-    if (slug.includes('innovation') || name.includes('innovation') || slug.includes('entertain') || name.includes('entertain')) {
-      return {
-        overview: 'Encouraging practical problem solving, tech concepts, innovation, pop culture, and creative thinking.',
-        scheduleInfo: {
-          ageGroup: ageGroupClean || '13–16',
-          entryFee: entryFeeFormatted,
-          date: '17 Nov 2026',
-          startTime: compTimeFormatted,
-          registrationClose: '13 Nov 2026, 11:59 PM',
-          maxScore: '100.00',
-        },
-        instructions: {
-          intro: `Competition Structure of ${activeCat.name} (Age ${ageGroupClean || '13–16'})`,
-          description: 'Students work through hands-on innovation challenges, tech problem-solving, and design thinking.',
-          categories: [
-            { emoji: '💡', name: 'Practical Problem Solving', weightage: '33%' },
-            { emoji: '💻', name: 'Tech Concepts & Coding', weightage: '33%' },
-            { emoji: '🚀', name: 'Design Thinking & Ideation', weightage: '34%' },
-          ],
-          objective: 'Measures practical application, technological literacy, and innovative mindset for real-world challenge resolution.',
-        },
-        activities: [
-          { emoji: '💡', name: 'Practical Problem Solving', weightage: '33%', description: 'Case studies, Real-world puzzle solving, Logic puzzles.' },
-          { emoji: '💻', name: 'Tech Concepts & Coding', weightage: '33%', description: 'Computational thinking, Coding logic, Digital literacy.' },
-          { emoji: '🚀', name: 'Design Thinking & Ideation', weightage: '34%', description: 'Product ideation, Solution pitching, Prototype concepts.' },
-        ],
-      };
-    }
-
-    // 5. Character League / History / Default
     return {
-      overview: 'Developing personality, leadership, ethics, integrity, historical awareness, and character assessment.',
+      overview: contestDesc,
       scheduleInfo: {
-        ageGroup: ageGroupClean || '17–19',
+        ageGroup: ageGroupClean || '3–5',
         entryFee: entryFeeFormatted,
-        date: '18 Nov 2026',
+        date: compDateFormatted,
         startTime: compTimeFormatted,
-        registrationClose: '14 Nov 2026, 11:59 PM',
-        maxScore: '100.00',
+        registrationClose: regCloseFormatted,
+        maxScore: maxScoreVal,
       },
       instructions: {
-        intro: `Competition Structure of ${activeCat.name} (Age ${ageGroupClean || '17–19'})`,
-        description: 'Assesses leadership, ethical decision making, values, and emotional intelligence.',
+        intro: `Competition Structure of ${contestTitle} (${catName})`,
+        description: `Each participant will solve ${totalQuestions} questions within the allocated duration of ${durationMins} minutes across 3 core evaluation rounds.`,
         categories: [
-          { emoji: '🌟', name: 'Leadership & Ethics', weightage: '33%' },
-          { emoji: '🤝', name: 'Integrity & Social Values', weightage: '33%' },
-          { emoji: '🧠', name: 'Character & Emotional Intelligence', weightage: '34%' },
+          { emoji: '⚡', name: 'Speed & Accuracy Round', weightage: '33%' },
+          { emoji: '🧠', name: 'Core Knowledge & Concepts', weightage: '33%' },
+          { emoji: '🔍', name: 'Logical Reasoning & Problem Solving', weightage: '34%' },
         ],
-        objective: 'Prepares young leaders with moral integrity, ethical reasoning, and social responsibility for life beyond school.',
+        objective: `This competition evaluates speed, accuracy, and depth of understanding in ${catName}. Complete all ${totalQuestions} questions within ${durationMins} minutes to achieve maximum score and rank on the global leaderboard.`,
       },
       activities: [
-        { emoji: '🌟', name: 'Leadership & Ethics', weightage: '33%', description: 'Ethical dilemma analysis, Leadership scenarios.' },
-        { emoji: '🤝', name: 'Integrity & Social Values', weightage: '33%', description: 'Community problem analysis, Social responsibility case studies.' },
-        { emoji: '🧠', name: 'Character & Emotional Intelligence', weightage: '34%', description: 'Emotional quotient tasks, Self-reflection, Situational judgement.' },
+        {
+          emoji: '⚡',
+          name: 'Speed & Accuracy Round',
+          weightage: '33%',
+          description: `Rapid response questions testing quick recall and precision under time pressure (${durationMins} minutes total limit).`,
+        },
+        {
+          emoji: '🧠',
+          name: 'Core Knowledge & Concepts',
+          weightage: '33%',
+          description: `Multiple choice questions covering key fundamental principles, facts, and syllabus topics of ${catName}.`,
+        },
+        {
+          emoji: '🔍',
+          name: 'Logical Reasoning & Problem Solving',
+          weightage: '34%',
+          description: 'Analytical questions, scenario-based problems, and pattern recognition to measure critical thinking abilities.',
+        },
       ],
     };
   };
@@ -560,13 +458,13 @@ const ExcellenceLeague = () => {
 
       </div>
 
-      {/* ── 2. Detailed Left-Side Content Section (4 Sections in Exact Order) ── */}
+      {/* ── 2. Detailed Content Section (Full-Width, 4 Sections in Exact Order) ── */}
       <section className="py-12 sm:py-16 bg-[#090b15]">
         <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
 
-            {/* Left Column (4 Sections) */}
-            <div className="lg:col-span-8 space-y-8">
+            {/* Full Width Column (4 Sections in Order) */}
+            <div className="lg:col-span-12 space-y-8">
 
               {/* SECTION 1: League Overview */}
               <div className="bg-[#0e1121] border border-gray-800/80 rounded-3xl p-6 sm:p-8 shadow-xl">
@@ -596,7 +494,7 @@ const ExcellenceLeague = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="bg-[#12162c] border border-gray-800/80 p-4 rounded-2xl flex items-center gap-3.5">
                     <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0">
                       <Users className="w-5 h-5" />
@@ -740,39 +638,6 @@ const ExcellenceLeague = () => {
 
             </div>
 
-            {/* Right Column Sticky Callout Card */}
-            <div className="lg:col-span-4">
-              <div className="bg-[#0e1121] border border-gray-800/80 rounded-3xl p-6 sm:p-8 shadow-xl sticky top-28 space-y-6">
-                <div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold mb-3">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Ready to Shine?
-                  </span>
-                  <h2 className="text-xl font-bold text-white mb-2">Participate in this league</h2>
-                  <p className="text-xs text-gray-400 leading-relaxed font-medium">
-                    Registered schools can enroll eligible students. Students may also participate through their own account.
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <Link
-                    to="/login"
-                    className="w-full py-3 px-4 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold rounded-xl text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
-                  >
-                    Login to Participate
-                  </Link>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsDownloadModalOpen(true)}
-                    className="w-full py-3 px-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs sm:text-sm border border-white/20 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    Register Student
-                  </button>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
       </section>
@@ -789,3 +654,4 @@ const ExcellenceLeague = () => {
 };
 
 export default ExcellenceLeague;
+
