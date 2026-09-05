@@ -20,7 +20,7 @@ const LEAGUES_CATALOG = {
     maxScore: '100.00',
     emoji: '🎨',
     icon: Palette,
-    gradient: 'from-[#1b0a3a] via-[#3b0944] to-[#610d47]',
+    gradient: 'from-[#0b0c16] via-[#120917] to-[#090b15]',
     accentColor: '#ec4899',
   },
   'knowledge-league': {
@@ -34,7 +34,7 @@ const LEAGUES_CATALOG = {
     maxScore: '100.00',
     emoji: '📚',
     icon: BookOpen,
-    gradient: 'from-[#0b1938] via-[#122b54] to-[#1e4079]',
+    gradient: 'from-[#0b0c16] via-[#120917] to-[#090b15]',
     accentColor: '#3b82f6',
   },
   'communication-league': {
@@ -48,7 +48,7 @@ const LEAGUES_CATALOG = {
     maxScore: '100.00',
     emoji: '🎤',
     icon: Mic,
-    gradient: 'from-[#331c08] via-[#4d2a0b] to-[#733f10]',
+    gradient: 'from-[#0b0c16] via-[#120917] to-[#090b15]',
     accentColor: '#f59e0b',
   },
   'innovation-league': {
@@ -62,7 +62,7 @@ const LEAGUES_CATALOG = {
     maxScore: '100.00',
     emoji: '💡',
     icon: Lightbulb,
-    gradient: 'from-[#08291b] via-[#0d422c] to-[#146142]',
+    gradient: 'from-[#0b0c16] via-[#120917] to-[#090b15]',
     accentColor: '#10b981',
   },
   'character-league': {
@@ -76,7 +76,7 @@ const LEAGUES_CATALOG = {
     maxScore: '100.00',
     emoji: '🌟',
     icon: Star,
-    gradient: 'from-[#280838] via-[#430f5b] to-[#67178c]',
+    gradient: 'from-[#0b0c16] via-[#120917] to-[#090b15]',
     accentColor: '#a855f7',
   },
 };
@@ -181,8 +181,8 @@ const ExcellenceLeague = () => {
       <ScrollToTop />
       <Navbar />
 
-      {/* ── 1. Hero Section (Matching Creative League Reference Screenshot) ── */}
-      <div className={`relative pt-32 pb-20 bg-gradient-to-br ${activeLeague.gradient || 'from-[#1b0a3a] via-[#3b0944] to-[#610d47]'} overflow-hidden border-b border-purple-950/60 shadow-2xl`}>
+      {/* ── 1. Hero Section (Matching Website Design Background) ── */}
+      <div className={`relative pt-32 pb-20 bg-gradient-to-b ${activeLeague.gradient || 'from-[#0b0c16] via-[#120917] to-[#090b15]'} overflow-hidden border-b border-gray-900 shadow-2xl`}>
 
         {/* Ambient Background Glow Circles */}
         <div className="absolute top-1/4 left-10 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
@@ -196,11 +196,10 @@ const ExcellenceLeague = () => {
               <button
                 key={lg.slug}
                 onClick={() => handleSelectLeague(lg.slug)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  selectedSlug === lg.slug
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${selectedSlug === lg.slug
                     ? 'bg-white text-gray-950 shadow-lg scale-105 font-black'
                     : 'text-gray-300 hover:text-white hover:bg-white/10'
-                }`}
+                  }`}
               >
                 <span>{lg.emoji}</span>
                 <span>{lg.name}</span>
@@ -248,22 +247,22 @@ const ExcellenceLeague = () => {
               {/* Buttons */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-4">
                 <Link
-                  to="/login"
+                  to="/register"
                   style={{
                     background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%)',
                     boxShadow: '0 4px 18px rgba(239, 68, 68, 0.4)',
                   }}
                   className="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-white font-bold rounded-xl text-sm sm:text-base tracking-wide transition-all duration-300 hover:opacity-95 hover:scale-[1.02] cursor-pointer"
                 >
-                  <span>Login to Participate</span>
+                  <span>Register Student</span>
                   <ArrowRight className="w-5 h-5" />
                 </Link>
 
                 <Link
-                  to="/register"
-                  className="inline-flex items-center justify-center px-8 py-3.5 bg-white hover:bg-gray-100 text-gray-900 font-bold rounded-xl text-sm sm:text-base shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                  to="/login"
+                  className="inline-flex items-center justify-center px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-sm sm:text-base border border-white/20 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer"
                 >
-                  Register Student
+                  Login to Participate
                 </Link>
               </div>
             </div>
@@ -271,7 +270,7 @@ const ExcellenceLeague = () => {
             {/* Right Information Card (Matching Reference Screenshot White Box) */}
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
               <div className="bg-white text-gray-900 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-100 max-w-md w-full">
-                
+
                 {/* Trophy Icon */}
                 <div className="w-16 h-16 rounded-full bg-amber-100 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto mb-4 shadow-inner">
                   <Trophy className="w-8 h-8 stroke-[2.5]" />
