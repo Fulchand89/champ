@@ -5,7 +5,6 @@ import {
   Smartphone, 
   Apple, 
   Download, 
-  QrCode, 
   ShieldCheck, 
   ExternalLink,
   Share2,
@@ -192,28 +191,8 @@ const AppDownloadModal = ({ isOpen, onClose, initialPlatform = 'android' }) => {
               </div>
             )}
 
-            {/* Simple QR Code Scan strip */}
-            <div className="mt-5 pt-4 border-t border-white/10 flex items-center gap-3.5 bg-[#080b15] p-3 rounded-xl">
-              <div className="w-14 h-14 bg-white p-1 rounded-lg shrink-0 flex items-center justify-center">
-                <img
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://knowchamp.com/app&color=090b15"
-                  alt="QR Code"
-                  className="w-full h-full object-contain"
-                  loading="lazy"
-                />
-              </div>
-              <div className="text-left">
-                <div className="text-xs font-semibold text-white flex items-center gap-1.5">
-                  <QrCode className="w-3.5 h-3.5 text-red-400" /> Scan QR to open on mobile
-                </div>
-                <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">
-                  Point phone camera at code for direct download
-                </p>
-              </div>
-            </div>
-
             {/* Footer Trust Badge */}
-            <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-gray-400">
+            <div className="mt-5 pt-4 border-t border-white/10 flex items-center justify-center gap-1.5 text-[11px] text-gray-400">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               <span>100% Safe & Verified APK</span>
             </div>
