@@ -320,12 +320,12 @@ const ExcellenceLeague = () => {
   const fullDetails = getLeagueFullDetails(activeCategory, matchedContestObj);
 
   return (
-    <div className="min-h-screen bg-[#090b15] text-white flex flex-col font-sans select-none overflow-x-hidden">
+    <div className="min-h-screen bg-[#010914] text-white flex flex-col font-sans select-none overflow-x-hidden">
       <ScrollToTop />
       <Navbar />
 
       {/* ── 1. Hero Section ── */}
-      <div className="relative pt-32 pb-20 bg-gradient-to-b from-[#0b0c16] via-[#120917] to-[#090b15] overflow-hidden border-b border-gray-900 shadow-2xl">
+      <div className="relative pt-32 pb-20 bg-[#010914] border-b border-gray-900 shadow-2xl overflow-hidden">
 
         {/* Ambient Background Glow Circles */}
         <div className="absolute top-1/4 left-10 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
@@ -461,7 +461,7 @@ const ExcellenceLeague = () => {
       </div>
 
       {/* ── 2. Detailed Content Section (Full-Width, 4 Sections in Exact Order) ── */}
-      <section className="py-12 sm:py-16 bg-[#090b15]">
+      <section className="py-12 sm:py-16 bg-[#010914]">
         <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
 
