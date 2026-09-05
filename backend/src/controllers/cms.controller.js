@@ -241,19 +241,22 @@ const getHowItWorksCms = asyncHandler(async (req, res) => {
 });
 
 const updateHowItWorksCms = asyncHandler(async (req, res) => {
-  const { hero, steps, callout } = req.body || {};
+  const payload = req.body || {};
   const existing = (await getCmsSectionData('howItWorks')) || {};
 
   const howItWorksData = {
-    hero: hero || existing.hero || defaultHowItWorks.hero,
-    steps: Array.isArray(steps)
-      ? steps.map((s, idx) => ({
+    ...defaultHowItWorks,
+    ...existing,
+    ...payload,
+    hero: payload.hero || existing.hero || defaultHowItWorks.hero,
+    steps: Array.isArray(payload.steps)
+      ? payload.steps.map((s, idx) => ({
           ...s,
           id: s.id || idx + 1,
           displayOrder: Number(s.displayOrder) || idx + 1,
         }))
       : (existing.steps || defaultHowItWorks.steps),
-    callout: callout || existing.callout || defaultHowItWorks.callout,
+    callout: payload.callout || existing.callout || defaultHowItWorks.callout,
   };
 
   await saveCmsSectionData('howItWorks', howItWorksData);

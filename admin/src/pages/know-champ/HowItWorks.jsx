@@ -285,9 +285,62 @@ const HowItWorks = () => {
   }, [loadData]);
 
   const data = cmsData || DEFAULT_DATA;
-  const hero = data.hero || DEFAULT_DATA.hero;
-  const callout = data.callout || DEFAULT_DATA.callout;
-  const bulletPoints = Array.isArray(callout.bulletPoints) ? callout.bulletPoints : DEFAULT_DATA.callout.bulletPoints;
+  const hero = {
+    badgeText: "India's First Holistic Child Excellence League",
+    title: 'How the KnowChamp',
+    titleHighlight: 'Works',
+    subtitle: 'Your Journey from School Champion to State Champion Starts Here! Simple, exciting, and fair — every participant gets the opportunity to learn, compete, and shine bright.',
+    ...(data.hero || {})
+  };
+  const callout = {
+    title: 'Rules & Fair Play Guidelines',
+    description: 'State-of-the-art anti-cheat detection, quick results calculation, and multi-signature security protocols ensure all contests are completely clean, secure, and 100% fair.',
+    bulletPoints: ['No emulator support', 'Single device account', 'Automated anti-bot detection', '24/7 support desk'],
+    ctaText: 'Start Playing Now',
+    ctaLink: '/contests',
+    ...(data.callout || {})
+  };
+  const preparation = {
+    title: 'Contest Preparation Details',
+    subtitle: 'Before every contest, participants can visit the Contest Details page to prepare with full clarity and confidence:',
+    items: PREPARATION_ITEMS,
+    footerNote: '💡 Sample activities provided where applicable to boost student confidence!',
+    ...(data.preparation || {})
+  };
+  const competition = {
+    title: 'Participate at Your School',
+    subtitle: 'On competition day, registered participants compete right at their own school. Depending on the league, challenges include:',
+    activities: COMPETITION_ACTIVITIES,
+    progressionNote: '🏆 School Winner Progression: Top 3 participants (1st 🥇, 2nd 🥈, 3rd 🥉) from each league qualify for the Sub-Division level!',
+    ...(data.competition || {})
+  };
+  const recognition = {
+    badge: 'Celebrated Endeavors',
+    title: 'Recognition at Every Stage',
+    subtitle: "Every participant's effort is valued and celebrated at every step of their journey.",
+    stages: RECOGNITION_STAGES,
+    communityTitle: 'KnowChamp Champions Community',
+    communityDesc: 'Outstanding performers receive certificates, medals, trophies, cash prizes, and the honor of joining our Champions Community.',
+    ...(data.recognition || {})
+  };
+  const skills = {
+    badge: 'Holistic Growth',
+    title: 'More Than Just a Competition',
+    description: 'The KnowChamp Excellence League is not just about winning prizes. It is about discovering potential and building lifelong skills that help children succeed in school and beyond.',
+    items: SKILLS_DEVELOPED,
+    ...(data.skills || {})
+  };
+  const summaryBanner = {
+    title: 'Your Journey to Excellence',
+    titleTagline: 'KnowChamp Excellence League',
+    subTagline: "India's First Holistic Child Excellence League",
+    motto: 'Answer Right. Shine Bright.',
+    ...(data.summaryBanner || {})
+  };
+
+  const bulletPoints = Array.isArray(callout.bulletPoints) && callout.bulletPoints.length > 0
+    ? callout.bulletPoints
+    : ['No emulator support', 'Single device account', 'Automated anti-bot detection', '24/7 support desk'];
 
   // Dynamically map CMS steps or fallback to 8-stage journey
   const rawCmsSteps = Array.isArray(data.steps) && data.steps.length > 0
@@ -301,14 +354,46 @@ const HowItWorks = () => {
         return {
           step: s.stepNumber || String(idx + 1).padStart(2, '0'),
           title: s.title,
-          shortDesc: fallbackStep.shortDesc || `Stage ${idx + 1}`,
+          shortDesc: s.shortDesc || fallbackStep.shortDesc || `Stage ${idx + 1}`,
           desc: s.description,
           icon: IconComponent,
-          color: fallbackStep.color || 'from-red-500 to-rose-600',
-          badge: `Step ${idx + 1}`,
+          color: s.color || fallbackStep.color || 'from-red-500 to-rose-600',
+          badge: s.badge || `Step ${idx + 1}`,
         };
       })
     : JOURNEY_STEPS;
+
+  const displayLeagues = Array.isArray(data.leagues) && data.leagues.length > 0
+    ? data.leagues.map((lg, idx) => ({
+        ...EXCELLENCE_LEAGUES[idx],
+        ...lg,
+        icon: ICON_MAP[lg.icon] || EXCELLENCE_LEAGUES[idx]?.icon || Palette
+      }))
+    : EXCELLENCE_LEAGUES;
+
+  const displayPrepItems = Array.isArray(preparation.items) && preparation.items.length > 0
+    ? preparation.items
+    : PREPARATION_ITEMS;
+
+  const displayActivities = Array.isArray(competition.activities) && competition.activities.length > 0
+    ? competition.activities
+    : COMPETITION_ACTIVITIES;
+
+  const displayRecognitionStages = Array.isArray(recognition.stages) && recognition.stages.length > 0
+    ? recognition.stages.map((stg, idx) => ({
+        ...RECOGNITION_STAGES[idx],
+        ...stg,
+        icon: ICON_MAP[stg.icon] || RECOGNITION_STAGES[idx]?.icon || Medal
+      }))
+    : RECOGNITION_STAGES;
+
+  const displaySkills = Array.isArray(skills.items) && skills.items.length > 0
+    ? skills.items.map((sk, idx) => ({
+        ...SKILLS_DEVELOPED[idx],
+        ...sk,
+        icon: ICON_MAP[sk.icon] || SKILLS_DEVELOPED[idx]?.icon || Palette
+      }))
+    : SKILLS_DEVELOPED;
 
   return (
     <div className="min-h-screen bg-[#090b15] text-white flex flex-col font-sans select-none overflow-x-hidden">
@@ -319,18 +404,18 @@ const HowItWorks = () => {
       <div className="relative pt-36 pb-20 bg-gradient-to-b from-[#0b0c16] via-[#120917] to-[#090b15] border-b border-gray-900 flex flex-col items-center text-center px-4">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs sm:text-sm font-semibold mb-6">
           <Sparkles className="w-4 h-4" />
-          <span>India's First Holistic Child Excellence League</span>
+          <span>{hero.badgeText}</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black mb-4 text-[#FFFFFF] max-w-4xl leading-tight">
-          How the KnowChamp{' '}
+          {hero.title}{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 to-amber-500">
-            Excellence League Works
+            {hero.titleHighlight}
           </span>
         </h1>
 
         <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed">
-          Your Journey from School Champion to State Champion Starts Here! Simple, exciting, and fair — every participant gets the opportunity to learn, compete, and shine bright.
+          {hero.subtitle}
         </p>
 
         {/* Quick Journey Navigation Pill Bar */}
@@ -434,17 +519,17 @@ const HowItWorks = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {EXCELLENCE_LEAGUES.map((league, idx) => {
-              const LeagueIcon = league.icon;
+            {displayLeagues.map((league, idx) => {
+              const LeagueIcon = league.icon || Palette;
               return (
                 <div
                   key={idx}
-                  className={`rounded-3xl bg-[#0e1121] border p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 shadow-md ${league.accent}`}
+                  className={`rounded-3xl bg-[#0e1121] border p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 shadow-md ${league.accent || 'border-pink-500/30 text-pink-400 bg-pink-500/5'}`}
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-3xl">{league.emoji}</span>
-                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${league.badgeBg}`}>
+                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${league.badgeBg || 'bg-pink-500/10 text-pink-400 border-pink-500/20'}`}>
                         {league.age}
                       </span>
                     </div>
@@ -485,15 +570,15 @@ const HowItWorks = () => {
                 <BookOpen className="w-6 h-6" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-white">
-                Contest Preparation Details
+                {preparation.title || 'Contest Preparation Details'}
               </h3>
               <p className="text-sm text-gray-400 leading-relaxed">
-                Before every contest, participants can visit the Contest Details page to prepare with full clarity and confidence:
+                {preparation.subtitle || 'Before every contest, participants can visit the Contest Details page to prepare with full clarity and confidence:'}
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              {PREPARATION_ITEMS.map((item, idx) => (
+              {displayPrepItems.map((item, idx) => (
                 <div key={idx} className="p-3.5 rounded-2xl bg-[#12162c] border border-gray-800/80 flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-1" />
                   <div>
@@ -505,7 +590,7 @@ const HowItWorks = () => {
             </div>
 
             <div className="pt-4 border-t border-gray-800 text-xs text-amber-400/90 font-medium">
-              💡 Sample activities provided where applicable to boost student confidence!
+              {preparation.footerNote || '💡 Sample activities provided where applicable to boost student confidence!'}
             </div>
           </div>
 
@@ -516,15 +601,15 @@ const HowItWorks = () => {
                 <Building2 className="w-6 h-6" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-white">
-                Participate at Your School
+                {competition.title || 'Participate at Your School'}
               </h3>
               <p className="text-sm text-gray-400 leading-relaxed">
-                On competition day, registered participants compete right at their own school. Depending on the league, challenges include:
+                {competition.subtitle || 'On competition day, registered participants compete right at their own school. Depending on the league, challenges include:'}
               </p>
             </div>
 
             <div className="flex flex-wrap gap-2.5 pt-2">
-              {COMPETITION_ACTIVITIES.map((activity, idx) => (
+              {displayActivities.map((activity, idx) => (
                 <span
                   key={idx}
                   className="px-3.5 py-2 rounded-xl bg-[#12162c] border border-gray-700/60 text-xs font-semibold text-gray-200 hover:text-white hover:border-red-500/40 transition duration-200 flex items-center gap-2"
@@ -536,7 +621,7 @@ const HowItWorks = () => {
             </div>
 
             <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 text-xs text-emerald-300 leading-relaxed">
-              🏆 <strong>School Winner Progression:</strong> Top 3 participants (1st 🥇, 2nd 🥈, 3rd 🥉) from each league qualify for the Sub-Division level!
+              {competition.progressionNote || '🏆 School Winner Progression: Top 3 participants (1st 🥇, 2nd 🥈, 3rd 🥉) from each league qualify for the Sub-Division level!'}
             </div>
           </div>
         </section>
@@ -545,26 +630,26 @@ const HowItWorks = () => {
         <section className="space-y-10">
           <div className="text-center space-y-3">
             <span className="text-xs font-bold uppercase tracking-widest text-red-500 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">
-              Celebrated Endeavors
+              {recognition.badge || 'Celebrated Endeavors'}
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
-              Recognition at Every Stage
+              {recognition.title || 'Recognition at Every Stage'}
             </h2>
             <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
-              Every participant's effort is valued and celebrated at every step of their journey.
+              {recognition.subtitle || "Every participant's effort is valued and celebrated at every step of their journey."}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {RECOGNITION_STAGES.map((stage, idx) => {
-              const StageIcon = stage.icon;
+            {displayRecognitionStages.map((stage, idx) => {
+              const StageIcon = stage.icon || Medal;
               return (
                 <div
                   key={idx}
                   className="p-6 rounded-3xl bg-[#0e1121] border border-gray-800 hover:border-gray-700 transition duration-300 flex items-start gap-4"
                 >
-                  <div className={`w-12 h-12 rounded-2xl ${stage.bg} flex items-center justify-center shrink-0`}>
-                    <StageIcon className={`w-6 h-6 ${stage.color}`} />
+                  <div className={`w-12 h-12 rounded-2xl ${stage.bg || 'bg-blue-500/10'} flex items-center justify-center shrink-0`}>
+                    <StageIcon className={`w-6 h-6 ${stage.color || 'text-blue-400'}`} />
                   </div>
                   <div className="space-y-1">
                     <h3 className="text-base font-bold text-white">{stage.title}</h3>
@@ -579,10 +664,10 @@ const HowItWorks = () => {
             <div className="space-y-1">
               <h3 className="text-lg font-bold text-white flex items-center justify-center sm:justify-start gap-2">
                 <Crown className="w-5 h-5 text-amber-400" />
-                KnowChamp Champions Community
+                {recognition.communityTitle || 'KnowChamp Champions Community'}
               </h3>
               <p className="text-xs sm:text-sm text-gray-300">
-                Outstanding performers receive certificates, medals, trophies, cash prizes, and the honor of joining our Champions Community.
+                {recognition.communityDesc || 'Outstanding performers receive certificates, medals, trophies, cash prizes, and the honor of joining our Champions Community.'}
               </p>
             </div>
             <Link
@@ -602,13 +687,13 @@ const HowItWorks = () => {
         <section className="bg-[#0e1121] border border-gray-800 rounded-3xl p-8 sm:p-12 space-y-10">
           <div className="max-w-3xl space-y-3">
             <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-              Holistic Growth
+              {skills.badge || 'Holistic Growth'}
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
-              More Than Just a Competition
+              {skills.title || 'More Than Just a Competition'}
             </h2>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-              The KnowChamp Excellence League is not just about winning prizes. It is about discovering potential and building lifelong skills that help children succeed in school and beyond.
+              {skills.description || 'The KnowChamp Excellence League is not just about winning prizes. It is about discovering potential and building lifelong skills that help children succeed in school and beyond.'}
             </p>
           </div>
 
@@ -618,8 +703,8 @@ const HowItWorks = () => {
             </h3>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              {SKILLS_DEVELOPED.map((skill, idx) => {
-                const SkillIcon = skill.icon;
+              {displaySkills.map((skill, idx) => {
+                const SkillIcon = skill.icon || Palette;
                 return (
                   <div
                     key={idx}
@@ -689,7 +774,7 @@ const HowItWorks = () => {
         {/* ── 8. Final Roadmap Summary Banner ── */}
         <section className="text-center bg-gradient-to-b from-[#0e1121] to-[#0a0d1e] border border-gray-800 rounded-3xl p-8 sm:p-12 space-y-6">
           <h3 className="text-xl sm:text-3xl font-black text-white">
-            Your Journey to Excellence
+            {summaryBanner.title || 'Your Journey to Excellence'}
           </h3>
 
           <div className="max-w-4xl mx-auto p-4 rounded-2xl bg-[#090b15] border border-gray-800 text-xs sm:text-sm font-semibold text-gray-300 flex flex-wrap items-center justify-center gap-2 leading-relaxed">
@@ -704,10 +789,10 @@ const HowItWorks = () => {
           </div>
 
           <div className="space-y-1">
-            <p className="text-lg font-bold text-white">KnowChamp Excellence League</p>
-            <p className="text-sm text-gray-400">India's First Holistic Child Excellence League</p>
+            <p className="text-lg font-bold text-white">{summaryBanner.titleTagline || 'KnowChamp Excellence League'}</p>
+            <p className="text-sm text-gray-400">{summaryBanner.subTagline || "India's First Holistic Child Excellence League"}</p>
             <p className="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 pt-2">
-              Answer Right. Shine Bright.
+              {summaryBanner.motto || 'Answer Right. Shine Bright.'}
             </p>
           </div>
         </section>
