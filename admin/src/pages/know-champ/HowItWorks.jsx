@@ -548,55 +548,62 @@ const HowItWorks = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {displayLeagues.map((league, idx) => {
-              const LeagueIcon = league.icon || Palette;
+          {/* Single-Line 4-Card Horizontal Scroller (Excellence League Card Style, No Buttons) */}
+          <div className="relative">
+            <div
+              className="flex flex-nowrap gap-6 overflow-x-auto pb-6 pt-2 scroll-smooth"
+              style={{
+                scrollbarWidth: 'auto',
+                scrollbarColor: '#ef4444 #111827',
+              }}
+            >
+              {displayLeagues.map((league, idx) => {
+                const LeagueIcon = league.icon || Palette;
+                const redirectUrl = league.slug ? `/excellence-league/${league.slug}` : "/excellence-league";
 
-              return (
-                <Link
-                  key={idx}
-                  to={
-                    league.slug
-                      ? `/excellence-league/${league.slug}`
-                      : "/excellence-league"
-                  }
-                  className={`w-full h-[280px] rounded-3xl bg-[#0e1121] border p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg cursor-pointer ${league.accent ||
-                    "border-pink-500/30 text-pink-400 bg-pink-500/5"
-                    }`}
-                >
-                  <div className="space-y-4">
-                    {/* Emoji + Age */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-3xl">
-                        {league.emoji}
-                      </span>
+                return (
+                  <Link
+                    key={league.id || idx}
+                    to={redirectUrl}
+                    className="group relative bg-[#0e1121] border border-gray-800/80 hover:border-red-500/50 rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_12px_35px_rgba(239,68,68,0.18)] cursor-pointer w-[85vw] sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-3rem)/3)] lg:w-[calc((100%-4.5rem)/4)] shrink-0 h-[290px]"
+                  >
+                    <div className="space-y-4">
+                      {/* Emoji + Age Badge */}
+                      <div className="flex items-center justify-between">
+                        <span className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/30 text-2xl flex items-center justify-center shadow-md">
+                          {league.emoji || '🏆'}
+                        </span>
 
-                      <span
-                        className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${league.badgeBg ||
-                          "bg-pink-500/10 text-pink-400 border-pink-500/20"
-                          }`}
-                      >
-                        {(league.age || '').replace(/\s*Years?/gi, '').trim()}
-                      </span>
+                        {league.age && (
+                          <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            {(league.age || '').replace(/\s*Years?/gi, '').trim()}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* League Name */}
+                      <div className="flex items-center gap-2 pt-1">
+                        <LeagueIcon className="w-5 h-5 text-red-500 shrink-0" />
+                        <h3 className="text-lg font-bold text-white group-hover:text-red-400 transition-colors leading-tight font-['Montserrat']">
+                          {league.name}
+                        </h3>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-xs text-gray-300 leading-relaxed line-clamp-3 font-medium">
+                        {league.desc}
+                      </p>
                     </div>
 
-                    {/* League Name */}
-                    <div className="flex items-center gap-2">
-                      <LeagueIcon className="w-5 h-5" />
-
-                      <h3 className="text-base font-bold text-white leading-tight">
-                        {league.name}
-                      </h3>
+                    {/* Bottom Link Action */}
+                    <div className="pt-3 border-t border-gray-800/60 flex items-center text-xs font-bold text-red-400 group-hover:text-red-300 transition-colors">
+                      <span>Explore League</span>
+                      <ArrowRight className="w-4 h-4 ms-auto group-hover:translate-x-1 transition-transform duration-200" />
                     </div>
-
-                    {/* Description */}
-                    <p className="text-xs text-gray-300 leading-relaxed">
-                      {league.desc}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </section>
         {/* ── 4. Preparation & Competition Details Section ── */}
