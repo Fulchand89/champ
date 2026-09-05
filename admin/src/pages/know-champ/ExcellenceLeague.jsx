@@ -128,9 +128,18 @@ const ExcellenceLeague = () => {
   useEffect(() => {
     if (activeCategoriesList.length > 0) {
       if (leagueSlug) {
-        const found = activeCategoriesList.find(
-          (c) => (c.slug || c.name.toLowerCase()) === leagueSlug.toLowerCase()
-        );
+        const cleanSlug = leagueSlug.toLowerCase().trim();
+        const found = activeCategoriesList.find((c) => {
+          const cSlug = (c.slug || '').toLowerCase();
+          const cName = (c.name || '').toLowerCase();
+          const cNameHyphenated = cName.replace(/\s+/g, '-');
+          return (
+            cSlug === cleanSlug ||
+            cName === cleanSlug ||
+            cNameHyphenated === cleanSlug ||
+            (cleanSlug.length > 3 && cName.includes(cleanSlug.replace(/-/g, ' ')))
+          );
+        });
         if (found) {
           setSelectedSlug((found.slug || found.name).toLowerCase());
           return;

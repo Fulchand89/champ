@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cmsService } from '../../api/services/cmsService';
+import { categoryService } from '../../api/services/categoryService';
 import { initAdminSocket } from '../../api/services/adminSocketService';
 import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
 
@@ -234,9 +235,28 @@ const SKILLS_DEVELOPED = [
 
 const HowItWorks = () => {
   const [cmsData, setCmsData] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const stepsContainerRef = useRef(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCategories = async () => {
+      try {
+        const res = await categoryService.getPublicCategories();
+        if (isMounted && res?.success && Array.isArray(res.data) && res.data.length > 0) {
+          setCategories(res.data.slice(0, 5));
+        }
+      } catch (err) {
+        console.error('Error fetching categories in HowItWorks:', err);
+      }
+    };
+    fetchCategories();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const loadData = useCallback(async () => {
     try {
@@ -366,13 +386,33 @@ const HowItWorks = () => {
     })
     : JOURNEY_STEPS;
 
-  const displayLeagues = Array.isArray(data.leagues) && data.leagues.length > 0
-    ? data.leagues.map((lg, idx) => ({
-      ...EXCELLENCE_LEAGUES[idx],
-      ...lg,
-      icon: ICON_MAP[lg.icon] || EXCELLENCE_LEAGUES[idx]?.icon || Palette
-    }))
-    : EXCELLENCE_LEAGUES;
+  const rawLeaguesList = (categories && categories.length > 0)
+    ? categories.slice(0, 5)
+    : (Array.isArray(data.leagues) && data.leagues.length > 0 ? data.leagues : EXCELLENCE_LEAGUES);
+
+  const displayLeagues = rawLeaguesList.map((lg, idx) => {
+    const preset = EXCELLENCE_LEAGUES[idx % EXCELLENCE_LEAGUES.length] || {};
+    const slugVal = (lg.slug || lg.name || '').toLowerCase().replace(/\s+/g, '-');
+    const IconComponent = ICON_MAP[lg.icon] || preset.icon || Palette;
+    const nameVal = lg.name || preset.name;
+    const ageVal = lg.ageGroup || lg.age || preset.age;
+    const descVal = lg.description || lg.desc || preset.desc;
+    const emojiVal = lg.emoji || preset.emoji || '📚';
+    const accentVal = lg.accent || preset.accent || 'border-pink-500/30 hover:border-pink-500 text-pink-400 bg-pink-500/5';
+    const badgeBgVal = lg.badgeBg || preset.badgeBg || 'bg-pink-500/10 text-pink-400 border-pink-500/20';
+
+    return {
+      slug: slugVal,
+      name: nameVal,
+      age: ageVal,
+      desc: descVal,
+      emoji: emojiVal,
+      icon: IconComponent,
+      accent: accentVal,
+      badgeBg: badgeBgVal,
+      id: lg.id || slugVal,
+    };
+  });
 
   const displayPrepItems = Array.isArray(preparation.items) && preparation.items.length > 0
     ? preparation.items
