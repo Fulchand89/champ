@@ -3,94 +3,78 @@ import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
 import ContestCard from '../../components/know-champ/ContestCard';
-import { Trophy, Users, ArrowRight, Star, BookOpen, Mic, Lightbulb, Palette } from 'lucide-react';
+import { Trophy, Users, ArrowRight } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import cmsService from '../../api/services/cmsService';
 import contestService from '../../api/services/contestService';
+import categoryService from '../../api/services/categoryService';
 import { initAdminSocket } from '../../api/services/adminSocketService';
 import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
 import { getImageUrl } from '../../api/services/api';
 
-// ── 5 Excellence Leagues Catalog Data ──
-const LEAGUES_CATALOG = {
-  'creative-league': {
-    slug: 'creative-league',
-    name: 'Creative League',
-    tagline: 'Identification of imagination, artistic expression, observation, and creative thinking.',
+// ── Default Top 5 Preset Categories Fallback ──
+const DEFAULT_CATEGORIES = [
+  {
+    id: 1,
+    name: 'Science',
+    slug: 'science',
+    icon: '🔬',
+    description: 'Identification of imagination, scientific inquiry, observation, and logical thinking.',
     ageGroup: '3–5 Years',
     code: 'K1',
-    schedule: '14 Nov 2026, 10:00 AM',
-    entryFee: '₹100.00',
-    maxScore: '100.00',
-    emoji: '🎨',
-    icon: Palette,
-    gradient: 'from-[#0b0c16] via-[#120917] to-[#090b15]',
-    accentColor: '#ec4899',
   },
-  'knowledge-league': {
-    slug: 'knowledge-league',
-    name: 'Knowledge League',
-    tagline: 'Fostering general awareness, curiosity, critical thinking, and core knowledge foundation.',
+  {
+    id: 2,
+    name: 'Technology',
+    slug: 'technology',
+    icon: '💻',
+    description: 'Encouraging practical problem solving, tech concepts, coding, and innovation.',
     ageGroup: '6–8 Years',
     code: 'K2',
-    schedule: '15 Nov 2026, 10:00 AM',
-    entryFee: '₹100.00',
-    maxScore: '100.00',
-    emoji: '📚',
-    icon: BookOpen,
-    gradient: 'from-[#0b0c16] via-[#120917] to-[#090b15]',
-    accentColor: '#3b82f6',
   },
-  'communication-league': {
-    slug: 'communication-league',
-    name: 'Communication League',
-    tagline: 'Enhancing storytelling, public speaking, dynamic expression, and clear articulation.',
+  {
+    id: 3,
+    name: 'Sports',
+    slug: 'sports',
+    icon: '⚽',
+    description: 'Enhancing team spirit, athletic knowledge, strategy, and quick decision making.',
     ageGroup: '9–12 Years',
     code: 'K3',
-    schedule: '16 Nov 2026, 10:00 AM',
-    entryFee: '₹100.00',
-    maxScore: '100.00',
-    emoji: '🎤',
-    icon: Mic,
-    gradient: 'from-[#0b0c16] via-[#120917] to-[#090b15]',
-    accentColor: '#f59e0b',
   },
-  'innovation-league': {
-    slug: 'innovation-league',
-    name: 'Innovation League',
-    tagline: 'Encouraging practical problem solving, tech concepts, innovation, and creative thinking.',
+  {
+    id: 4,
+    name: 'Entertainment',
+    slug: 'entertainment',
+    icon: '🎬',
+    description: 'Fostering creative arts, music, cinema, pop culture, and dynamic expression.',
     ageGroup: '13–16 Years',
     code: 'K4',
-    schedule: '17 Nov 2026, 10:00 AM',
-    entryFee: '₹100.00',
-    maxScore: '100.00',
-    emoji: '💡',
-    icon: Lightbulb,
-    gradient: 'from-[#0b0c16] via-[#120917] to-[#090b15]',
-    accentColor: '#10b981',
   },
-  'character-league': {
-    slug: 'character-league',
-    name: 'Character League',
-    tagline: 'Developing personality, leadership, ethics, integrity, and character assessment.',
+  {
+    id: 5,
+    name: 'History',
+    slug: 'history',
+    icon: '📜',
+    description: 'Exploring ancient civilizations, historical events, heritage, and global culture.',
     ageGroup: '17–19 Years',
     code: 'K5',
-    schedule: '18 Nov 2026, 10:00 AM',
-    entryFee: '₹100.00',
-    maxScore: '100.00',
-    emoji: '🌟',
-    icon: Star,
-    gradient: 'from-[#0b0c16] via-[#120917] to-[#090b15]',
-    accentColor: '#a855f7',
   },
-};
+];
+
+const PRESET_METRICS = [
+  { ageGroup: '3–5 Years', code: 'K1', desc: 'Identification of imagination, scientific inquiry, observation, and logical thinking.' },
+  { ageGroup: '6–8 Years', code: 'K2', desc: 'Encouraging practical problem solving, tech concepts, coding, and innovation.' },
+  { ageGroup: '9–12 Years', code: 'K3', desc: 'Enhancing team spirit, athletic knowledge, strategy, and quick decision making.' },
+  { ageGroup: '13–16 Years', code: 'K4', desc: 'Fostering creative arts, music, cinema, pop culture, and dynamic expression.' },
+  { ageGroup: '17–19 Years', code: 'K5', desc: 'Exploring ancient civilizations, historical events, heritage, and global culture.' },
+];
 
 const ExcellenceLeague = () => {
   const { leagueSlug } = useParams();
   const navigate = useNavigate();
-  const [selectedSlug, setSelectedSlug] = useState('creative-league');
 
-  const [leaguesCatalog, setLeaguesCatalog] = useState(LEAGUES_CATALOG);
+  const [categories, setCategories] = useState([]);
+  const [selectedSlug, setSelectedSlug] = useState('');
   const [contests, setContests] = useState([]);
 
   const [hero, setHero] = useState({
@@ -101,40 +85,34 @@ const ExcellenceLeague = () => {
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Sync selected league slug from route or default
-  useEffect(() => {
-    if (leagueSlug && leaguesCatalog[leagueSlug]) {
-      setSelectedSlug(leagueSlug);
-    } else {
-      setSelectedSlug('creative-league');
-    }
-  }, [leagueSlug, leaguesCatalog]);
-
-  const activeLeague = leaguesCatalog[selectedSlug] || leaguesCatalog['creative-league'];
-
-  const handleSelectLeague = (slug) => {
-    setSelectedSlug(slug);
-    navigate(`/excellence-leagues/${slug}`, { replace: true });
-  };
-
-  // Fetch dynamic contest details matching /contests data structure
+  // Fetch top 5 categories & public contests dynamically (same API as /contests page)
   useEffect(() => {
     let isMounted = true;
 
-    const fetchContests = async () => {
+    const loadData = async () => {
       try {
-        const res = await contestService.getPublicContests();
-        if (isMounted && res?.success && Array.isArray(res.data)) {
-          setContests(res.data);
+        // 1. Fetch categories from backend
+        const catRes = await categoryService.getPublicCategories();
+        if (isMounted && catRes?.success && Array.isArray(catRes.data) && catRes.data.length > 0) {
+          const top5 = catRes.data.slice(0, 5);
+          setCategories(top5);
+        }
+
+        // 2. Fetch contests from backend
+        const cntRes = await contestService.getPublicContests();
+        if (isMounted && cntRes?.success && Array.isArray(cntRes.data)) {
+          setContests(cntRes.data);
         }
       } catch (err) {
-        console.error('Error fetching public contests for Excellence League:', err);
+        console.error('Error loading categories or contests for Excellence League:', err);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
-    fetchContests();
+    loadData();
     const interval = setInterval(() => {
-      if (isMounted) fetchContests();
+      if (isMounted) loadData();
     }, 4000);
 
     return () => {
@@ -143,70 +121,46 @@ const ExcellenceLeague = () => {
     };
   }, []);
 
+  // Compute active categories list (top 5 categories)
+  const activeCategoriesList = (categories && categories.length > 0) ? categories.slice(0, 5) : DEFAULT_CATEGORIES;
+
+  // Sync selected slug from route or set default to top 1 category
   useEffect(() => {
-    let isMounted = true;
-
-    const processCmsData = (data) => {
-      if (!data) return;
-      if (data.hero?.title) setHero(data.hero);
-      if (data.leagues && typeof data.leagues === 'object') {
-        setLeaguesCatalog((prev) => {
-          const updated = { ...prev };
-          Object.keys(data.leagues).forEach((key) => {
-            if (updated[key]) {
-              updated[key] = { ...updated[key], ...data.leagues[key] };
-            } else {
-              updated[key] = data.leagues[key];
-            }
-          });
-          return updated;
-        });
-      }
-    };
-
-    const fetchExcellenceCms = async () => {
-      try {
-        const res = await cmsService.getPublicExcellenceLeague();
-        if (isMounted && res?.success && res.data) {
-          processCmsData(res.data);
+    if (activeCategoriesList.length > 0) {
+      if (leagueSlug) {
+        const found = activeCategoriesList.find(
+          (c) => (c.slug || c.name.toLowerCase()) === leagueSlug.toLowerCase()
+        );
+        if (found) {
+          setSelectedSlug((found.slug || found.name).toLowerCase());
+          return;
         }
-      } catch (err) {
-        console.error('Error fetching Excellence League CMS:', err);
-      } finally {
-        if (isMounted) setLoading(false);
       }
-    };
+      setSelectedSlug((activeCategoriesList[0].slug || activeCategoriesList[0].name).toLowerCase());
+    }
+  }, [leagueSlug, categories]);
 
-    fetchExcellenceCms();
+  const activeCategoryIndex = Math.max(
+    0,
+    activeCategoriesList.findIndex(
+      (c) => (c.slug || c.name).toLowerCase() === (selectedSlug || '').toLowerCase()
+    )
+  );
 
-    // Socket listener for instant updates
-    const socket = initAdminSocket();
-    const handleCmsUpdate = (updatedData) => {
-      if (updatedData) {
-        processCmsData(updatedData);
-      }
-    };
-    socket.on('cms_excellence_league_updated', handleCmsUpdate);
+  const rawActiveCategory = activeCategoriesList[activeCategoryIndex] || activeCategoriesList[0];
 
-    // Polling fallback
-    const pollInterval = setInterval(() => {
-      if (isMounted) fetchExcellenceCms();
-    }, 4000);
+  const activeCategory = {
+    ...rawActiveCategory,
+    ageGroup: rawActiveCategory.ageGroup || PRESET_METRICS[activeCategoryIndex % 5].ageGroup,
+    code: rawActiveCategory.code || PRESET_METRICS[activeCategoryIndex % 5].code,
+    description: rawActiveCategory.description || PRESET_METRICS[activeCategoryIndex % 5].desc,
+  };
 
-    const handleFocus = () => {
-      if (isMounted) fetchExcellenceCms();
-    };
-    window.addEventListener('focus', handleFocus);
-    document.addEventListener('visibilitychange', handleFocus);
-
-    return () => {
-      isMounted = false;
-      socket.off('cms_excellence_league_updated', handleCmsUpdate);
-      clearInterval(pollInterval);
-      window.removeEventListener('focus', handleFocus);
-      document.removeEventListener('visibilitychange', handleFocus);
-    };
-  }, []);
+  const handleSelectCategory = (cat) => {
+    const slugVal = (cat.slug || cat.name).toLowerCase();
+    setSelectedSlug(slugVal);
+    navigate(`/excellence-leagues/${slugVal}`, { replace: true });
+  };
 
   const getCategoryTheme = (catName = '', catData = {}) => {
     const nameLower = (catName || '').toLowerCase();
@@ -258,39 +212,25 @@ const ExcellenceLeague = () => {
     };
   };
 
-  const getMatchedContest = (league, contestsList) => {
-    if (!league) return null;
-    const slug = (league.slug || '').toLowerCase();
-    const leagueName = (league.name || '').toLowerCase();
+  const getMatchedContest = (catObj, contestsList) => {
+    if (!catObj) return null;
+    const catName = (catObj.name || '').toLowerCase();
+    const catSlug = (catObj.slug || '').toLowerCase();
 
-    // 1. Search for created contest matching this league
+    // 1. Search for public contest matching this category
     let matched = Array.isArray(contestsList) ? contestsList.find((c) => {
       if (!c) return false;
       const title = (c.title || '').toLowerCase();
-      const catName = (c.category?.name || c.category || '').toLowerCase();
+      const contestCatName = (c.category?.name || c.category || '').toLowerCase();
 
-      if (slug.includes('creative')) {
-        return title.includes('creative') || catName.includes('creative') || catName.includes('art');
-      }
-      if (slug.includes('knowledge')) {
-        return title.includes('knowledge') || title.includes('gk') || catName.includes('knowledge') || catName.includes('gk');
-      }
-      if (slug.includes('communication')) {
-        return title.includes('communication') || catName.includes('communication') || catName.includes('entertain') || catName.includes('speak');
-      }
-      if (slug.includes('innovation')) {
-        return title.includes('innovation') || title.includes('tech') || catName.includes('technology') || catName.includes('tech') || catName.includes('science');
-      }
-      if (slug.includes('character')) {
-        return title.includes('character') || catName.includes('character') || catName.includes('history') || catName.includes('ethic');
-      }
-      return title.includes(leagueName) || catName.includes(leagueName);
+      return contestCatName.includes(catName) || title.includes(catName) || (catSlug && contestCatName.includes(catSlug));
     }) : null;
 
-    // 2. Index fallback
+    // 2. Fallback matching by index
     if (!matched && Array.isArray(contestsList) && contestsList.length > 0) {
-      const slugOrder = ['creative-league', 'knowledge-league', 'communication-league', 'innovation-league', 'character-league'];
-      const idx = slugOrder.indexOf(slug);
+      const idx = activeCategoriesList.findIndex(
+        (c) => (c.slug || c.name).toLowerCase() === (catObj.slug || catObj.name).toLowerCase()
+      );
       if (idx !== -1 && contestsList[idx]) {
         matched = contestsList[idx];
       } else {
@@ -301,13 +241,13 @@ const ExcellenceLeague = () => {
     // 3. Fallback object if no backend contests exist
     if (!matched) {
       matched = {
-        id: league.slug,
-        title: league.name,
-        category: { name: league.name },
+        id: catObj.id || catObj.slug,
+        title: `${catObj.name} Champions`,
+        category: { name: catObj.name, icon: catObj.icon, image: catObj.image },
         prizePool: 30000,
-        entryFee: 100,
+        entryFee: 15,
         joined: 0,
-        startTime: new Date('2026-11-14T10:00:00Z'),
+        startTime: new Date('2026-08-22T10:00:00Z'),
       };
     }
 
@@ -319,8 +259,8 @@ const ExcellenceLeague = () => {
       <ScrollToTop />
       <Navbar />
 
-      {/* ── 1. Hero Section (Matching Website Design Background) ── */}
-      <div className={`relative pt-32 pb-20 bg-gradient-to-b ${activeLeague.gradient || 'from-[#0b0c16] via-[#120917] to-[#090b15]'} overflow-hidden border-b border-gray-900 shadow-2xl`}>
+      {/* ── 1. Hero Section ── */}
+      <div className="relative pt-32 pb-20 bg-gradient-to-b from-[#0b0c16] via-[#120917] to-[#090b15] overflow-hidden border-b border-gray-900 shadow-2xl">
 
         {/* Ambient Background Glow Circles */}
         <div className="absolute top-1/4 left-10 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
@@ -328,21 +268,28 @@ const ExcellenceLeague = () => {
 
         <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
-          {/* League Switcher Selector Bar */}
+          {/* Dynamic Top 5 Categories Switcher Bar */}
           <div className="mb-8 flex flex-wrap items-center justify-center lg:justify-start gap-2 bg-black/30 p-2 rounded-2xl border border-white/10 backdrop-blur-md max-w-fit">
-            {Object.values(leaguesCatalog).map((lg) => (
-              <button
-                key={lg.slug}
-                onClick={() => handleSelectLeague(lg.slug)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${selectedSlug === lg.slug
-                    ? 'bg-white text-gray-950 shadow-lg scale-105 font-black'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
-                  }`}
-              >
-                <span>{lg.emoji}</span>
-                <span>{lg.name}</span>
-              </button>
-            ))}
+            {activeCategoriesList.map((cat, idx) => {
+              const catSlug = (cat.slug || cat.name).toLowerCase();
+              const currentSlug = (selectedSlug || activeCategoriesList[0]?.slug || activeCategoriesList[0]?.name).toLowerCase();
+              const isSelected = currentSlug === catSlug;
+              const theme = getCategoryTheme(cat.name, cat);
+
+              return (
+                <button
+                  key={cat.id || catSlug || idx}
+                  onClick={() => handleSelectCategory(cat)}
+                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${isSelected
+                      ? 'bg-white text-gray-950 shadow-lg scale-105 font-black'
+                      : 'text-gray-300 hover:text-white hover:bg-white/10'
+                    }`}
+                >
+                  <span>{theme.icon || '📚'}</span>
+                  <span>{cat.name}</span>
+                </button>
+              );
+            })}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
@@ -357,12 +304,12 @@ const ExcellenceLeague = () => {
 
               {/* Main Heading */}
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-tight font-['Montserrat']">
-                {activeLeague.name}
+                {activeCategory.name}
               </h1>
 
               {/* Subtitle Tagline */}
               <p className="text-gray-200 text-sm sm:text-base lg:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-                {activeLeague.tagline}
+                {activeCategory.description}
               </p>
 
               {/* Status Badges Row */}
@@ -374,11 +321,11 @@ const ExcellenceLeague = () => {
 
                 <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-blue-500/20 text-blue-200 border border-blue-500/30 backdrop-blur-md">
                   <Users className="w-4 h-4 text-blue-300" />
-                  {activeLeague.ageGroup}
+                  {activeCategory.ageGroup}
                 </span>
 
                 <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white/10 text-white border border-white/20 backdrop-blur-md">
-                  # {activeLeague.code}
+                  # {activeCategory.code}
                 </span>
               </div>
 
@@ -410,8 +357,8 @@ const ExcellenceLeague = () => {
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
               <div className="w-full max-w-sm">
                 {(() => {
-                  const contest = getMatchedContest(activeLeague, contests);
-                  const categoryName = contest.category?.name || contest.category || activeLeague.name;
+                  const contest = getMatchedContest(activeCategory, contests);
+                  const categoryName = contest.category?.name || contest.category || activeCategory.name;
                   const catTheme = getCategoryTheme(categoryName, contest.category);
                   const prize = contest.prizePool !== undefined ? parseFloat(contest.prizePool) : (contest.prize || 0);
                   const entry = contest.entryFee !== undefined ? parseFloat(contest.entryFee) : (contest.entry || 0);
@@ -419,7 +366,7 @@ const ExcellenceLeague = () => {
                   const image = getImageUrl(contest.image) || catTheme.image || catTheme.icon;
                   const date = contest?.startTime
                     ? new Date(contest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 Am'
-                    : (contest?.date || activeLeague.schedule || '14 Nov 2026, 10:00 AM');
+                    : (contest?.date || 'Aug 22, 2026, 10:00 Am');
 
                   return (
                     <ContestCard
