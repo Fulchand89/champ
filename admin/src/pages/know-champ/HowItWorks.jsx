@@ -415,7 +415,7 @@ const HowItWorks = () => {
         </h1>
 
         <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed">
-          {hero.subtitle}
+          Follow this clear 8-stage roadmap from registration at your school all the way to statewide glory!
         </p>
 
 
@@ -430,9 +430,6 @@ const HowItWorks = () => {
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
               The KnowChamp Excellence Journey
             </h2>
-            <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
-              Follow this clear 8-stage roadmap from registration at your school all the way to statewide glory!
-            </p>
           </div>
 
           {/* Single-Line Horizontal Scroller for Steps (3 cards per screen) */}

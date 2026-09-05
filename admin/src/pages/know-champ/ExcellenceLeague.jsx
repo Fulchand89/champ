@@ -413,35 +413,42 @@ const ExcellenceLeague = () => {
               </div>
             </div>
 
-            {/* Right Side Contest Card (Same card component used on /contests) */}
+            {/* Right Side Contest Card (Strictly matches the selected category) */}
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
               <div className="w-full max-w-sm">
                 {(() => {
                   const contest = matchedContestObj;
-                  const categoryName = contest.category?.name || contest.category || activeCategory.name;
-                  const catTheme = getCategoryTheme(categoryName, contest.category);
-                  const prize = contest.prizePool !== undefined ? parseFloat(contest.prizePool) : (contest.prize || 0);
-                  const entry = contest.entryFee !== undefined ? parseFloat(contest.entryFee) : (contest.entry || 0);
-                  const joined = contest.joined !== undefined ? contest.joined : 0;
-                  const image = getImageUrl(contest.image) || catTheme.image || catTheme.icon;
+                  const categoryName = activeCategory.name;
+                  const catTheme = getCategoryTheme(activeCategory.name, activeCategory);
+                  const contestTitle = contest?.title && contest.title.toLowerCase().includes(categoryName.toLowerCase())
+                    ? contest.title
+                    : `${categoryName} Challenge`;
+                  const prize = contest?.prizePool !== undefined ? parseFloat(contest.prizePool) : (contest?.prize || 30000);
+                  const entry = contest?.entryFee !== undefined ? parseFloat(contest.entryFee) : (contest?.entry || 100);
+                  const joined = contest?.joined !== undefined ? contest.joined : 0;
+                  const image = catTheme.image || getImageUrl(contest?.image) || catTheme.icon;
                   const date = contest?.startTime
-                    ? new Date(contest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 Am'
-                    : (contest?.date || 'Aug 22, 2026, 10:00 Am');
+                    ? new Date(contest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 AM'
+                    : (contest?.date || 'Nov 14, 2026, 10:00 AM');
 
                   return (
                     <ContestCard
-                      id={contest.id}
+                      id={contest?.id || activeCategory.id || activeCategory.slug}
                       category={categoryName}
-                      title={contest.title}
+                      title={contestTitle}
                       prize={prize}
                       entry={entry}
                       joined={joined}
-                      maxPlayers={contest.maxParticipants || contest.maxPlayers}
+                      maxPlayers={contest?.maxParticipants || contest?.maxPlayers || 500}
                       icon={catTheme.icon}
                       colorClass={catTheme.colorClass}
                       image={image}
                       date={date}
-                      contest={contest}
+                      contest={{
+                        ...contest,
+                        category: categoryName,
+                        title: contestTitle,
+                      }}
                     />
                   );
                 })()}
