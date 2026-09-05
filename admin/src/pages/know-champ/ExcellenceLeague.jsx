@@ -3,7 +3,7 @@ import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
 import ContestCard from '../../components/know-champ/ContestCard';
-import { Trophy, Users, ArrowRight } from 'lucide-react';
+import { Trophy, Users, ArrowRight, Info, Calendar, Coins, Clock, AlertCircle, Award, FileText, Sparkles } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import cmsService from '../../api/services/cmsService';
 import contestService from '../../api/services/contestService';
@@ -16,57 +16,57 @@ import { getImageUrl } from '../../api/services/api';
 const DEFAULT_CATEGORIES = [
   {
     id: 1,
-    name: 'Science',
-    slug: 'science',
-    icon: '🔬',
-    description: 'Identification of imagination, scientific inquiry, observation, and logical thinking.',
-    ageGroup: '3–5 Years',
+    name: 'Creative League',
+    slug: 'creative-league',
+    icon: '🎨',
+    description: 'Identification of imagination, artistic expression, observation, and creative thinking.',
+    ageGroup: '3–5',
     code: 'K1',
   },
   {
     id: 2,
-    name: 'Technology',
-    slug: 'technology',
-    icon: '💻',
-    description: 'Encouraging practical problem solving, tech concepts, coding, and innovation.',
-    ageGroup: '6–8 Years',
+    name: 'Knowledge League',
+    slug: 'knowledge-league',
+    icon: '📚',
+    description: 'Encouraging practical problem solving, general awareness, critical thinking, and core knowledge.',
+    ageGroup: '6–8',
     code: 'K2',
   },
   {
     id: 3,
-    name: 'Sports',
-    slug: 'sports',
-    icon: '⚽',
-    description: 'Enhancing team spirit, athletic knowledge, strategy, and quick decision making.',
-    ageGroup: '9–12 Years',
+    name: 'Communication League',
+    slug: 'communication-league',
+    icon: '🎤',
+    description: 'Enhancing storytelling, public speaking, dynamic expression, and clear articulation.',
+    ageGroup: '9–12',
     code: 'K3',
   },
   {
     id: 4,
-    name: 'Entertainment',
-    slug: 'entertainment',
-    icon: '🎬',
-    description: 'Fostering creative arts, music, cinema, pop culture, and dynamic expression.',
-    ageGroup: '13–16 Years',
+    name: 'Innovation League',
+    slug: 'innovation-league',
+    icon: '💡',
+    description: 'Encouraging practical problem solving, tech concepts, innovation, and creative thinking.',
+    ageGroup: '13–16',
     code: 'K4',
   },
   {
     id: 5,
-    name: 'History',
-    slug: 'history',
-    icon: '📜',
-    description: 'Exploring ancient civilizations, historical events, heritage, and global culture.',
-    ageGroup: '17–19 Years',
+    name: 'Character League',
+    slug: 'character-league',
+    icon: '🌟',
+    description: 'Developing personality, leadership, ethics, integrity, and character assessment.',
+    ageGroup: '17–19',
     code: 'K5',
   },
 ];
 
 const PRESET_METRICS = [
-  { ageGroup: '3–5 Years', code: 'K1', desc: 'Identification of imagination, scientific inquiry, observation, and logical thinking.' },
-  { ageGroup: '6–8 Years', code: 'K2', desc: 'Encouraging practical problem solving, tech concepts, coding, and innovation.' },
-  { ageGroup: '9–12 Years', code: 'K3', desc: 'Enhancing team spirit, athletic knowledge, strategy, and quick decision making.' },
-  { ageGroup: '13–16 Years', code: 'K4', desc: 'Fostering creative arts, music, cinema, pop culture, and dynamic expression.' },
-  { ageGroup: '17–19 Years', code: 'K5', desc: 'Exploring ancient civilizations, historical events, heritage, and global culture.' },
+  { ageGroup: '3–5', code: 'K1', desc: 'Identification of imagination, artistic expression, observation, and creative thinking.' },
+  { ageGroup: '6–8', code: 'K2', desc: 'Encouraging practical problem solving, general awareness, critical thinking, and core knowledge.' },
+  { ageGroup: '9–12', code: 'K3', desc: 'Enhancing storytelling, public speaking, dynamic expression, and clear articulation.' },
+  { ageGroup: '13–16', code: 'K4', desc: 'Encouraging practical problem solving, tech concepts, innovation, and creative thinking.' },
+  { ageGroup: '17–19', code: 'K5', desc: 'Developing personality, leadership, ethics, integrity, and character assessment.' },
 ];
 
 const ExcellenceLeague = () => {
@@ -174,6 +174,9 @@ const ExcellenceLeague = () => {
       img = imgVal;
     } else if (iconVal && typeof iconVal === 'string' && (iconVal.startsWith('data:') || iconVal.startsWith('/') || iconVal.startsWith('http') || iconVal.startsWith('uploads/'))) {
       img = iconVal;
+    } else if (iconVal === '🎨' || nameLower.includes('creative') || nameLower.includes('art')) {
+      img = '/cat-science.png';
+      icon = '🎨';
     } else if (iconVal === '🔬' || nameLower.includes('science')) {
       img = '/cat-science.png';
       icon = '🔬';
@@ -189,15 +192,9 @@ const ExcellenceLeague = () => {
     } else if (iconVal === '📜' || nameLower.includes('history') || nameLower.includes('culture') || nameLower.includes('geo') || nameLower.includes('earth')) {
       img = '/cat-history.png';
       icon = '📜';
-    } else if (iconVal === '📰' || nameLower.includes('current') || nameLower.includes('news') || nameLower.includes('affair') || nameLower.includes('today')) {
-      img = '/cat-current.png';
-      icon = '📰';
-    } else if (nameLower.includes('health') || nameLower.includes('medic') || nameLower.includes('environ') || nameLower.includes('nature')) {
-      img = '/cat-science.png';
-      icon = '🩺';
-    } else if (nameLower.includes('brain') || nameLower.includes('math') || nameLower.includes('logic') || nameLower.includes('iq')) {
+    } else if (iconVal === '🎤' || nameLower.includes('speak') || nameLower.includes('communication')) {
       img = '/Knowledge.png';
-      icon = '🧠';
+      icon = '🎤';
     } else {
       const presets = ['/cat-science.png', '/cat-technology.png', '/cat-sports.png', '/cat-entertainment.png', '/cat-history.png', '/cat-current.png', '/Knowledge.png'];
       const charSum = nameLower.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
@@ -245,14 +242,184 @@ const ExcellenceLeague = () => {
         title: `${catObj.name} Champions`,
         category: { name: catObj.name, icon: catObj.icon, image: catObj.image },
         prizePool: 30000,
-        entryFee: 15,
+        entryFee: 100,
         joined: 0,
-        startTime: new Date('2026-08-22T10:00:00Z'),
+        startTime: new Date('2026-11-14T10:00:00Z'),
       };
     }
 
     return matched;
   };
+
+  // Helper to generate dynamic left-side sections per category/league
+  const getLeagueFullDetails = (activeCat, matchedContest) => {
+    const name = (activeCat?.name || '').toLowerCase();
+    const slug = (activeCat?.slug || name).toLowerCase();
+
+    const entryFeeVal = matchedContest?.entryFee !== undefined ? parseFloat(matchedContest.entryFee) : 100;
+    const entryFeeFormatted = typeof entryFeeVal === 'number' && !isNaN(entryFeeVal) ? `₹${entryFeeVal.toFixed(2)}` : '₹100.00';
+
+    const startTimeVal = matchedContest?.startTime ? new Date(matchedContest.startTime) : new Date('2026-11-14T10:00:00Z');
+    const compDateFormatted = startTimeVal.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    const compTimeFormatted = '10:00 AM';
+
+    // Registration closes 4 days prior at 11:59 PM
+    const regCloseDate = new Date(startTimeVal.getTime() - 4 * 24 * 60 * 60 * 1000);
+    const regCloseFormatted = '10 Nov 2026, 11:59 PM';
+
+    const ageGroupClean = (activeCat?.ageGroup || '3–5').replace(/\s*Years?/gi, '').trim();
+
+    // 1. Creative League / Science
+    if (slug.includes('creative') || name.includes('creative') || slug.includes('science') || name.includes('science')) {
+      return {
+        overview: 'Identification of imagination, artistic expression, observation, and creative thinking.',
+        scheduleInfo: {
+          ageGroup: ageGroupClean || '3–5',
+          entryFee: entryFeeFormatted,
+          date: '14 Nov 2026',
+          startTime: compTimeFormatted,
+          registrationClose: regCloseFormatted,
+          maxScore: '100.00',
+        },
+        instructions: {
+          intro: `Competition Structure of ${activeCat.name} (Age ${ageGroupClean || '3–5'})`,
+          description: 'Each participant will take part in various activities across the following three categories.',
+          categories: [
+            { emoji: '🌍', name: 'Imagine & Create', weightage: '33%' },
+            { emoji: '🔬', name: 'Little Maker Challenge', weightage: '33%' },
+            { emoji: '🌱', name: 'Creative Explorer', weightage: '34%' },
+          ],
+          objective: 'This gives you a very important advantage for KnowChamp: a child does not have to be a good writer or reader to participate successfully. The competition measures what a young child can actually demonstrate through drawing, making, observing, imagining and expressing.',
+        },
+        activities: [
+          { emoji: '🌍', name: 'Imagine & Create', weightage: '33%', description: 'Visual Creativity, Imagination Challenge, Shape & Colour Challenge, Creative Expression.' },
+          { emoji: '🔬', name: 'Little Maker Challenge', weightage: '33%', description: 'Creative Craft, Build & Create, Reuse & Recreate, Presentation.' },
+          { emoji: '🌱', name: 'Creative Explorer', weightage: '34%', description: 'Picture Observation, Visual Memory, Pattern & Puzzle, Story from Pictures.' },
+        ],
+      };
+    }
+
+    // 2. Knowledge League / Technology
+    if (slug.includes('knowledge') || name.includes('knowledge') || slug.includes('tech') || name.includes('tech')) {
+      return {
+        overview: 'Fostering general awareness, curiosity, critical thinking, tech concepts, and core knowledge foundation.',
+        scheduleInfo: {
+          ageGroup: ageGroupClean || '6–8',
+          entryFee: entryFeeFormatted,
+          date: '15 Nov 2026',
+          startTime: compTimeFormatted,
+          registrationClose: '11 Nov 2026, 11:59 PM',
+          maxScore: '100.00',
+        },
+        instructions: {
+          intro: `Competition Structure of ${activeCat.name} (Age ${ageGroupClean || '6–8'})`,
+          description: 'Each participant will take part in interactive quizzes and knowledge challenges across three core categories.',
+          categories: [
+            { emoji: '🧠', name: 'General Awareness & Curiosity', weightage: '33%' },
+            { emoji: '🔍', name: 'Critical Thinking & Logic', weightage: '33%' },
+            { emoji: '📚', name: 'Core Knowledge Foundation', weightage: '34%' },
+          ],
+          objective: 'Designed to encourage curiosity, logical reasoning, and broad awareness about science, technology, and the world around them.',
+        },
+        activities: [
+          { emoji: '🧠', name: 'General Awareness & Curiosity', weightage: '33%', description: 'World around us, Nature, Science facts & Current Events.' },
+          { emoji: '🔍', name: 'Critical Thinking & Logic', weightage: '33%', description: 'Logic puzzles, Pattern recognition, Spatial reasoning, Problem solving.' },
+          { emoji: '📚', name: 'Core Knowledge Foundation', weightage: '34%', description: 'Language basics, Numbers & Math concepts, Environmental science.' },
+        ],
+      };
+    }
+
+    // 3. Communication League / Sports
+    if (slug.includes('communication') || name.includes('communication') || slug.includes('sport') || name.includes('sport')) {
+      return {
+        overview: 'Enhancing storytelling, public speaking, dynamic expression, athletic awareness, and clear articulation.',
+        scheduleInfo: {
+          ageGroup: ageGroupClean || '9–12',
+          entryFee: entryFeeFormatted,
+          date: '16 Nov 2026',
+          startTime: compTimeFormatted,
+          registrationClose: '12 Nov 2026, 11:59 PM',
+          maxScore: '100.00',
+        },
+        instructions: {
+          intro: `Competition Structure of ${activeCat.name} (Age ${ageGroupClean || '9–12'})`,
+          description: 'Participants present, articulate, and express ideas across three structured rounds.',
+          categories: [
+            { emoji: '📖', name: 'Storytelling & Narration', weightage: '33%' },
+            { emoji: '🎤', name: 'Public Speaking & Articulation', weightage: '33%' },
+            { emoji: '⚡', name: 'Dynamic Expression & Vocabulary', weightage: '34%' },
+          ],
+          objective: 'Empowers students to speak confidently, express original thoughts clearly, and master effective communication skills.',
+        },
+        activities: [
+          { emoji: '📖', name: 'Storytelling & Narration', weightage: '33%', description: 'Picture prompt stories, Narrative flow, Creative prose.' },
+          { emoji: '🎤', name: 'Public Speaking & Articulation', weightage: '33%', description: 'Extempore talks, Prepared speeches, Voice modulation.' },
+          { emoji: '⚡', name: 'Dynamic Expression & Vocabulary', weightage: '34%', description: 'Vocabulary challenges, Debates, Active listening tasks.' },
+        ],
+      };
+    }
+
+    // 4. Innovation League / Entertainment
+    if (slug.includes('innovation') || name.includes('innovation') || slug.includes('entertain') || name.includes('entertain')) {
+      return {
+        overview: 'Encouraging practical problem solving, tech concepts, innovation, pop culture, and creative thinking.',
+        scheduleInfo: {
+          ageGroup: ageGroupClean || '13–16',
+          entryFee: entryFeeFormatted,
+          date: '17 Nov 2026',
+          startTime: compTimeFormatted,
+          registrationClose: '13 Nov 2026, 11:59 PM',
+          maxScore: '100.00',
+        },
+        instructions: {
+          intro: `Competition Structure of ${activeCat.name} (Age ${ageGroupClean || '13–16'})`,
+          description: 'Students work through hands-on innovation challenges, tech problem-solving, and design thinking.',
+          categories: [
+            { emoji: '💡', name: 'Practical Problem Solving', weightage: '33%' },
+            { emoji: '💻', name: 'Tech Concepts & Coding', weightage: '33%' },
+            { emoji: '🚀', name: 'Design Thinking & Ideation', weightage: '34%' },
+          ],
+          objective: 'Measures practical application, technological literacy, and innovative mindset for real-world challenge resolution.',
+        },
+        activities: [
+          { emoji: '💡', name: 'Practical Problem Solving', weightage: '33%', description: 'Case studies, Real-world puzzle solving, Logic puzzles.' },
+          { emoji: '💻', name: 'Tech Concepts & Coding', weightage: '33%', description: 'Computational thinking, Coding logic, Digital literacy.' },
+          { emoji: '🚀', name: 'Design Thinking & Ideation', weightage: '34%', description: 'Product ideation, Solution pitching, Prototype concepts.' },
+        ],
+      };
+    }
+
+    // 5. Character League / History / Default
+    return {
+      overview: 'Developing personality, leadership, ethics, integrity, historical awareness, and character assessment.',
+      scheduleInfo: {
+        ageGroup: ageGroupClean || '17–19',
+        entryFee: entryFeeFormatted,
+        date: '18 Nov 2026',
+        startTime: compTimeFormatted,
+        registrationClose: '14 Nov 2026, 11:59 PM',
+        maxScore: '100.00',
+      },
+      instructions: {
+        intro: `Competition Structure of ${activeCat.name} (Age ${ageGroupClean || '17–19'})`,
+        description: 'Assesses leadership, ethical decision making, values, and emotional intelligence.',
+        categories: [
+          { emoji: '🌟', name: 'Leadership & Ethics', weightage: '33%' },
+          { emoji: '🤝', name: 'Integrity & Social Values', weightage: '33%' },
+          { emoji: '🧠', name: 'Character & Emotional Intelligence', weightage: '34%' },
+        ],
+        objective: 'Prepares young leaders with moral integrity, ethical reasoning, and social responsibility for life beyond school.',
+      },
+      activities: [
+        { emoji: '🌟', name: 'Leadership & Ethics', weightage: '33%', description: 'Ethical dilemma analysis, Leadership scenarios.' },
+        { emoji: '🤝', name: 'Integrity & Social Values', weightage: '33%', description: 'Community problem analysis, Social responsibility case studies.' },
+        { emoji: '🧠', name: 'Character & Emotional Intelligence', weightage: '34%', description: 'Emotional quotient tasks, Self-reflection, Situational judgement.' },
+      ],
+    };
+  };
+
+  const matchedContestObj = getMatchedContest(activeCategory, contests);
+  const fullDetails = getLeagueFullDetails(activeCategory, matchedContestObj);
 
   return (
     <div className="min-h-screen bg-[#090b15] text-white flex flex-col font-sans select-none overflow-x-hidden">
@@ -294,7 +461,7 @@ const ExcellenceLeague = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
 
-            {/* Left Content Area */}
+            {/* Left Content Area Header */}
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               {/* Badge */}
               <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-sm">
@@ -321,7 +488,7 @@ const ExcellenceLeague = () => {
 
                 <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-blue-500/20 text-blue-200 border border-blue-500/30 backdrop-blur-md">
                   <Users className="w-4 h-4 text-blue-300" />
-                  {activeCategory.ageGroup}
+                  {(activeCategory.ageGroup || '').replace(/\s*Years?/gi, '').trim()}
                 </span>
 
                 <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white/10 text-white border border-white/20 backdrop-blur-md">
@@ -357,7 +524,7 @@ const ExcellenceLeague = () => {
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
               <div className="w-full max-w-sm">
                 {(() => {
-                  const contest = getMatchedContest(activeCategory, contests);
+                  const contest = matchedContestObj;
                   const categoryName = contest.category?.name || contest.category || activeCategory.name;
                   const catTheme = getCategoryTheme(categoryName, contest.category);
                   const prize = contest.prizePool !== undefined ? parseFloat(contest.prizePool) : (contest.prize || 0);
@@ -392,6 +559,223 @@ const ExcellenceLeague = () => {
         </div>
 
       </div>
+
+      {/* ── 2. Detailed Left-Side Content Section (4 Sections in Exact Order) ── */}
+      <section className="py-12 sm:py-16 bg-[#090b15]">
+        <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
+
+            {/* Left Column (4 Sections) */}
+            <div className="lg:col-span-8 space-y-8">
+
+              {/* SECTION 1: League Overview */}
+              <div className="bg-[#0e1121] border border-gray-800/80 rounded-3xl p-6 sm:p-8 shadow-xl">
+                <div className="flex items-center gap-3.5 mb-4">
+                  <span className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                    <Info className="w-6 h-6" />
+                  </span>
+                  <div>
+                    <span className="text-blue-400 font-semibold text-xs tracking-wider uppercase block">About the Competition</span>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">League Overview</h2>
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-medium">
+                  {fullDetails.overview}
+                </p>
+              </div>
+
+              {/* SECTION 2: Schedule & Eligibility */}
+              <div className="bg-[#0e1121] border border-gray-800/80 rounded-3xl p-6 sm:p-8 shadow-xl">
+                <div className="flex items-center gap-3.5 mb-6">
+                  <span className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                    <Calendar className="w-6 h-6" />
+                  </span>
+                  <div>
+                    <span className="text-amber-400 font-semibold text-xs tracking-wider uppercase block">Important Information</span>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Schedule</h2>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-[#12162c] border border-gray-800/80 p-4 rounded-2xl flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0">
+                      <Users className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <small className="block text-gray-400 text-xs font-medium mb-0.5">Eligible Age Group</small>
+                      <strong className="text-white text-sm sm:text-base font-bold">{fullDetails.scheduleInfo.ageGroup}</strong>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#12162c] border border-gray-800/80 p-4 rounded-2xl flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                      <Coins className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <small className="block text-gray-400 text-xs font-medium mb-0.5">Participation Fee</small>
+                      <strong className="text-white text-sm sm:text-base font-bold">{fullDetails.scheduleInfo.entryFee}</strong>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#12162c] border border-gray-800/80 p-4 rounded-2xl flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                      <Calendar className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <small className="block text-gray-400 text-xs font-medium mb-0.5">Competition Date</small>
+                      <strong className="text-white text-sm sm:text-base font-bold">{fullDetails.scheduleInfo.date}</strong>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#12162c] border border-gray-800/80 p-4 rounded-2xl flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <small className="block text-gray-400 text-xs font-medium mb-0.5">Start Time</small>
+                      <strong className="text-white text-sm sm:text-base font-bold">{fullDetails.scheduleInfo.startTime}</strong>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#12162c] border border-gray-800/80 p-4 rounded-2xl flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                      <AlertCircle className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <small className="block text-gray-400 text-xs font-medium mb-0.5">Registration Closes</small>
+                      <strong className="text-white text-sm sm:text-base font-bold">{fullDetails.scheduleInfo.registrationClose}</strong>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#12162c] border border-gray-800/80 p-4 rounded-2xl flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+                      <Award className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <small className="block text-gray-400 text-xs font-medium mb-0.5">Maximum Score</small>
+                      <strong className="text-white text-sm sm:text-base font-bold">{fullDetails.scheduleInfo.maxScore}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 3: Instructions */}
+              <div className="bg-[#0e1121] border border-gray-800/80 rounded-3xl p-6 sm:p-8 shadow-xl">
+                <div className="flex items-center gap-3.5 mb-6">
+                  <span className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+                    <FileText className="w-6 h-6" />
+                  </span>
+                  <div>
+                    <span className="text-purple-400 font-semibold text-xs tracking-wider uppercase block">Participation Guidelines</span>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Instructions</h2>
+                  </div>
+                </div>
+
+                <div className="space-y-5">
+                  <h3 className="text-base sm:text-lg font-bold text-white leading-snug">
+                    {fullDetails.instructions.intro}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-300 font-medium">
+                    {fullDetails.instructions.description}
+                  </p>
+
+                  {/* Category Weightage Table */}
+                  <div className="bg-[#12162c] border border-gray-800/80 rounded-2xl overflow-hidden">
+                    <div className="grid grid-cols-12 bg-white/5 p-3.5 px-4 border-b border-gray-800 font-bold text-xs text-gray-400 uppercase tracking-wider">
+                      <div className="col-span-8">Category</div>
+                      <div className="col-span-4 text-right">Weightage</div>
+                    </div>
+                    {fullDetails.instructions.categories.map((cat, idx) => (
+                      <div key={idx} className="grid grid-cols-12 p-3.5 px-4 border-b border-gray-800/60 last:border-0 text-xs sm:text-sm font-semibold items-center text-white">
+                        <div className="col-span-8 flex items-center gap-2">
+                          <span className="text-base">{cat.emoji}</span>
+                          <span>{cat.name}</span>
+                        </div>
+                        <div className="col-span-4 text-right text-emerald-400 font-extrabold">{cat.weightage}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Objective Box */}
+                  <div className="bg-amber-500/10 border border-amber-500/20 p-4 sm:p-5 rounded-2xl text-xs sm:text-sm text-amber-200/90 leading-relaxed font-medium space-y-1">
+                    <strong className="block text-amber-400 font-bold text-sm">Objective :</strong>
+                    <p>{fullDetails.instructions.objective}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 4: Type of Activities */}
+              <div className="bg-[#0e1121] border border-gray-800/80 rounded-3xl p-6 sm:p-8 shadow-xl">
+                <div className="flex items-center gap-3.5 mb-6">
+                  <span className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-6 h-6" />
+                  </span>
+                  <div>
+                    <span className="text-emerald-400 font-semibold text-xs tracking-wider uppercase block">Assessed Skills & Tasks</span>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Type of Activities</h2>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {fullDetails.activities.map((act, idx) => (
+                    <div key={idx} className="bg-[#12162c] border border-gray-800/80 p-4 sm:p-5 rounded-2xl space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                          <span>{act.emoji}</span>
+                          <span>{act.name}</span>
+                        </h4>
+                        {act.weightage && (
+                          <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs font-bold shrink-0">
+                            {act.weightage} Weightage
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-medium">
+                        {act.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Right Column Sticky Callout Card */}
+            <div className="lg:col-span-4">
+              <div className="bg-[#0e1121] border border-gray-800/80 rounded-3xl p-6 sm:p-8 shadow-xl sticky top-28 space-y-6">
+                <div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold mb-3">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Ready to Shine?
+                  </span>
+                  <h2 className="text-xl font-bold text-white mb-2">Participate in this league</h2>
+                  <p className="text-xs text-gray-400 leading-relaxed font-medium">
+                    Registered schools can enroll eligible students. Students may also participate through their own account.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <Link
+                    to="/login"
+                    className="w-full py-3 px-4 bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold rounded-xl text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
+                  >
+                    Login to Participate
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsDownloadModalOpen(true)}
+                    className="w-full py-3 px-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs sm:text-sm border border-white/20 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    Register Student
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
 
       <Footer />
 

@@ -144,7 +144,7 @@ const EXCELLENCE_LEAGUES = [
     emoji: '🎨',
     icon: Palette,
     name: 'Creative League',
-    age: 'Age 3–5 Years',
+    age: 'Age 3–5',
     desc: 'Engaging, age-appropriate activities, craft & drawing to ignite early imagination and creative confidence.',
     accent: 'border-pink-500/30 hover:border-pink-500 text-pink-400 bg-pink-500/5',
     badgeBg: 'bg-pink-500/10 text-pink-400 border-pink-500/20'
@@ -154,7 +154,7 @@ const EXCELLENCE_LEAGUES = [
     emoji: '📚',
     icon: Book,
     name: 'Knowledge League',
-    age: 'Age 6–8 Years',
+    age: 'Age 6–8',
     desc: 'Interactive quizzes, curious exploration, and general awareness designed to build foundational understanding.',
     accent: 'border-blue-500/30 hover:border-blue-500 text-blue-400 bg-blue-500/5',
     badgeBg: 'bg-blue-500/10 text-blue-400 border-blue-500/20'
@@ -164,7 +164,7 @@ const EXCELLENCE_LEAGUES = [
     emoji: '🎤',
     icon: Mic,
     name: 'Communication League',
-    age: 'Age 9–12 Years',
+    age: 'Age 9–12',
     desc: 'Storytelling, public speaking, dynamic expression, and clear articulation to cultivate confident speakers.',
     accent: 'border-amber-500/30 hover:border-amber-500 text-amber-400 bg-amber-500/5',
     badgeBg: 'bg-amber-500/10 text-amber-400 border-amber-500/20'
@@ -174,7 +174,7 @@ const EXCELLENCE_LEAGUES = [
     emoji: '💡',
     icon: Lightbulb,
     name: 'Innovation League',
-    age: 'Age 13–16 Years',
+    age: 'Age 13–16',
     desc: 'Practical problem solving, innovation challenges, and creative thinking for future-ready problem solvers.',
     accent: 'border-emerald-500/30 hover:border-emerald-500 text-emerald-400 bg-emerald-500/5',
     badgeBg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
@@ -184,7 +184,7 @@ const EXCELLENCE_LEAGUES = [
     emoji: '🌟',
     icon: Star,
     name: 'Character League',
-    age: 'Age 17–19 Years',
+    age: 'Age 17–19',
     desc: 'Personality and character assessment, ethics, leadership, and emotional intelligence for young leaders.',
     accent: 'border-purple-500/30 hover:border-purple-500 text-purple-400 bg-purple-500/5',
     badgeBg: 'bg-purple-500/10 text-purple-400 border-purple-500/20'
