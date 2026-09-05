@@ -267,47 +267,47 @@ const ExcellenceLeague = () => {
               </div>
             </div>
 
-            {/* Right Information Card (Matching Reference Screenshot White Box) */}
+            {/* Right Information Card (Dark Website Theme Card) */}
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
-              <div className="bg-white text-gray-900 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-100 max-w-md w-full">
+              <div className="bg-[#0e1121] text-white rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-gray-800/80 max-w-md w-full">
 
                 {/* Trophy Icon */}
-                <div className="w-16 h-16 rounded-full bg-amber-100 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto mb-4 shadow-inner">
+                <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-4 shadow-inner">
                   <Trophy className="w-8 h-8 stroke-[2.5]" />
                 </div>
 
-                <h3 className="text-xl font-extrabold text-gray-900 text-center tracking-tight">
+                <h3 className="text-xl font-extrabold text-white text-center tracking-tight">
                   {activeLeague.name}
                 </h3>
-                <p className="text-xs text-gray-500 font-medium text-center mb-6">
+                <p className="text-xs text-gray-400 font-medium text-center mb-6">
                   Answer right. Shine bright.
                 </p>
 
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-gray-50 border border-gray-150 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-500 block">Age Group</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-gray-900 mt-0.5 block">{activeLeague.ageGroup}</span>
+                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
+                    <span className="text-[11px] font-semibold text-gray-400 block">Age Group</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block">{activeLeague.ageGroup}</span>
                   </div>
 
-                  <div className="bg-gray-50 border border-gray-150 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-500 block">Entry Fee</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-gray-900 mt-0.5 block">{activeLeague.entryFee}</span>
+                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
+                    <span className="text-[11px] font-semibold text-gray-400 block">Entry Fee</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-emerald-400 mt-0.5 block">{activeLeague.entryFee}</span>
                   </div>
 
-                  <div className="bg-gray-50 border border-gray-150 p-3.5 rounded-2xl col-span-2">
-                    <span className="text-[11px] font-semibold text-gray-500 block">Competition Schedule</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-gray-900 mt-0.5 block">{activeLeague.schedule}</span>
+                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl col-span-2">
+                    <span className="text-[11px] font-semibold text-gray-400 block">Competition Schedule</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block">{activeLeague.schedule}</span>
                   </div>
 
-                  <div className="bg-gray-50 border border-gray-150 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-500 block">Maximum Score</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-gray-900 mt-0.5 block">{activeLeague.maxScore}</span>
+                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
+                    <span className="text-[11px] font-semibold text-gray-400 block">Maximum Score</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block">{activeLeague.maxScore}</span>
                   </div>
 
-                  <div className="bg-gray-50 border border-gray-150 p-3.5 rounded-2xl">
-                    <span className="text-[11px] font-semibold text-gray-500 block">League Code</span>
-                    <span className="text-xs sm:text-sm font-extrabold text-gray-900 mt-0.5 block">{activeLeague.code}</span>
+                  <div className="bg-[#12162c] border border-gray-800/80 p-3.5 rounded-2xl">
+                    <span className="text-[11px] font-semibold text-gray-400 block">League Code</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-white mt-0.5 block">{activeLeague.code}</span>
                   </div>
                 </div>
 
