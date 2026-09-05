@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
 import {
   UserCheck, Sparkles, BookOpen, Building2, Trophy, MapPin, Landmark, Crown,
   Award, Medal, Palette, Book, Mic, Lightbulb, Star, ShieldCheck, CheckCircle2,
-  ArrowRight, ChevronRight, Zap, Target, Brain, HeartHandshake, Compass, Flame,
+  ArrowRight, ChevronLeft, ChevronRight, Zap, Target, Brain, HeartHandshake, Compass, Flame,
   Download, Wallet, PlayCircle, Lock, Headphones, Smartphone, BarChart2, CreditCard, Users
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -236,6 +236,7 @@ const HowItWorks = () => {
   const [cmsData, setCmsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+  const stepsContainerRef = useRef(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -434,59 +435,94 @@ const HowItWorks = () => {
             </p>
           </div>
 
-          {/* Dynamic 8 Step Grid Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-            {displaySteps.map((item, idx) => {
-              const StepIcon = item.icon || UserCheck;
-              return (
-                <div
-                  key={idx}
-                  className="group relative bg-[#0e1121] border border-gray-800/80 hover:border-red-500/40 rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(239,68,68,0.1)] flex flex-col justify-between"
-                >
-                  {/* Step Badge */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className={`text-xs font-black px-3 py-1 rounded-full text-white bg-gradient-to-r ${item.color}`}>
-                      {item.badge}
-                    </span>
-                    <span className="text-3xl font-black text-gray-800 group-hover:text-gray-700 font-mono transition duration-300">
-                      {item.step}
-                    </span>
-                  </div>
+          {/* Single-Line Horizontal Scroller for Steps */}
+          <div className="relative group/scroller">
+            {/* Left Scroll Arrow */}
+            <button
+              type="button"
+              onClick={() => {
+                if (stepsContainerRef.current) {
+                  stepsContainerRef.current.scrollBy({ left: -320, behavior: 'smooth' });
+                }
+              }}
+              className="hidden sm:flex absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-red-600/90 text-white items-center justify-center shadow-xl border border-red-400/50 hover:scale-110 hover:bg-red-500 transition cursor-pointer"
+              title="Scroll Left"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
 
-                  {/* Icon */}
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} p-0.5 mb-5 shadow-md flex items-center justify-center`}>
-                    <div className="w-full h-full bg-[#0e1121] rounded-[14px] flex items-center justify-center group-hover:bg-transparent transition-all duration-300">
-                      <StepIcon className="w-7 h-7 text-white" />
-                    </div>
-                  </div>
+            {/* Right Scroll Arrow */}
+            <button
+              type="button"
+              onClick={() => {
+                if (stepsContainerRef.current) {
+                  stepsContainerRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+                }
+              }}
+              className="hidden sm:flex absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-red-600/90 text-white items-center justify-center shadow-xl border border-red-400/50 hover:scale-110 hover:bg-red-500 transition cursor-pointer"
+              title="Scroll Right"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
 
-                  {/* Body */}
-                  <div className="flex-1 space-y-2">
-                    <h3 className="text-lg font-bold text-white group-hover:text-red-400 transition duration-200">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs font-semibold text-amber-400/90">{item.shortDesc}</p>
-                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed pt-1">
-                      {item.desc}
-                    </p>
-                  </div>
+            <div
+              ref={stepsContainerRef}
+              className="flex flex-nowrap gap-6 overflow-x-auto pb-6 pt-2 scroll-smooth"
+              style={{
+                scrollbarWidth: 'auto',
+                scrollbarColor: '#ef4444 #111827',
+              }}
+            >
+              {displaySteps.map((item, idx) => {
+                const StepIcon = item.icon || UserCheck;
+                return (
+                  <div
+                    key={idx}
+                    className="group/card relative bg-[#0e1121] border border-gray-800/80 hover:border-red-500/40 rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(239,68,68,0.15)] flex flex-col justify-between w-[285px] sm:w-[320px] shrink-0"
+                  >
+                    {/* Step Badge */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className={`text-xs font-black px-3 py-1 rounded-full text-white bg-gradient-to-r ${item.color}`}>
+                        {item.badge}
+                      </span>
+                      <span className="text-3xl font-black text-gray-800 group-hover/card:text-gray-700 font-mono transition duration-300">
+                        {item.step}
+                      </span>
+                    </div>
 
-                  {/* Step Connector Indicator for Next Step */}
-                  {idx < displaySteps.length - 1 && (
-                    <div className="mt-4 pt-3 border-t border-gray-800/50 flex items-center text-[11px] font-semibold text-gray-500 group-hover:text-red-400 transition">
-                      <span>Next Stage</span>
-                      <ArrowRight className="w-3.5 h-3.5 ms-auto" />
+                    {/* Icon - Always RED outline & text */}
+                    <div className="w-14 h-14 rounded-2xl bg-red-500/10 border-2 border-red-500 text-red-500 mb-5 shadow-md shadow-red-500/10 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover/card:scale-105">
+                      <StepIcon className="w-7 h-7 text-red-500" />
                     </div>
-                  )}
-                  {idx === displaySteps.length - 1 && (
-                    <div className="mt-4 pt-3 border-t border-amber-500/20 flex items-center text-[11px] font-bold text-amber-400">
-                      <span>Crown Champion!</span>
-                      <Crown className="w-3.5 h-3.5 ms-auto" />
+
+                    {/* Body */}
+                    <div className="flex-1 space-y-2">
+                      <h3 className="text-lg font-bold text-white group-hover/card:text-red-400 transition duration-200">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs font-semibold text-amber-400/90">{item.shortDesc}</p>
+                      <p className="text-xs sm:text-sm text-gray-300 leading-relaxed pt-1">
+                        {item.desc}
+                      </p>
                     </div>
-                  )}
-                </div>
-              );
-            })}
+
+                    {/* Step Connector Indicator for Next Step */}
+                    {idx < displaySteps.length - 1 && (
+                      <div className="mt-4 pt-3 border-t border-gray-800/50 flex items-center text-[11px] font-semibold text-gray-500 group-hover/card:text-red-400 transition">
+                        <span>Next Stage</span>
+                        <ArrowRight className="w-3.5 h-3.5 ms-auto" />
+                      </div>
+                    )}
+                    {idx === displaySteps.length - 1 && (
+                      <div className="mt-4 pt-3 border-t border-amber-500/20 flex items-center text-[11px] font-bold text-amber-400">
+                        <span>Crown Champion!</span>
+                        <Crown className="w-3.5 h-3.5 ms-auto" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
 
