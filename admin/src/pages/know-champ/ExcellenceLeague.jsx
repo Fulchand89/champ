@@ -357,57 +357,97 @@ const ExcellenceLeague = () => {
             })}
           </div>
 
-          <div className="max-w-4xl space-y-6 text-center lg:text-left">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-sm">
-              <Trophy className="w-4 h-4 text-amber-400" />
-              <span>Excellence League</span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+
+            {/* Left Content Area Header */}
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/90 text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-sm">
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>Excellence League</span>
+              </div>
+
+              {/* Main Heading */}
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-tight font-['Montserrat']">
+                {activeCategory.name}
+              </h1>
+
+              {/* Subtitle Tagline */}
+              <p className="text-gray-200 text-sm sm:text-base lg:text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+                {activeCategory.description}
+              </p>
+
+              {/* Status Badges Row */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+                <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 backdrop-blur-md">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Registration Open
+                </span>
+
+                <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white/10 text-white border border-white/20 backdrop-blur-md">
+                  # {activeCategory.code}
+                </span>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsDownloadModalOpen(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%)',
+                    boxShadow: '0 4px 18px rgba(239, 68, 68, 0.4)',
+                  }}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-white font-bold rounded-xl text-sm sm:text-base tracking-wide transition-all duration-300 hover:opacity-95 hover:scale-[1.02] cursor-pointer"
+                >
+                  <span>Register Student</span>
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-sm sm:text-base border border-white/20 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                >
+                  Login to Participate
+                </Link>
+              </div>
             </div>
 
-            {/* Main Heading */}
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-tight font-['Montserrat']">
-              {activeCategory.name}
-            </h1>
+            {/* Right Side Contest Card (Same card component used on /contests) */}
+            <div className="lg:col-span-5 flex justify-center lg:justify-end">
+              <div className="w-full max-w-sm">
+                {(() => {
+                  const contest = matchedContestObj;
+                  const categoryName = contest.category?.name || contest.category || activeCategory.name;
+                  const catTheme = getCategoryTheme(categoryName, contest.category);
+                  const prize = contest.prizePool !== undefined ? parseFloat(contest.prizePool) : (contest.prize || 0);
+                  const entry = contest.entryFee !== undefined ? parseFloat(contest.entryFee) : (contest.entry || 0);
+                  const joined = contest.joined !== undefined ? contest.joined : 0;
+                  const image = getImageUrl(contest.image) || catTheme.image || catTheme.icon;
+                  const date = contest?.startTime
+                    ? new Date(contest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 Am'
+                    : (contest?.date || 'Aug 22, 2026, 10:00 Am');
 
-            {/* Subtitle Tagline */}
-            <p className="text-gray-200 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium">
-              {activeCategory.description}
-            </p>
-
-            {/* Status Badges Row */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
-              <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 backdrop-blur-md">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Registration Open
-              </span>
-
-              <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white/10 text-white border border-white/20 backdrop-blur-md">
-                # {activeCategory.code}
-              </span>
+                  return (
+                    <ContestCard
+                      id={contest.id}
+                      category={categoryName}
+                      title={contest.title}
+                      prize={prize}
+                      entry={entry}
+                      joined={joined}
+                      maxPlayers={contest.maxParticipants || contest.maxPlayers}
+                      icon={catTheme.icon}
+                      colorClass={catTheme.colorClass}
+                      image={image}
+                      date={date}
+                      contest={contest}
+                    />
+                  );
+                })()}
+              </div>
             </div>
 
-            {/* Buttons */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-4">
-              <button
-                type="button"
-                onClick={() => setIsDownloadModalOpen(true)}
-                style={{
-                  background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%)',
-                  boxShadow: '0 4px 18px rgba(239, 68, 68, 0.4)',
-                }}
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-white font-bold rounded-xl text-sm sm:text-base tracking-wide transition-all duration-300 hover:opacity-95 hover:scale-[1.02] cursor-pointer"
-              >
-                <span>Register Student</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-sm sm:text-base border border-white/20 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-              >
-                Login to Participate
-              </Link>
-            </div>
           </div>
         </div>
 
