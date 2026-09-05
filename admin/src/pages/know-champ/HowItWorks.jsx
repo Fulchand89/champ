@@ -351,26 +351,26 @@ const HowItWorks = () => {
 
   const displaySteps = rawCmsSteps.length > 0
     ? rawCmsSteps.map((s, idx) => {
-        const IconComponent = ICON_MAP[s.icon] || UserCheck;
-        const fallbackStep = JOURNEY_STEPS[idx] || {};
-        return {
-          step: s.stepNumber || String(idx + 1).padStart(2, '0'),
-          title: s.title,
-          shortDesc: s.shortDesc || fallbackStep.shortDesc || `Stage ${idx + 1}`,
-          desc: s.description,
-          icon: IconComponent,
-          color: s.color || fallbackStep.color || 'from-red-500 to-rose-600',
-          badge: s.badge || `Step ${idx + 1}`,
-        };
-      })
+      const IconComponent = ICON_MAP[s.icon] || UserCheck;
+      const fallbackStep = JOURNEY_STEPS[idx] || {};
+      return {
+        step: s.stepNumber || String(idx + 1).padStart(2, '0'),
+        title: s.title,
+        shortDesc: s.shortDesc || fallbackStep.shortDesc || `Stage ${idx + 1}`,
+        desc: s.description,
+        icon: IconComponent,
+        color: s.color || fallbackStep.color || 'from-red-500 to-rose-600',
+        badge: s.badge || `Step ${idx + 1}`,
+      };
+    })
     : JOURNEY_STEPS;
 
   const displayLeagues = Array.isArray(data.leagues) && data.leagues.length > 0
     ? data.leagues.map((lg, idx) => ({
-        ...EXCELLENCE_LEAGUES[idx],
-        ...lg,
-        icon: ICON_MAP[lg.icon] || EXCELLENCE_LEAGUES[idx]?.icon || Palette
-      }))
+      ...EXCELLENCE_LEAGUES[idx],
+      ...lg,
+      icon: ICON_MAP[lg.icon] || EXCELLENCE_LEAGUES[idx]?.icon || Palette
+    }))
     : EXCELLENCE_LEAGUES;
 
   const displayPrepItems = Array.isArray(preparation.items) && preparation.items.length > 0
@@ -383,18 +383,18 @@ const HowItWorks = () => {
 
   const displayRecognitionStages = Array.isArray(recognition.stages) && recognition.stages.length > 0
     ? recognition.stages.map((stg, idx) => ({
-        ...RECOGNITION_STAGES[idx],
-        ...stg,
-        icon: ICON_MAP[stg.icon] || RECOGNITION_STAGES[idx]?.icon || Medal
-      }))
+      ...RECOGNITION_STAGES[idx],
+      ...stg,
+      icon: ICON_MAP[stg.icon] || RECOGNITION_STAGES[idx]?.icon || Medal
+    }))
     : RECOGNITION_STAGES;
 
   const displaySkills = Array.isArray(skills.items) && skills.items.length > 0
     ? skills.items.map((sk, idx) => ({
-        ...SKILLS_DEVELOPED[idx],
-        ...sk,
-        icon: ICON_MAP[sk.icon] || SKILLS_DEVELOPED[idx]?.icon || Palette
-      }))
+      ...SKILLS_DEVELOPED[idx],
+      ...sk,
+      icon: ICON_MAP[sk.icon] || SKILLS_DEVELOPED[idx]?.icon || Palette
+    }))
     : SKILLS_DEVELOPED;
 
   return (
@@ -493,58 +493,67 @@ const HowItWorks = () => {
         {/* ── 3. Five Excellence Leagues Section ── */}
         <section className="space-y-10">
           <div className="text-center space-y-3">
-
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white">
-              Five Excellence Leagues
+              Popular Excellence Leagues
             </h2>
+
             <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
-              Our system automatically assigns participants to the appropriate league based on their age — no manual choice required!
+              Our system automatically assigns participants to the appropriate league
+              based on their age — no manual choice required!
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {displayLeagues.map((league, idx) => {
               const LeagueIcon = league.icon || Palette;
+
               return (
-                <div
+                <Link
                   key={idx}
-                  className={`rounded-3xl bg-[#0e1121] border p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 shadow-md ${league.accent || 'border-pink-500/30 text-pink-400 bg-pink-500/5'}`}
+                  to={
+                    league.slug
+                      ? `/excellence-league/${league.slug}`
+                      : "/excellence-league"
+                  }
+                  className={`w-full h-[280px] rounded-3xl bg-[#0e1121] border p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg cursor-pointer ${league.accent ||
+                    "border-pink-500/30 text-pink-400 bg-pink-500/5"
+                    }`}
                 >
                   <div className="space-y-4">
+                    {/* Emoji + Age */}
                     <div className="flex items-center justify-between">
-                      <span className="text-3xl">{league.emoji}</span>
-                      <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${league.badgeBg || 'bg-pink-500/10 text-pink-400 border-pink-500/20'}`}>
+                      <span className="text-3xl">
+                        {league.emoji}
+                      </span>
+
+                      <span
+                        className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${league.badgeBg ||
+                          "bg-pink-500/10 text-pink-400 border-pink-500/20"
+                          }`}
+                      >
                         {league.age}
                       </span>
                     </div>
 
+                    {/* League Name */}
                     <div className="flex items-center gap-2">
                       <LeagueIcon className="w-5 h-5" />
+
                       <h3 className="text-base font-bold text-white leading-tight">
                         {league.name}
                       </h3>
                     </div>
 
+                    {/* Description */}
                     <p className="text-xs text-gray-300 leading-relaxed">
                       {league.desc}
                     </p>
                   </div>
-
-                  <div className="mt-6 pt-3 border-t border-gray-800/60 text-[11px] text-gray-400 flex items-center justify-between">
-                    <span>Selection</span>
-                    <Link
-                      to={league.slug ? `/excellence-league/${league.slug}` : '/excellence-league'}
-                      className="font-semibold text-emerald-400 hover:underline cursor-pointer transition-colors"
-                    >
-                      Automatic
-                    </Link>
-                  </div>
-                </div>
+                </Link>
               );
             })}
           </div>
         </section>
-
         {/* ── 4. Preparation & Competition Details Section ── */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Contest Preparation Card */}
