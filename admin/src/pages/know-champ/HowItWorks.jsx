@@ -435,36 +435,8 @@ const HowItWorks = () => {
             </p>
           </div>
 
-          {/* Single-Line Horizontal Scroller for Steps */}
-          <div className="relative group/scroller">
-            {/* Left Scroll Arrow */}
-            <button
-              type="button"
-              onClick={() => {
-                if (stepsContainerRef.current) {
-                  stepsContainerRef.current.scrollBy({ left: -320, behavior: 'smooth' });
-                }
-              }}
-              className="hidden sm:flex absolute -left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-red-600/90 text-white items-center justify-center shadow-xl border border-red-400/50 hover:scale-110 hover:bg-red-500 transition cursor-pointer"
-              title="Scroll Left"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-
-            {/* Right Scroll Arrow */}
-            <button
-              type="button"
-              onClick={() => {
-                if (stepsContainerRef.current) {
-                  stepsContainerRef.current.scrollBy({ left: 320, behavior: 'smooth' });
-                }
-              }}
-              className="hidden sm:flex absolute -right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-red-600/90 text-white items-center justify-center shadow-xl border border-red-400/50 hover:scale-110 hover:bg-red-500 transition cursor-pointer"
-              title="Scroll Right"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
+          {/* Single-Line Horizontal Scroller for Steps (3 cards per screen) */}
+          <div className="relative">
             <div
               ref={stepsContainerRef}
               className="flex flex-nowrap gap-6 overflow-x-auto pb-6 pt-2 scroll-smooth"
@@ -478,7 +450,7 @@ const HowItWorks = () => {
                 return (
                   <div
                     key={idx}
-                    className="group/card relative bg-[#0e1121] border border-gray-800/80 hover:border-red-500/40 rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(239,68,68,0.15)] flex flex-col justify-between w-[285px] sm:w-[320px] shrink-0"
+                    className="group/card relative bg-[#0e1121] border border-gray-800/80 hover:border-red-500/40 rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_10px_30px_rgba(239,68,68,0.15)] flex flex-col justify-between w-[85vw] sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)] shrink-0"
                   >
                     {/* Step Badge */}
                     <div className="flex items-center justify-between mb-4">
