@@ -139,6 +139,7 @@ const JOURNEY_STEPS = [
 // ── 5 Excellence Leagues ──
 const EXCELLENCE_LEAGUES = [
   {
+    slug: 'creative-league',
     emoji: '🎨',
     icon: Palette,
     name: 'Creative League',
@@ -148,6 +149,7 @@ const EXCELLENCE_LEAGUES = [
     badgeBg: 'bg-pink-500/10 text-pink-400 border-pink-500/20'
   },
   {
+    slug: 'knowledge-league',
     emoji: '📚',
     icon: Book,
     name: 'Knowledge League',
@@ -157,6 +159,7 @@ const EXCELLENCE_LEAGUES = [
     badgeBg: 'bg-blue-500/10 text-blue-400 border-blue-500/20'
   },
   {
+    slug: 'communication-league',
     emoji: '🎤',
     icon: Mic,
     name: 'Communication League',
@@ -166,6 +169,7 @@ const EXCELLENCE_LEAGUES = [
     badgeBg: 'bg-amber-500/10 text-amber-400 border-amber-500/20'
   },
   {
+    slug: 'innovation-league',
     emoji: '💡',
     icon: Lightbulb,
     name: 'Innovation League',
@@ -175,6 +179,7 @@ const EXCELLENCE_LEAGUES = [
     badgeBg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
   },
   {
+    slug: 'character-league',
     emoji: '🌟',
     icon: Star,
     name: 'Character League',
@@ -458,7 +463,12 @@ const HowItWorks = () => {
 
                   <div className="mt-6 pt-3 border-t border-gray-800/60 text-[11px] text-gray-400 flex items-center justify-between">
                     <span>Selection</span>
-                    <span className="font-semibold text-emerald-400">Automatic</span>
+                    <Link
+                      to={league.slug ? `/excellence-league/${league.slug}` : '/excellence-league'}
+                      className="font-semibold text-emerald-400 hover:underline cursor-pointer transition-colors"
+                    >
+                      Automatic
+                    </Link>
                   </div>
                 </div>
               );
