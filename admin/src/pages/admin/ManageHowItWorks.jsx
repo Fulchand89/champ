@@ -81,11 +81,11 @@ const DEFAULT_STEPS = [
 ];
 
 const DEFAULT_LEAGUES = [
-  { slug: 'creative-league', emoji: '🎨', icon: 'Palette', name: 'Creative League', age: 'Age 3–5 Years', desc: 'Engaging, age-appropriate activities, craft & drawing to ignite early imagination and creative confidence.' },
-  { slug: 'knowledge-league', emoji: '📚', icon: 'BookOpen', name: 'Knowledge League', age: 'Age 6–8 Years', desc: 'Interactive quizzes, curious exploration, and general awareness designed to build foundational understanding.' },
-  { slug: 'communication-league', emoji: '🎤', icon: 'Mic', name: 'Communication League', age: 'Age 9–12 Years', desc: 'Storytelling, public speaking, dynamic expression, and clear articulation to cultivate confident speakers.' },
-  { slug: 'innovation-league', emoji: '💡', icon: 'Lightbulb', name: 'Innovation League', age: 'Age 13–16 Years', desc: 'Practical problem solving, innovation challenges, and creative thinking for future-ready problem solvers.' },
-  { slug: 'character-league', emoji: '🌟', icon: 'Star', name: 'Character League', age: 'Age 17–19 Years', desc: 'Personality and character assessment, ethics, leadership, and emotional intelligence for young leaders.' },
+  { slug: 'creative-league', emoji: '🎨', icon: 'Palette', name: 'Creative League', age: 'Age 3–5', desc: 'Engaging, age-appropriate activities, craft & drawing to ignite early imagination and creative confidence.' },
+  { slug: 'knowledge-league', emoji: '📚', icon: 'BookOpen', name: 'Knowledge League', age: 'Age 6–8', desc: 'Interactive quizzes, curious exploration, and general awareness designed to build foundational understanding.' },
+  { slug: 'communication-league', emoji: '🎤', icon: 'Mic', name: 'Communication League', age: 'Age 9–12', desc: 'Storytelling, public speaking, dynamic expression, and clear articulation to cultivate confident speakers.' },
+  { slug: 'innovation-league', emoji: '💡', icon: 'Lightbulb', name: 'Innovation League', age: 'Age 13–16', desc: 'Practical problem solving, innovation challenges, and creative thinking for future-ready problem solvers.' },
+  { slug: 'character-league', emoji: '🌟', icon: 'Star', name: 'Character League', age: 'Age 17–19', desc: 'Personality and character assessment, ethics, leadership, and emotional intelligence for young leaders.' },
 ];
 
 const DEFAULT_PREP_ITEMS = [

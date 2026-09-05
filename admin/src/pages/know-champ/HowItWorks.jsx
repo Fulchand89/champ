@@ -531,7 +531,7 @@ const HowItWorks = () => {
                           "bg-pink-500/10 text-pink-400 border-pink-500/20"
                           }`}
                       >
-                        {league.age}
+                        {(league.age || '').replace(/\s*Years?/gi, '').trim()}
                       </span>
                     </div>
 
