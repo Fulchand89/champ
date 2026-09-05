@@ -176,7 +176,7 @@ const ExcellenceLeague = () => {
           if (!c) return false;
           const title = (c.title || '').toLowerCase();
           const catName = (c.category?.name || c.category || '').toLowerCase();
-          return catName.includes(nameLower) || title.includes(nameLower) || catName.includes(slugLower);
+          return (catName.includes(nameLower) || title.includes(nameLower) || catName.includes(slugLower)) && title.includes('league');
         })
       : null;
 
@@ -197,10 +197,12 @@ const ExcellenceLeague = () => {
   const matchedContestObj = getMatchedContest(activeLeague);
 
   const getLeagueFullDetails = (lg, matchedContest) => {
-    const contestTitle = matchedContest?.title || `${lg.name} Challenge`;
+    const contestTitle = `${lg.name} Challenge`;
     const contestDesc = matchedContest?.description || lg.description;
 
-    const entryFeeVal = matchedContest?.entryFee !== undefined ? parseFloat(matchedContest.entryFee) : (lg.entryFee || 100);
+    const entryFeeVal = matchedContest?.entryFee !== undefined && matchedContest.entryFee >= 50
+      ? parseFloat(matchedContest.entryFee) 
+      : (lg.entryFee || 100);
     const entryFeeFormatted = typeof entryFeeVal === 'number' && !isNaN(entryFeeVal) ? `₹${entryFeeVal.toFixed(2)}` : '₹100.00';
 
     const startTimeVal = matchedContest?.startTime ? new Date(matchedContest.startTime) : new Date('2026-11-14T10:00:00Z');
@@ -347,15 +349,19 @@ const ExcellenceLeague = () => {
               </div>
             </div>
 
-            {/* Right Side Contest Card */}
+            {/* Right Side Contest Card (Strictly Excellence League Card) */}
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
               <div className="w-full max-w-sm">
                 {(() => {
                   const contest = matchedContestObj;
                   const categoryName = activeLeague.name;
-                  const contestTitle = contest?.title || `${categoryName} Challenge`;
-                  const prize = contest?.prizePool !== undefined ? parseFloat(contest.prizePool) : (activeLeague.prizePool || 30000);
-                  const entry = contest?.entryFee !== undefined ? parseFloat(contest.entryFee) : (activeLeague.entryFee || 100);
+                  const contestTitle = `${categoryName} Challenge`;
+                  const prize = contest?.prizePool !== undefined && contest?.prizePool > 1000
+                    ? parseFloat(contest.prizePool)
+                    : (activeLeague.prizePool || 30000);
+                  const entry = contest?.entryFee !== undefined && contest?.entryFee >= 50
+                    ? parseFloat(contest.entryFee)
+                    : (activeLeague.entryFee || 100);
                   const joined = contest?.joined !== undefined ? contest.joined : 0;
                   const image = getImageUrl(contest?.image) || activeLeague.image || activeLeague.icon;
                   const date = contest?.startTime
