@@ -381,11 +381,6 @@ const ExcellenceLeague = () => {
                 Registration Open
               </span>
 
-              <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-blue-500/20 text-blue-200 border border-blue-500/30 backdrop-blur-md">
-                <Users className="w-4 h-4 text-blue-300" />
-                {(activeCategory.ageGroup || '').replace(/\s*Years?/gi, '').trim()}
-              </span>
-
               <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white/10 text-white border border-white/20 backdrop-blur-md">
                 # {activeCategory.code}
               </span>
@@ -455,16 +450,6 @@ const ExcellenceLeague = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="bg-[#12162c] border border-gray-800/80 p-4 rounded-2xl flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0">
-                      <Users className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <small className="block text-gray-400 text-xs font-medium mb-0.5">Eligible Age Group</small>
-                      <strong className="text-white text-sm sm:text-base font-bold">{fullDetails.scheduleInfo.ageGroup}</strong>
-                    </div>
-                  </div>
-
                   <div className="bg-[#12162c] border border-gray-800/80 p-4 rounded-2xl flex items-center gap-3.5">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
                       <Coins className="w-5 h-5" />
