@@ -11,8 +11,11 @@ import {
 import { Link } from 'react-router-dom';
 import { cmsService } from '../../api/services/cmsService';
 import { categoryService } from '../../api/services/categoryService';
+import contestService from '../../api/services/contestService';
 import { initAdminSocket } from '../../api/services/adminSocketService';
 import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
+import ContestCard from '../../components/know-champ/ContestCard';
+import { getImageUrl } from '../../api/services/api';
 
 // ── Map icon name strings (stored in DB) to Lucide components ──
 const ICON_MAP = {
@@ -233,26 +236,79 @@ const SKILLS_DEVELOPED = [
   { name: 'Competitive Spirit', icon: Trophy },
 ];
 
+const getCategoryTheme = (catName = '', catData = {}) => {
+  const nameLower = (catName || '').toLowerCase();
+  const iconVal = catData?.icon || '';
+  const imgVal = catData?.image ? getImageUrl(catData.image) : '';
+
+  let img = null;
+  let icon = iconVal || '📚';
+
+  if (imgVal && typeof imgVal === 'string' && imgVal.trim() !== '') {
+    img = imgVal;
+  } else if (iconVal && typeof iconVal === 'string' && (iconVal.startsWith('data:') || iconVal.startsWith('/') || iconVal.startsWith('http') || iconVal.startsWith('uploads/'))) {
+    img = iconVal;
+  } else if (iconVal === '🎨' || nameLower.includes('creative') || nameLower.includes('art')) {
+    img = '/cat-science.png';
+    icon = '🎨';
+  } else if (iconVal === '🔬' || nameLower.includes('science')) {
+    img = '/cat-science.png';
+    icon = '🔬';
+  } else if (iconVal === '💻' || iconVal === '🤖' || nameLower.includes('tech') || nameLower.includes('robot') || nameLower.includes('code') || nameLower.includes('computer')) {
+    img = '/cat-technology.png';
+    icon = iconVal || '💻';
+  } else if (iconVal === '⚽' || nameLower.includes('sport') || nameLower.includes('cricket') || nameLower.includes('football') || nameLower.includes('game')) {
+    img = '/cat-sports.png';
+    icon = '⚽';
+  } else if (iconVal === '🎬' || nameLower.includes('entertain') || nameLower.includes('movie') || nameLower.includes('music') || nameLower.includes('cinema') || nameLower.includes('song')) {
+    img = '/cat-entertainment.png';
+    icon = '🎬';
+  } else if (iconVal === '📜' || nameLower.includes('history') || nameLower.includes('culture') || nameLower.includes('geo') || nameLower.includes('earth')) {
+    img = '/cat-history.png';
+    icon = '📜';
+  } else if (iconVal === '🎤' || nameLower.includes('speak') || nameLower.includes('communication')) {
+    img = '/Knowledge.png';
+    icon = '🎤';
+  } else {
+    const presets = ['/cat-science.png', '/cat-technology.png', '/cat-sports.png', '/cat-entertainment.png', '/cat-history.png', '/cat-current.png', '/Knowledge.png'];
+    const charSum = nameLower.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+    img = presets[charSum % presets.length];
+    icon = iconVal || '📚';
+  }
+
+  return {
+    icon: icon,
+    image: img,
+    colorClass: 'text-red-500 bg-red-500/10 border-red-500/20',
+  };
+};
+
 const HowItWorks = () => {
   const [cmsData, setCmsData] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const stepsContainerRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
-    const fetchCategories = async () => {
+    const fetchCategoriesAndContests = async () => {
       try {
-        const res = await categoryService.getPublicCategories();
-        if (isMounted && res?.success && Array.isArray(res.data) && res.data.length > 0) {
-          setCategories(res.data.slice(0, 5));
+        const catRes = await categoryService.getPublicCategories();
+        if (isMounted && catRes?.success && Array.isArray(catRes.data) && catRes.data.length > 0) {
+          setCategories(catRes.data.slice(0, 5));
+        }
+
+        const cntRes = await contestService.getPublicContests();
+        if (isMounted && cntRes?.success && Array.isArray(cntRes.data)) {
+          setContests(cntRes.data);
         }
       } catch (err) {
-        console.error('Error fetching categories in HowItWorks:', err);
+        console.error('Error fetching categories or contests in HowItWorks:', err);
       }
     };
-    fetchCategories();
+    fetchCategoriesAndContests();
     return () => {
       isMounted = false;
     };
@@ -548,59 +604,76 @@ const HowItWorks = () => {
             </p>
           </div>
 
-          {/* Single-Line 4-Card Horizontal Scroller (Excellence League Card Style, No Buttons) */}
+          {/* Single-Line 4-Card Horizontal Scroller (Exact ContestCard Component, No Buttons) */}
           <div className="relative">
             <div
-              className="flex flex-nowrap gap-6 overflow-x-auto pb-6 pt-2 scroll-smooth"
+              className="flex flex-nowrap gap-4 sm:gap-6 overflow-x-auto pb-6 pt-2 scroll-smooth"
               style={{
                 scrollbarWidth: 'auto',
                 scrollbarColor: '#ef4444 #111827',
               }}
             >
               {displayLeagues.map((league, idx) => {
-                const LeagueIcon = league.icon || Palette;
+                const catTheme = getCategoryTheme(league.name, league);
+
+                const matchedCnt = Array.isArray(contests)
+                  ? contests.find(c => c && (
+                      (c.category?.name || c.category || '').toLowerCase().includes(league.name.toLowerCase()) ||
+                      (c.title || '').toLowerCase().includes(league.name.toLowerCase()) ||
+                      (league.slug && (c.category?.name || c.category || '').toLowerCase().includes(league.slug.replace(/-/g, ' ')))
+                    ))
+                  : null;
+
+                const contestObj = matchedCnt || {
+                  id: league.slug,
+                  title: `${league.name} Challenge`,
+                  category: { name: league.name },
+                  prizePool: 30000,
+                  entryFee: 100,
+                  joined: 0,
+                  startTime: new Date('2026-11-14T10:00:00Z'),
+                };
+
+                const categoryName = league.name;
+                const contestTitle = contestObj?.title && contestObj.title.toLowerCase().includes(categoryName.toLowerCase())
+                  ? contestObj.title
+                  : `${categoryName} Challenge`;
+                const prize = contestObj?.prizePool !== undefined ? parseFloat(contestObj.prizePool) : (contestObj?.prize || 30000);
+                const entry = contestObj?.entryFee !== undefined ? parseFloat(contestObj.entryFee) : (contestObj?.entry || 100);
+                const joined = contestObj?.joined !== undefined ? contestObj.joined : 0;
+                const image = catTheme.image || (contestObj?.image ? getImageUrl(contestObj.image) : '/cat-science.png');
+                const date = contestObj?.startTime
+                  ? new Date(contestObj.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 AM'
+                  : (contestObj?.date || 'Nov 14, 2026, 10:00 AM');
+
                 const redirectUrl = league.slug ? `/excellence-league/${league.slug}` : "/excellence-league";
 
                 return (
-                  <Link
+                  <div
                     key={league.id || idx}
-                    to={redirectUrl}
-                    className="group relative bg-[#0e1121] border border-gray-800/80 hover:border-red-500/50 rounded-3xl p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_12px_35px_rgba(239,68,68,0.18)] cursor-pointer w-[85vw] sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-3rem)/3)] lg:w-[calc((100%-4.5rem)/4)] shrink-0 h-[290px]"
+                    className="w-[85%] xs:w-[calc((100%-1rem)/2)] sm:w-[calc((100%-1.5rem)/2)] md:w-[calc((100%-2*1.5rem)/3)] lg:w-[calc((100%-3*1.5rem)/4)] shrink-0"
                   >
-                    <div className="space-y-4">
-                      {/* Emoji + Age Badge */}
-                      <div className="flex items-center justify-between">
-                        <span className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/30 text-2xl flex items-center justify-center shadow-md">
-                          {league.emoji || '🏆'}
-                        </span>
-
-                        {league.age && (
-                          <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            {(league.age || '').replace(/\s*Years?/gi, '').trim()}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* League Name */}
-                      <div className="flex items-center gap-2 pt-1">
-                        <LeagueIcon className="w-5 h-5 text-red-500 shrink-0" />
-                        <h3 className="text-lg font-bold text-white group-hover:text-red-400 transition-colors leading-tight font-['Montserrat']">
-                          {league.name}
-                        </h3>
-                      </div>
-
-                      {/* Description */}
-                      <p className="text-xs text-gray-300 leading-relaxed line-clamp-3 font-medium">
-                        {league.desc}
-                      </p>
-                    </div>
-
-                    {/* Bottom Link Action */}
-                    <div className="pt-3 border-t border-gray-800/60 flex items-center text-xs font-bold text-red-400 group-hover:text-red-300 transition-colors">
-                      <span>Explore League</span>
-                      <ArrowRight className="w-4 h-4 ms-auto group-hover:translate-x-1 transition-transform duration-200" />
-                    </div>
-                  </Link>
+                    <Link to={redirectUrl} className="block group">
+                      <ContestCard
+                        id={contestObj?.id || league.slug}
+                        category={categoryName}
+                        title={contestTitle}
+                        prize={prize}
+                        entry={entry}
+                        joined={joined}
+                        maxPlayers={contestObj?.maxParticipants || contestObj?.maxPlayers || 500}
+                        icon={catTheme.icon}
+                        colorClass={catTheme.colorClass}
+                        image={image}
+                        date={date}
+                        contest={{
+                          ...contestObj,
+                          category: categoryName,
+                          title: contestTitle,
+                        }}
+                      />
+                    </Link>
+                  </div>
                 );
               })}
             </div>
