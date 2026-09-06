@@ -16,11 +16,12 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import cmsService from '../../api/services/cmsService';
 import contestService from '../../api/services/contestService';
 import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
 
-// ── 5 Official KnowChamp Excellence Leagues (Uniform Design System) ──
-const EXCELLENCE_LEAGUES = [
+// ── 5 Official KnowChamp Excellence Leagues (Default Fallback Configuration) ──
+const EXCELLENCE_LEAGUES_DEFAULT = [
   {
     id: 1,
     name: 'Creative League',
@@ -229,13 +230,14 @@ const ExcellenceLeague = () => {
 
   const [selectedSlug, setSelectedSlug] = useState('creative-league');
   const [contests, setContests] = useState([]);
+  const [cmsData, setCmsData] = useState(null);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   // Sync route param slug to selected league
   useEffect(() => {
     if (leagueSlug) {
       const cleanSlug = leagueSlug.toLowerCase().trim();
-      const found = EXCELLENCE_LEAGUES.find(
+      const found = EXCELLENCE_LEAGUES_DEFAULT.find(
         (lg) =>
           lg.slug === cleanSlug ||
           lg.name.toLowerCase() === cleanSlug ||
@@ -248,6 +250,23 @@ const ExcellenceLeague = () => {
     }
     setSelectedSlug('creative-league');
   }, [leagueSlug]);
+
+  // Fetch CMS data dynamically controlled by Admin Panel
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCmsData = async () => {
+      try {
+        const res = await cmsService.getPublicExcellenceLeague();
+        if (isMounted && res?.success && res.data) {
+          setCmsData(res.data);
+        }
+      } catch (err) {
+        console.error('Error fetching Excellence League CMS:', err);
+      }
+    };
+
+    fetchCmsData();
+  }, []);
 
   // Fetch optional backend contests to enrich live contest cards
   useEffect(() => {
@@ -266,7 +285,25 @@ const ExcellenceLeague = () => {
     loadContests();
   }, []);
 
-  const activeLeague = EXCELLENCE_LEAGUES.find((lg) => lg.slug === selectedSlug) || EXCELLENCE_LEAGUES[0];
+  // Dynamically merge Admin CMS settings with default config
+  const excellenceLeaguesList = EXCELLENCE_LEAGUES_DEFAULT.map((lg) => {
+    const cmsLg = cmsData?.leagues?.[lg.slug] || {};
+    return {
+      ...lg,
+      name: cmsLg.name || lg.name,
+      description: cmsLg.tagline || lg.description,
+      ageGroup: cmsLg.ageGroup 
+        ? (cmsLg.ageGroup.includes('Year') || cmsLg.ageGroup.includes('Years') ? cmsLg.ageGroup : `${cmsLg.ageGroup} Years`) 
+        : lg.ageGroup,
+      code: cmsLg.code || lg.code,
+      icon: cmsLg.emoji || lg.icon,
+      schedule: cmsLg.schedule || `${lg.scheduleDate}, ${lg.scheduleTime}`,
+      entryFeeText: cmsLg.entryFee || `₹${lg.entryFee}.00`,
+      maxScoreText: cmsLg.maxScore || '100.00',
+    };
+  });
+
+  const activeLeague = excellenceLeaguesList.find((lg) => lg.slug === selectedSlug) || excellenceLeaguesList[0];
 
   const handleSelectLeague = (lg) => {
     setSelectedSlug(lg.slug);
@@ -308,13 +345,13 @@ const ExcellenceLeague = () => {
     const contestTitle = `${lg.name} Challenge`;
     const contestDesc = matchedContest?.description || lg.description;
 
-    const entryFeeVal = matchedContest?.entryFee !== undefined && matchedContest.entryFee >= 50
-      ? parseFloat(matchedContest.entryFee) 
-      : (lg.entryFee || 100);
-    const entryFeeFormatted = typeof entryFeeVal === 'number' && !isNaN(entryFeeVal) ? `₹${entryFeeVal.toFixed(2)}` : '₹100.00';
+    const entryFeeFormatted = lg.entryFeeText || (matchedContest?.entryFee !== undefined && matchedContest.entryFee >= 50
+      ? `₹${parseFloat(matchedContest.entryFee).toFixed(2)}`
+      : '₹100.00');
 
-    const dateFormatted = lg.scheduleDate || '14 Nov 2026';
-    const timeFormatted = lg.scheduleTime || '10:00 AM';
+    const scheduleParts = (lg.schedule || '14 Nov 2026, 10:00 AM').split(',');
+    const dateFormatted = scheduleParts[0]?.trim() || lg.scheduleDate || '14 Nov 2026';
+    const timeFormatted = scheduleParts[1]?.trim() || lg.scheduleTime || '10:00 AM';
 
     const regCloseFormatted = `${dateFormatted}, 11:59 PM`;
 
@@ -326,7 +363,7 @@ const ExcellenceLeague = () => {
         date: dateFormatted,
         startTime: timeFormatted,
         registrationClose: regCloseFormatted,
-        maxScore: '100.00',
+        maxScore: lg.maxScoreText || '100.00',
       },
       instructions: {
         intro: `Competition Structure of ${contestTitle} (${lg.name})`,
@@ -379,7 +416,7 @@ const ExcellenceLeague = () => {
 
           {/* 5 Official Excellence Leagues Tab Switcher Bar */}
           <div className="mb-8 flex flex-wrap items-center justify-center lg:justify-start gap-2 bg-black/40 p-2 rounded-2xl border border-white/10 backdrop-blur-md max-w-fit shadow-xl">
-            {EXCELLENCE_LEAGUES.map((lg) => {
+            {excellenceLeaguesList.map((lg) => {
               const isSelected = activeLeague.slug === lg.slug;
 
               return (
@@ -406,7 +443,7 @@ const ExcellenceLeague = () => {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-sm">
                 <Trophy className="w-4 h-4 text-amber-400" />
-                <span>Excellence League</span>
+                <span>{cmsData?.hero?.title || 'Excellence League'}</span>
               </div>
 
               {/* Main Heading */}
