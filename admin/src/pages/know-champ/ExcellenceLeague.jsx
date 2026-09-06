@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
-import ContestCard from '../../components/know-champ/ContestCard';
 import { 
   Trophy, 
   Users, 
@@ -24,7 +23,7 @@ import contestService from '../../api/services/contestService';
 import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
 import { getImageUrl } from '../../api/services/api';
 
-// ── 5 Official KnowChamp Excellence Leagues (Strictly Fixed) ──
+// ── 5 Official KnowChamp Excellence Leagues (Uniform Design System) ──
 const EXCELLENCE_LEAGUES = [
   {
     id: 1,
@@ -38,6 +37,33 @@ const EXCELLENCE_LEAGUES = [
     image: '/cat-science.png',
     prizePool: 30000,
     entryFee: 100,
+    scheduleDate: '14 Nov 2026',
+    scheduleTime: '10:00 AM',
+    activities: [
+      {
+        emoji: '🎨',
+        name: 'Drawing, Coloring & Visual Thinking',
+        weightage: '33%',
+        description: 'Simple pattern matching, shape identification, color recognition, and creative visual puzzles designed for toddlers.',
+      },
+      {
+        emoji: '🧩',
+        name: 'Imagination & Object Identification',
+        weightage: '33%',
+        description: 'Identifying everyday objects, animals, storytelling elements, and basic spatial orientation.',
+      },
+      {
+        emoji: '💡',
+        name: 'Basic Observation & Curiosity',
+        weightage: '34%',
+        description: 'Fun interactive observation tests, sound and picture matching, and simple logical sequence ordering.',
+      },
+    ],
+    categories: [
+      { emoji: '🎨', name: 'Visual Thinking & Coloring', weightage: '33%' },
+      { emoji: '🧩', name: 'Object & Animal Identification', weightage: '33%' },
+      { emoji: '💡', name: 'Observation & Pattern Puzzles', weightage: '34%' },
+    ],
   },
   {
     id: 2,
@@ -51,6 +77,33 @@ const EXCELLENCE_LEAGUES = [
     image: '/Knowledge.png',
     prizePool: 30000,
     entryFee: 100,
+    scheduleDate: '15 Nov 2026',
+    scheduleTime: '10:00 AM',
+    activities: [
+      {
+        emoji: '📚',
+        name: 'General Awareness & World Concepts',
+        weightage: '33%',
+        description: 'Fundamentals of science, nature, geography, and general knowledge tailored for early schoolers.',
+      },
+      {
+        emoji: '🧠',
+        name: 'Analytical & Practical Problem Solving',
+        weightage: '33%',
+        description: 'Word puzzles, mathematical logic, basic arithmetic reasoning, and real-life situational questions.',
+      },
+      {
+        emoji: '🔍',
+        name: 'Critical Thinking & Memory Recall',
+        weightage: '34%',
+        description: 'Reading comprehension, sequence puzzles, and quick memory recall challenges.',
+      },
+    ],
+    categories: [
+      { emoji: '📚', name: 'General Awareness & Science', weightage: '33%' },
+      { emoji: '🧠', name: 'Practical Problem Solving', weightage: '33%' },
+      { emoji: '🔍', name: 'Critical Thinking & Logic', weightage: '34%' },
+    ],
   },
   {
     id: 3,
@@ -64,6 +117,33 @@ const EXCELLENCE_LEAGUES = [
     image: '/cat-entertainment.png',
     prizePool: 30000,
     entryFee: 100,
+    scheduleDate: '16 Nov 2026',
+    scheduleTime: '10:00 AM',
+    activities: [
+      {
+        emoji: '🎤',
+        name: 'Storytelling & Dynamic Expression',
+        weightage: '33%',
+        description: 'Vocabulary building, sentence structuring, grammar precision, and creative narrative expression.',
+      },
+      {
+        emoji: '📢',
+        name: 'Public Speaking & Articulation Concepts',
+        weightage: '33%',
+        description: 'Effective communication techniques, active listening comprehension, and public speaking logic.',
+      },
+      {
+        emoji: '✍️',
+        name: 'Comprehension & Verbal Reasoning',
+        weightage: '34%',
+        description: 'Context analysis, passage interpretation, opinion articulation, and linguistic clarity.',
+      },
+    ],
+    categories: [
+      { emoji: '🎤', name: 'Storytelling & Vocabulary', weightage: '33%' },
+      { emoji: '📢', name: 'Public Speaking Concepts', weightage: '33%' },
+      { emoji: '✍️', name: 'Comprehension & Expression', weightage: '34%' },
+    ],
   },
   {
     id: 4,
@@ -77,6 +157,33 @@ const EXCELLENCE_LEAGUES = [
     image: '/cat-technology.png',
     prizePool: 30000,
     entryFee: 100,
+    scheduleDate: '17 Nov 2026',
+    scheduleTime: '10:00 AM',
+    activities: [
+      {
+        emoji: '💡',
+        name: 'STEM & Technology Concepts',
+        weightage: '33%',
+        description: 'Fundamentals of science, technology, coding logic, robotics, and modern digital awareness.',
+      },
+      {
+        emoji: '⚙️',
+        name: 'Practical Innovation & Design Thinking',
+        weightage: '33%',
+        description: 'Real-world case studies, engineering logic, design thinking, and innovative problem solving.',
+      },
+      {
+        emoji: '🔬',
+        name: 'Scientific Reasoning & Analytical Aptitude',
+        weightage: '34%',
+        description: 'Data interpretation, hypothesis testing, logic grids, and experimental observation scenarios.',
+      },
+    ],
+    categories: [
+      { emoji: '💡', name: 'STEM & Tech Fundamentals', weightage: '33%' },
+      { emoji: '⚙️', name: 'Innovation & Design Logic', weightage: '33%' },
+      { emoji: '🔬', name: 'Scientific & Data Aptitude', weightage: '34%' },
+    ],
   },
   {
     id: 5,
@@ -90,6 +197,33 @@ const EXCELLENCE_LEAGUES = [
     image: '/cat-history.png',
     prizePool: 30000,
     entryFee: 100,
+    scheduleDate: '18 Nov 2026',
+    scheduleTime: '10:00 AM',
+    activities: [
+      {
+        emoji: '🌟',
+        name: 'Leadership & Ethical Decision Making',
+        weightage: '33%',
+        description: 'Moral dilemma scenarios, leadership principles, integrity tests, and team management ethics.',
+      },
+      {
+        emoji: '👑',
+        name: 'Personality Assessment & EQ Skills',
+        weightage: '33%',
+        description: 'Emotional intelligence (EQ), interpersonal communication, self-reflection, and personal growth.',
+      },
+      {
+        emoji: '🏆',
+        name: 'Civic Responsibility & Social Impact',
+        weightage: '34%',
+        description: 'Environmental ethics, community leadership, civic awareness, and strategic societal problem solving.',
+      },
+    ],
+    categories: [
+      { emoji: '🌟', name: 'Leadership & Ethics', weightage: '33%' },
+      { emoji: '👑', name: 'Personality & EQ Assessment', weightage: '33%' },
+      { emoji: '🏆', name: 'Civic & Social Responsibility', weightage: '34%' },
+    ],
   },
 ];
 
@@ -188,7 +322,7 @@ const ExcellenceLeague = () => {
         prizePool: lg.prizePool || 30000,
         entryFee: lg.entryFee || 100,
         joined: 0,
-        startTime: new Date('2026-11-14T10:00:00Z'),
+        startTime: new Date(`${lg.scheduleDate || '14 Nov 2026'} 10:00 AM`),
       };
     }
     return matched;
@@ -205,34 +339,32 @@ const ExcellenceLeague = () => {
       : (lg.entryFee || 100);
     const entryFeeFormatted = typeof entryFeeVal === 'number' && !isNaN(entryFeeVal) ? `₹${entryFeeVal.toFixed(2)}` : '₹100.00';
 
-    const startTimeVal = matchedContest?.startTime ? new Date(matchedContest.startTime) : new Date('2026-11-14T10:00:00Z');
-    const compDateFormatted = startTimeVal.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    const compTimeFormatted = startTimeVal.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) || '10:00 AM';
+    const dateFormatted = lg.scheduleDate || '14 Nov 2026';
+    const timeFormatted = lg.scheduleTime || '10:00 AM';
 
-    const regCloseDate = new Date(startTimeVal.getTime() - 1 * 24 * 60 * 60 * 1000);
-    const regCloseFormatted = regCloseDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 11:59 PM';
+    const regCloseFormatted = `${dateFormatted}, 11:59 PM`;
 
     return {
       overview: contestDesc,
       scheduleInfo: {
         ageGroup: lg.ageGroup,
         entryFee: entryFeeFormatted,
-        date: compDateFormatted,
-        startTime: compTimeFormatted,
+        date: dateFormatted,
+        startTime: timeFormatted,
         registrationClose: regCloseFormatted,
         maxScore: '100.00',
       },
       instructions: {
         intro: `Competition Structure of ${contestTitle} (${lg.name})`,
-        description: `Each participant will solve 10 questions within the allocated duration of 30 minutes across 3 core evaluation rounds.`,
-        categories: [
+        description: `Each participant will solve 10 questions within the allocated duration of 30 minutes across 3 core evaluation rounds tailored for ${lg.name}.`,
+        categories: lg.categories || [
           { emoji: '⚡', name: 'Speed & Accuracy Round', weightage: '33%' },
           { emoji: '🧠', name: 'Core Knowledge & Concepts', weightage: '33%' },
           { emoji: '🔍', name: 'Logical Reasoning & Problem Solving', weightage: '34%' },
         ],
-        objective: `This competition evaluates speed, accuracy, and depth of understanding in ${lg.name}. Complete all questions within 30 minutes to achieve maximum score and rank on the global leaderboard.`,
+        objective: `This competition evaluates speed, accuracy, creative thinking, and depth of understanding in ${lg.name}. Complete all questions within 30 minutes to achieve maximum score and rank on the global leaderboard.`,
       },
-      activities: [
+      activities: lg.activities || [
         {
           emoji: '⚡',
           name: 'Speed & Accuracy Round',
@@ -262,7 +394,7 @@ const ExcellenceLeague = () => {
       <ScrollToTop />
       <Navbar />
 
-      {/* ── 1. Hero Section ── */}
+      {/* ── 1. Hero Section (Matching Exact Excellence League Layout) ── */}
       <div className="relative pt-32 pb-20 bg-[#010914] border-b border-gray-900 shadow-2xl overflow-hidden">
 
         {/* Ambient Background Glow Circles */}
@@ -280,9 +412,9 @@ const ExcellenceLeague = () => {
                 <button
                   key={lg.slug}
                   onClick={() => handleSelectLeague(lg)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
                     isSelected
-                      ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg scale-105 font-black border border-red-400/40'
+                      ? 'bg-white text-black font-extrabold shadow-lg scale-105'
                       : 'text-gray-300 hover:text-white hover:bg-white/10'
                   }`}
                 >
@@ -298,9 +430,9 @@ const ExcellenceLeague = () => {
             {/* Left Content Area Header */}
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               {/* Badge */}
-              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-xs sm:text-sm font-semibold tracking-wide backdrop-blur-sm">
                 <Trophy className="w-4 h-4 text-amber-400" />
-                <span>India's First Holistic Child Excellence League</span>
+                <span>Excellence League</span>
               </div>
 
               {/* Main Heading */}
@@ -320,8 +452,13 @@ const ExcellenceLeague = () => {
                   Registration Open
                 </span>
 
+                <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 backdrop-blur-md">
+                  <Users className="w-3.5 h-3.5" />
+                  {activeLeague.ageGroup}
+                </span>
+
                 <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white/10 text-white border border-white/20 backdrop-blur-md">
-                  Age: {activeLeague.ageGroup} (#{activeLeague.code})
+                  # {activeLeague.code}
                 </span>
               </div>
 
@@ -349,46 +486,51 @@ const ExcellenceLeague = () => {
               </div>
             </div>
 
-            {/* Right Side Contest Card (Strictly Excellence League Card) */}
+            {/* Right Side Excellence League Showcase Card (Custom Card Design) */}
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
-              <div className="w-full max-w-sm">
-                {(() => {
-                  const contest = matchedContestObj;
-                  const categoryName = activeLeague.name;
-                  const contestTitle = `${categoryName} Challenge`;
-                  const prize = contest?.prizePool !== undefined && contest?.prizePool > 1000
-                    ? parseFloat(contest.prizePool)
-                    : (activeLeague.prizePool || 30000);
-                  const entry = contest?.entryFee !== undefined && contest?.entryFee >= 50
-                    ? parseFloat(contest.entryFee)
-                    : (activeLeague.entryFee || 100);
-                  const joined = contest?.joined !== undefined ? contest.joined : 0;
-                  const image = getImageUrl(contest?.image) || activeLeague.image || activeLeague.icon;
-                  const date = contest?.startTime
-                    ? new Date(contest.startTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) + ', 10:00 AM'
-                    : 'Nov 14, 2026, 10:00 AM';
+              <div className="w-full max-w-sm bg-[#0b101f] border border-blue-900/40 rounded-3xl p-6 shadow-2xl space-y-5 relative overflow-hidden backdrop-blur-xl">
+                {/* Header Icon + Title */}
+                <div className="text-center space-y-2">
+                  <div className="w-14 h-14 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center justify-center mx-auto text-amber-400 shadow-inner">
+                    <Trophy className="w-7 h-7 text-amber-400" />
+                  </div>
+                  <h3 className="text-2xl font-black text-white tracking-tight">
+                    {activeLeague.name}
+                  </h3>
+                  <p className="text-xs text-gray-400 font-medium">
+                    Answer right. Shine bright.
+                  </p>
+                </div>
 
-                  return (
-                    <ContestCard
-                      id={contest?.id || activeLeague.slug}
-                      category={categoryName}
-                      title={contestTitle}
-                      prize={prize}
-                      entry={entry}
-                      joined={joined}
-                      maxPlayers={contest?.maxParticipants || 500}
-                      icon={activeLeague.icon}
-                      colorClass="text-red-500 bg-red-500/10 border-red-500/20"
-                      image={image}
-                      date={date}
-                      contest={{
-                        ...contest,
-                        category: categoryName,
-                        title: contestTitle,
-                      }}
-                    />
-                  );
-                })()}
+                {/* Info Box 1: Age Group & Entry Fee */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-[#10172a] border border-white/5 p-3.5 rounded-2xl">
+                    <span className="block text-[11px] text-gray-400 font-medium mb-1">Age Group</span>
+                    <strong className="text-sm font-extrabold text-white">{activeLeague.ageGroup}</strong>
+                  </div>
+                  <div className="bg-[#10172a] border border-white/5 p-3.5 rounded-2xl">
+                    <span className="block text-[11px] text-gray-400 font-medium mb-1">Entry Fee</span>
+                    <strong className="text-sm font-extrabold text-emerald-400">{fullDetails.scheduleInfo.entryFee}</strong>
+                  </div>
+                </div>
+
+                {/* Info Box 2: Competition Schedule */}
+                <div className="bg-[#10172a] border border-white/5 p-3.5 rounded-2xl">
+                  <span className="block text-[11px] text-gray-400 font-medium mb-1">Competition Schedule</span>
+                  <strong className="text-sm font-extrabold text-white">{fullDetails.scheduleInfo.date}, {fullDetails.scheduleInfo.startTime}</strong>
+                </div>
+
+                {/* Info Box 3: Maximum Score & League Code */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-[#10172a] border border-white/5 p-3.5 rounded-2xl">
+                    <span className="block text-[11px] text-gray-400 font-medium mb-1">Maximum Score</span>
+                    <strong className="text-sm font-extrabold text-white">{fullDetails.scheduleInfo.maxScore}</strong>
+                  </div>
+                  <div className="bg-[#10172a] border border-white/5 p-3.5 rounded-2xl">
+                    <span className="block text-[11px] text-gray-400 font-medium mb-1">League Code</span>
+                    <strong className="text-sm font-extrabold text-white">{activeLeague.code}</strong>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -464,19 +606,26 @@ const ExcellenceLeague = () => {
                 <div className="pt-2">
                   <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3">The available leagues are:</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {EXCELLENCE_LEAGUES.map((lg) => (
-                      <button 
-                        key={lg.slug} 
-                        onClick={() => handleSelectLeague(lg)}
-                        className={`bg-gradient-to-br ${lg.color} p-4 rounded-xl border flex items-center gap-3 transition-all hover:scale-[1.02] cursor-pointer text-left group`}
-                      >
-                        <span className="text-2xl group-hover:scale-110 transition-transform">{lg.icon}</span>
-                        <div>
-                          <strong className="block text-white text-sm font-bold">{lg.name}</strong>
-                          <span className="text-xs text-white/70">Age {lg.ageGroup} (#{lg.code})</span>
-                        </div>
-                      </button>
-                    ))}
+                    {EXCELLENCE_LEAGUES.map((lg) => {
+                      const isSel = activeLeague.slug === lg.slug;
+                      return (
+                        <button 
+                          key={lg.slug} 
+                          onClick={() => handleSelectLeague(lg)}
+                          className={`p-4 rounded-xl border flex items-center gap-3 transition-all cursor-pointer text-left group ${
+                            isSel 
+                              ? 'bg-gradient-to-r from-red-600/30 to-orange-600/20 border-red-500 text-white shadow-lg ring-1 ring-red-500/50' 
+                              : `bg-gradient-to-br ${lg.color} hover:scale-[1.02]`
+                          }`}
+                        >
+                          <span className="text-2xl group-hover:scale-110 transition-transform">{lg.icon}</span>
+                          <div>
+                            <strong className="block text-white text-sm font-bold">{lg.name}</strong>
+                            <span className="text-xs text-white/70">Age {lg.ageGroup} (#{lg.code})</span>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -731,7 +880,7 @@ const ExcellenceLeague = () => {
         </div>
       </section>
 
-      {/* ── 3. Selected League Deep-Dive Section ── */}
+      {/* ── 3. Selected League Deep-Dive Section (Uniform Design Across All 5 Leagues) ── */}
       <section className="py-12 sm:py-16 bg-[#010914]">
         <div className="w-[calc(100%-32px)] max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
@@ -823,7 +972,7 @@ const ExcellenceLeague = () => {
               </div>
             </div>
 
-            {/* SECTION 3: Instructions */}
+            {/* SECTION 3: Instructions & Pattern */}
             <div className="bg-[#0e1121] border border-gray-800/80 rounded-3xl p-6 sm:p-8 shadow-xl">
               <div className="flex items-center gap-3.5 mb-6">
                 <span className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
