@@ -3,40 +3,29 @@ import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
 import { 
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
   Download,
   UserCheck,
   Wallet,
   Play,
-  Trophy, 
-  Sparkles,
+  Trophy,
   BookOpen,
   Building2,
   Medal,
   MapPin,
   Landmark,
   Crown,
-  Award,
   Palette,
   Mic,
   Lightbulb,
-  Star,
-  Brain,
-  Flame,
-  Compass,
-  ShieldCheck,
-  ArrowRight,
-  CheckCircle2,
-  Zap,
-  Info,
-  Calendar,
-  Clock,
-  AlertCircle,
-  Coins
+  Star
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import cmsService from '../../api/services/cmsService';
 
-// Helper to render dynamic Lucide icons from string name
+// Lightweight Icon Resolver
 const renderDynamicIcon = (iconName, className = "w-6 h-6") => {
   const iconMap = {
     Download,
@@ -51,75 +40,60 @@ const renderDynamicIcon = (iconName, className = "w-6 h-6") => {
     MapPin,
     Landmark,
     Crown,
-    Award,
     Palette,
     Mic,
     Lightbulb,
     Star,
-    Brain,
-    Flame,
-    Compass,
-    ShieldCheck,
-    Zap,
   };
   const IconComponent = iconMap[iconName] || Sparkles;
   return <IconComponent className={className} />;
 };
 
-// Step Card Color Themes
+// Step Card Color Themes matching Screenshot 1
 const STEP_THEMES = [
   {
     pill: 'bg-red-600 text-white',
     iconBox: 'bg-red-500/10 border-red-500/40 text-red-500',
     border: 'border-red-500/20 hover:border-red-500/50',
-    number: 'text-gray-700/60',
   },
   {
     pill: 'bg-amber-600 text-white',
     iconBox: 'bg-amber-500/10 border-amber-500/40 text-amber-500',
-    border: 'border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.15)] ring-1 ring-amber-500/30', // Highlighted active card style matching Screenshot 1
-    number: 'text-gray-700/60',
-    active: true,
+    border: 'border-amber-500/50 ring-1 ring-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.15)]', // Highlighted Card 2 in Screenshot 1
   },
   {
     pill: 'bg-amber-500 text-black font-extrabold',
     iconBox: 'bg-amber-500/10 border-amber-500/40 text-amber-400',
     border: 'border-amber-500/20 hover:border-amber-500/50',
-    number: 'text-gray-700/60',
   },
   {
     pill: 'bg-emerald-500 text-black font-extrabold',
     iconBox: 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400',
     border: 'border-emerald-500/20 hover:border-emerald-500/50',
-    number: 'text-gray-700/60',
   },
   {
     pill: 'bg-blue-600 text-white',
     iconBox: 'bg-blue-500/10 border-blue-500/40 text-blue-400',
     border: 'border-blue-500/20 hover:border-blue-500/50',
-    number: 'text-gray-700/60',
   },
   {
     pill: 'bg-purple-600 text-white',
     iconBox: 'bg-purple-500/10 border-purple-500/40 text-purple-400',
     border: 'border-purple-500/20 hover:border-purple-500/50',
-    number: 'text-gray-700/60',
   },
   {
     pill: 'bg-indigo-600 text-white',
     iconBox: 'bg-indigo-500/10 border-indigo-500/40 text-indigo-400',
     border: 'border-indigo-500/20 hover:border-indigo-500/50',
-    number: 'text-gray-700/60',
   },
   {
     pill: 'bg-rose-600 text-white',
     iconBox: 'bg-rose-500/10 border-rose-500/40 text-rose-400',
     border: 'border-rose-500/20 hover:border-rose-500/50',
-    number: 'text-gray-700/60',
   },
 ];
 
-// Default 8-step roadmap configuration
+// Default 8-step roadmap configuration matching Screenshot 1
 const DEFAULT_STEPS = [
   {
     id: 1,
@@ -252,7 +226,6 @@ const DEFAULT_LEAGUES = [
 
 const HowItWorks = () => {
   const [cmsData, setCmsData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   // Fetch CMS data from Admin API
   useEffect(() => {
@@ -265,8 +238,6 @@ const HowItWorks = () => {
         }
       } catch (err) {
         console.error('Error loading HowItWorks CMS content:', err);
-      } finally {
-        if (isMounted) setLoading(false);
       }
     };
 
@@ -300,7 +271,6 @@ const HowItWorks = () => {
 
       {/* ── Page Hero Section ── */}
       <section className="relative pt-32 pb-16 bg-[#060913] border-b border-gray-900 flex flex-col items-center text-center px-4 overflow-hidden">
-        {/* Glow ambient background */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-red-500/10 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="relative z-10 space-y-4 max-w-4xl">
