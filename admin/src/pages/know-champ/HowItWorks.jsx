@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../../components/know-champ/Navbar';
 import Footer from '../../components/know-champ/Footer';
 import ScrollToTop from '../../components/common/ScrollToTop';
@@ -27,6 +27,7 @@ import {
   Compass,
   CheckCircle2,
   HelpCircle,
+  ChevronLeft,
   ChevronRight,
   Zap,
   Target,
@@ -289,6 +290,15 @@ const DEFAULT_SKILLS = [
 const HowItWorks = () => {
   const [cmsData, setCmsData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const stepsScrollRef = useRef(null);
+
+  const scrollSteps = (direction) => {
+    if (stepsScrollRef.current) {
+      const containerWidth = stepsScrollRef.current.clientWidth;
+      const scrollAmount = direction === 'left' ? -containerWidth * 0.75 : containerWidth * 0.75;
+      stepsScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   const fetchCmsData = async () => {
     try {
@@ -397,12 +407,6 @@ const HowItWorks = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-red-500/10 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="relative z-10 space-y-4 max-w-4xl mx-auto">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold uppercase tracking-wider mb-2">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Excellence League Roadmap</span>
-          </div>
-
           {/* Heading */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
             {heroTitle}{' '}
@@ -420,20 +424,46 @@ const HowItWorks = () => {
         </div>
       </section>
 
-      {/* ── 2. STEP-BY-STEP ROADMAP GRID ── */}
+      {/* ── 2. STEP-BY-STEP ROADMAP (SINGLE ROW HORIZONTAL SCROLLER) ── */}
       <section className="py-16 bg-[#090b15]">
-        <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           
-          <div className="text-center max-w-2xl mx-auto space-y-2 mb-10">
-            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-              The 8-Stage Championship Journey
-            </h2>
-            <p className="text-gray-400 text-xs sm:text-sm">
-              Simple, exciting, and fair progression from school level to the statewide grand finale.
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-gray-800/40">
+            <div className="space-y-1">
+              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+                The 8-Stage Championship Journey
+              </h2>
+              <p className="text-gray-400 text-xs sm:text-sm">
+                Simple, exciting, and fair progression from school level to the statewide grand finale.
+              </p>
+            </div>
+
+            {/* Scroll Navigation Buttons */}
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <button
+                type="button"
+                onClick={() => scrollSteps('left')}
+                className="w-9 h-9 rounded-xl bg-[#0e1121] border border-gray-800 hover:border-red-500/60 hover:bg-gray-800/80 text-gray-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 shadow-sm"
+                aria-label="Previous stages"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollSteps('right')}
+                className="w-9 h-9 rounded-xl bg-[#0e1121] border border-gray-800 hover:border-red-500/60 hover:bg-gray-800/80 text-gray-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 shadow-sm"
+                aria-label="Next stages"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Single Row Horizontal Scroll Container */}
+          <div
+            ref={stepsScrollRef}
+            className="flex items-stretch gap-5 overflow-x-auto no-scrollbar scroll-smooth py-3 px-1"
+          >
             {stepsList.map((step, idx) => {
               const theme = STEP_THEMES[idx % STEP_THEMES.length];
               const stepNo = step.stepNumber || String(idx + 1).padStart(2, '0');
@@ -441,7 +471,7 @@ const HowItWorks = () => {
               return (
                 <div
                   key={step.id || idx}
-                  className={`bg-[#0f111d] border rounded-3xl p-6 shadow-2xl flex flex-col justify-between transition-all duration-300 relative group overflow-hidden ${theme.border}`}
+                  className={`w-[290px] sm:w-[320px] lg:w-[340px] flex-shrink-0 bg-[#0f111d] border rounded-3xl p-6 shadow-2xl flex flex-col justify-between transition-all duration-300 relative group overflow-hidden ${theme.border}`}
                 >
                   <div className="space-y-4 relative z-10">
                     {/* Top Row: Step Badge & Step Number */}
@@ -494,10 +524,6 @@ const HowItWorks = () => {
         <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           
           <div className="text-center max-w-2xl mx-auto space-y-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wider">
-              <Award className="w-3.5 h-3.5" />
-              Automated Placement
-            </span>
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
               5 Age-Appropriate Excellence Leagues
             </h2>
