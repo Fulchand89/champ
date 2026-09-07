@@ -77,6 +77,10 @@ const PublicRoutes = [
     element: withSuspense(PublicSupportContact),
   },
   {
+    path: '/contact-us',
+    element: withSuspense(PublicSupportContact),
+  },
+  {
     path: '/support',
     element: withSuspense(PublicSupportContact),
   },
