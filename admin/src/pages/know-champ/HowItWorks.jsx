@@ -36,6 +36,7 @@ import {
 import { Link } from 'react-router-dom';
 import cmsService from '../../api/services/cmsService';
 import { initAdminSocket } from '../../api/services/adminSocketService';
+import AppDownloadModal from '../../components/know-champ/AppDownloadModal';
 
 // Dynamic Icon Resolver
 const renderDynamicIcon = (iconName, className = "w-6 h-6") => {
@@ -290,6 +291,7 @@ const DEFAULT_SKILLS = [
 const HowItWorks = () => {
   const [cmsData, setCmsData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
   const stepsScrollRef = useRef(null);
 
   const scrollSteps = (direction) => {
@@ -428,41 +430,20 @@ const HowItWorks = () => {
       <section className="py-16 bg-[#090b15]">
         <div className="w-[calc(100%-32px)] max-w-[1425px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-gray-800/40">
-            <div className="space-y-1">
-              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                The 8-Stage Championship Journey
-              </h2>
-              <p className="text-gray-400 text-xs sm:text-sm">
-                Simple, exciting, and fair progression from school level to the statewide grand finale.
-              </p>
-            </div>
-
-            {/* Scroll Navigation Buttons */}
-            <div className="flex items-center gap-2 self-end sm:self-auto">
-              <button
-                type="button"
-                onClick={() => scrollSteps('left')}
-                className="w-9 h-9 rounded-xl bg-[#0e1121] border border-gray-800 hover:border-red-500/60 hover:bg-gray-800/80 text-gray-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 shadow-sm"
-                aria-label="Previous stages"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollSteps('right')}
-                className="w-9 h-9 rounded-xl bg-[#0e1121] border border-gray-800 hover:border-red-500/60 hover:bg-gray-800/80 text-gray-300 hover:text-white flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 shadow-sm"
-                aria-label="Next stages"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
+          {/* Section Header: Centered without scroll buttons */}
+          <div className="text-center max-w-2xl mx-auto space-y-2 mb-8">
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+              The 8-Stage Championship Journey
+            </h2>
+            <p className="text-gray-400 text-xs sm:text-sm">
+              Simple, exciting, and fair progression from school level to the statewide grand finale.
+            </p>
           </div>
 
-          {/* Single Row Horizontal Scroll Container */}
+          {/* Single Row Horizontal Scroll Container - 3 cards visible per view on desktop */}
           <div
             ref={stepsScrollRef}
-            className="flex items-stretch gap-5 overflow-x-auto no-scrollbar scroll-smooth py-3 px-1"
+            className="flex items-stretch gap-5 overflow-x-auto no-scrollbar scroll-smooth py-3 px-1 snap-x snap-mandatory"
           >
             {stepsList.map((step, idx) => {
               const theme = STEP_THEMES[idx % STEP_THEMES.length];
@@ -471,7 +452,7 @@ const HowItWorks = () => {
               return (
                 <div
                   key={step.id || idx}
-                  className={`w-[290px] sm:w-[320px] lg:w-[340px] flex-shrink-0 bg-[#0f111d] border rounded-3xl p-6 shadow-2xl flex flex-col justify-between transition-all duration-300 relative group overflow-hidden ${theme.border}`}
+                  className={`w-[85%] sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)] flex-shrink-0 snap-start bg-[#0f111d] border rounded-3xl p-6 shadow-2xl flex flex-col justify-between transition-all duration-300 relative group overflow-hidden ${theme.border}`}
                 >
                   <div className="space-y-4 relative z-10">
                     {/* Top Row: Step Badge & Step Number */}
@@ -507,10 +488,26 @@ const HowItWorks = () => {
                     </p>
                   </div>
 
-                  {/* Card Bottom Link */}
-                  <div className="pt-5 mt-4 border-t border-white/5 flex items-center justify-between text-xs font-bold text-gray-400 group-hover:text-red-400 transition-colors">
-                    <span>Next Stage</span>
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  {/* Card Bottom Link / Action */}
+                  <div className="pt-5 mt-4 border-t border-white/5">
+                    {idx === 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => setIsDownloadModalOpen(true)}
+                        className="w-full flex items-center justify-between text-xs font-bold text-red-400 hover:text-red-300 transition-colors cursor-pointer"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <Download className="w-3.5 h-3.5" />
+                          Register Now
+                        </span>
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      </button>
+                    ) : (
+                      <div className="flex items-center justify-between text-xs font-bold text-gray-400 group-hover:text-red-400 transition-colors">
+                        <span>Next Stage</span>
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -692,17 +689,19 @@ const HowItWorks = () => {
               <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">{commDesc}</p>
             </div>
 
-            <Link
-              to="/register"
+            <button
+              type="button"
+              onClick={() => setIsDownloadModalOpen(true)}
               style={{
                 background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 50%, #991B1B 100%)',
                 boxShadow: '0 4px 18px rgba(239, 68, 68, 0.4)',
               }}
               className="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-white font-bold rounded-xl text-sm tracking-wide transition-all duration-300 hover:opacity-95 hover:scale-[1.02] cursor-pointer shrink-0"
             >
-              <span>Register Student</span>
+              <Download className="w-4 h-4" />
+              <span>Register Now</span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
 
         </div>
@@ -831,6 +830,12 @@ const HowItWorks = () => {
           </div>
         </div>
       </section>
+
+      {/* App Download Modal */}
+      <AppDownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+      />
 
       <Footer />
     </div>
