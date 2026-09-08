@@ -112,8 +112,7 @@ const ExcellenceLeague = () => {
                 </div>
                 <button
                   onClick={handleLinkClick}
-                  className="flex items-center gap-1 text-red-400 font-semibold hover:text-red-300 transition-colors cursor-pointer shrink-0"
-                >
+                  className="flex items-center gap-1 text-red-500 font-semibold hover:text-red-600 transition-colors cursor-pointer shrink-0"                >
                   <span>Open Link</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
