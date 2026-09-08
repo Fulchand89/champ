@@ -160,11 +160,9 @@ const updateLeaderboardCms = asyncHandler(async (req, res) => {
 
 const getExcellenceLeagueCms = asyncHandler(async (req, res) => {
   const excellenceData = (await getCmsSectionData('excellenceLeague')) || {
-    hero: { title: 'Excellence League', subtitle: 'Compete in live timed quiz battles, climb tier rankings, and win weekly championship rewards.' },
-    leagues: {},
-    tiers: [],
-    leaders: [],
-    rules: [],
+    hero: { title: 'Excellence League', subtitle: 'Access the official Excellence League platform.' },
+    linkUrl: 'https://knowchamp.com/excellence-league',
+    buttonText: 'Visit Excellence League',
   };
 
   res.status(200).json({
@@ -174,15 +172,16 @@ const getExcellenceLeagueCms = asyncHandler(async (req, res) => {
 });
 
 const updateExcellenceLeagueCms = asyncHandler(async (req, res) => {
-  const { hero, leagues, tiers, leaders, rules } = req.body || {};
+  const { hero, linkUrl, buttonText, title, subtitle } = req.body || {};
   const existing = (await getCmsSectionData('excellenceLeague')) || {};
 
   const excellenceData = {
-    hero: hero || existing.hero || { title: 'Excellence League', subtitle: '' },
-    leagues: leagues || existing.leagues || {},
-    tiers: Array.isArray(tiers) ? tiers : (existing.tiers || []),
-    leaders: Array.isArray(leaders) ? leaders : (existing.leaders || []),
-    rules: Array.isArray(rules) ? rules : (existing.rules || []),
+    hero: {
+      title: title || hero?.title || existing.hero?.title || 'Excellence League',
+      subtitle: subtitle || hero?.subtitle || existing.hero?.subtitle || 'Access the official Excellence League platform.',
+    },
+    linkUrl: linkUrl !== undefined ? linkUrl : (existing.linkUrl || 'https://knowchamp.com/excellence-league'),
+    buttonText: buttonText || existing.buttonText || 'Visit Excellence League',
   };
 
   await saveCmsSectionData('excellenceLeague', excellenceData);
@@ -197,7 +196,7 @@ const updateExcellenceLeagueCms = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: 'Excellence League content saved and updated successfully',
+    message: 'Excellence League link updated successfully',
     data: excellenceData,
   });
 });
