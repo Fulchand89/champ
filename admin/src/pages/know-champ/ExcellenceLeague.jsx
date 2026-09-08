@@ -57,16 +57,10 @@ const ExcellenceLeague = () => {
       {/* Main Content Area */}
       <main className="flex-1 flex items-center justify-center py-20 px-4 sm:px-6 relative overflow-hidden">
         {/* Background Decorative Glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-red-600/15 blur-[120px] rounded-full pointer-events-none"></div>
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
         <div className="absolute bottom-10 right-10 w-[300px] h-[300px] bg-amber-500/10 blur-[100px] rounded-full pointer-events-none"></div>
 
         <div className="max-w-3xl w-full mx-auto relative z-10 text-center space-y-8">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 text-red-400 text-xs font-bold tracking-wide uppercase shadow-lg shadow-red-500/10">
-            <Sparkles className="w-4 h-4 text-red-400 animate-pulse" />
-            <span>Excellence League Official Portal</span>
-          </div>
-
           {/* Heading & Subtitle */}
           <div className="space-y-4">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
