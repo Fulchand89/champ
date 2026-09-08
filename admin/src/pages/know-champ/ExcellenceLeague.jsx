@@ -50,12 +50,12 @@ const ExcellenceLeague = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-white flex flex-col justify-between selection:bg-red-500/30 selection:text-red-200">
+    <div className="min-h-screen bg-[#090b15] text-white flex flex-col justify-between selection:bg-red-500/30 selection:text-red-200">
       <ScrollToTop />
       <Navbar />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex items-center justify-center py-20 px-4 sm:px-6 relative overflow-hidden">
+      <main className="flex-1 flex flex-col items-center justify-center pt-32 sm:pt-36 pb-20 px-4 sm:px-6 relative overflow-hidden">
         {/* Background Decorative Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
         <div className="absolute bottom-10 right-10 w-[300px] h-[300px] bg-amber-500/10 blur-[100px] rounded-full pointer-events-none"></div>
@@ -63,10 +63,10 @@ const ExcellenceLeague = () => {
         <div className="max-w-3xl w-full mx-auto relative z-10 text-center space-y-8">
           {/* Heading & Subtitle */}
           <div className="space-y-4">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
               {title}
             </h1>
-            <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-300 max-w-xl mx-auto leading-relaxed">
               {subtitle}
             </p>
           </div>
@@ -87,7 +87,7 @@ const ExcellenceLeague = () => {
                 <h2 className="text-xl sm:text-2xl font-bold text-white">
                   Join the Excellence League
                 </h2>
-                <p className="text-xs sm:text-sm text-gray-400 max-w-md mx-auto">
+                <p className="text-xs sm:text-sm text-gray-300 max-w-md mx-auto">
                   Click below to access the official page and participate in the Excellence League.
                 </p>
               </div>
